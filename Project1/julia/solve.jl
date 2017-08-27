@@ -3,21 +3,30 @@ using PyPlot
 # Code for project1. Is as fast as C++ Armadillo, except when
 # garbage collection kicks in
 
-function solve(N::Array{Int64})
+function solveSpecial(N::Array{Int64})
     for n in N
-        h = 1/(n+1)
+        h = 1/(n-1)
+    end
+end
+
+function solveGeneral(N::Array{Int64})
+    for n in N
+        h = 1/(n-1)
         println("Solving $n×$n with stepsize $h")
         x::Array{Float64, 1} = collect(0:h:1)
         f = 100exp.(-10x) * h^2
-        println(x[1], x[end])
 
         a = fill(-1.0, n)
         b = fill(2.0, n)
         c = fill(-1.0, n)
 
-        @time solution = thomas(a, b, c, f)
-        plot(x[2:end-1], solution, label="n = $n")
+
+        @time solution = thomast(a, b, c, f)
+        plot(x, solution, label="n = $n")
     end
+    x = linspace(0,1,1000)
+    y = 1 - (1-exp(-10))x - exp.(-10x)
+    plot(x, y, label="analytic")
     legend()
     show()
 end
@@ -38,7 +47,7 @@ function thomas(a::Array{Float64, 1}, b::Array{Float64, 1},
     end
     # Backwards Sweep
     u[n] = d′[n]
-    for i in n-1:1
+    for i in n-1:-1:1
         u[i] = d′[i] - c′[i]*u[i+1]
     end
     return u
@@ -60,7 +69,8 @@ function thomast(a::Array{Float64, 1}, b::Array{Float64, 1},
     end
 
     # Backwards Sweep
-    for i in n-1:1
+    u[end] = 0
+    for i in n-1:-1:1
         u[i] -= tmp[i+1]*u[i+1]
     end
 
@@ -68,4 +78,4 @@ function thomast(a::Array{Float64, 1}, b::Array{Float64, 1},
 end
 
 
-solve([10^n for n in 1:6])
+solve([10^n for n in 1:5])

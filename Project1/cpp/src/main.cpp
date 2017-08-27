@@ -12,10 +12,10 @@ arma::vec thomas(const arma::vec& a, const arma::vec& b, const arma::vec& c, con
 int main(int argc, char *argv[])
 {
     for(unsigned int n = 10; n <= 1e6; n *= 10){
-        double h = 1/(static_cast<double>(n));
+        double h = 1/(static_cast<double>(n+1));
         std::cout << "Solving " << n << "×" << n << " with stepsize " << h <<  std::endl;
 
-        arma::vec btilde = h*arma::linspace(0, n, n); // Armadillo lacks arange :(
+        arma::vec btilde = h*arma::linspace(0, n+2, n+2); // Armadillo lacks arange :(
         // Using f(x) = 100exp(-10x)
         btilde.transform([](double x){return 100*exp(-10*x);});
 
