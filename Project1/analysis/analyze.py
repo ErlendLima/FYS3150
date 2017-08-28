@@ -33,7 +33,7 @@ class Analyzer:
     def plot(self):
         fig, ax = plt.subplots()
         for n, data in self.data.items():
-            x = np.linspace(0, 1, n)
+            x = np.linspace(0, 1, n+2)
             ax.plot(x, data, label='n = {}'.format(n))
         ax.plot(*self.analytic, label='analytic')
         ax.legend()
