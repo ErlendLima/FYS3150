@@ -1,6 +1,9 @@
 using PyPlot
 using Formatting
+using PyCall
 
+@pyimport seaborn as sns
+sns.set()
 # Code for project1. Is as fast as C++ Armadillo, except when
 # garbage collection kicks in
 # Loading Plot-package takes a long time since all dependencies

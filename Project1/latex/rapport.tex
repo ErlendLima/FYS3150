@@ -30,6 +30,7 @@
 \usepackage{subcaption}
 \usepackage{pdfpages}
 \usepackage{lipsum}
+\usepackage{pythontex}
 
 
 \newcommand{\mc}[2]{\multicolumn{#1}{c}{#2}}
@@ -70,6 +71,7 @@
 
 \begin{document}
 \maketitle
-\lipsum
-
+\begin{pycode}
+print(r'\emph{Hello}, world!')
+\end{pycode}
 \end{document}

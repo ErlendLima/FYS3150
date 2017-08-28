@@ -29,7 +29,7 @@ class Analyzer:
             self.data[int(n.group(1))] = np.loadtxt(match)
         self.data = sorted(self.data.items(), key=operator.itemgetter(0))
 
-    def compute_analytic_solution(self, n = 1000):
+    def compute_analytic_solution(self, n=1000):
         x = np.linspace(0, 1, n)
         y = 1 - (1-np.exp(-10))*x - np.exp(-10*x)
         return (x, y)
@@ -39,7 +39,7 @@ class Analyzer:
             if n == 10:
                 return '$n = 10$'
             else:
-                return '$n = 10^{%g}$'%(np.log10(n))
+                return '$n = 10^{%g}$' % (np.log10(n))
 
         fig, ax = plt.subplots()
         for n, data in self.data:
@@ -58,7 +58,7 @@ class Analyzer:
             maxerr = np.max(err)
             rows.append([n, maxerr])
 
-        print(tabulate(rows, headers=["n", "log error"], tablefmt = "latex"))
+        print(tabulate(rows, headers=["n", "log error"], tablefmt="latex"))
 
 
 if __name__ == '__main__':
