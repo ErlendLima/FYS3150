@@ -8,6 +8,8 @@ import argparse
 import os
 from glob import glob
 import re
+from tabulate import tabulate
+import operator
 
 sns.set()
 
@@ -15,7 +17,8 @@ sns.set()
 class Analyzer:
     def __init__(self, path):
         self.load(path)
-        self.compute_analytic_solution()
+        self.analytic = self.compute_analytic_solution()
+        self.compute_relative_error()
 
     def load(self, path):
         matches = glob(os.path.join(path, 'n*.txt'))
@@ -24,20 +27,38 @@ class Analyzer:
         for match in matches:
             n = re.search('n(\d+)\.txt', match)
             self.data[int(n.group(1))] = np.loadtxt(match)
+        self.data = sorted(self.data.items(), key=operator.itemgetter(0))
 
-    def compute_analytic_solution(self):
-        x = np.linspace(0, 1, 1000)
+    def compute_analytic_solution(self, n = 1000):
+        x = np.linspace(0, 1, n)
         y = 1 - (1-np.exp(-10))*x - np.exp(-10*x)
-        self.analytic = (x, y)
+        return (x, y)
 
     def plot(self):
+        def make_label(n):
+            if n == 10:
+                return '$n = 10$'
+            else:
+                return '$n = 10^{%g}$'%(np.log10(n))
+
         fig, ax = plt.subplots()
-        for n, data in self.data.items():
+        for n, data in self.data:
             x = np.linspace(0, 1, n+2)
-            ax.plot(x, data, label='n = {}'.format(n))
-        ax.plot(*self.analytic, label='analytic')
+            ax.plot(x, data, label=make_label(n))
+        ax.plot(*self.analytic, label=r'Analytic')
         ax.legend()
         plt.show()
+
+    def compute_relative_error(self):
+        rows = []
+        for n, data in self.data:
+            # Ignoring boundary terms since they are correct
+            analytic = self.compute_analytic_solution(n+2)[1][1:-1]
+            err = np.log10(np.abs((data[1:-1] - analytic)/analytic))
+            maxerr = np.max(err)
+            rows.append([n, maxerr])
+
+        print(tabulate(rows, headers=["n", "log error"], tablefmt = "latex"))
 
 
 if __name__ == '__main__':
