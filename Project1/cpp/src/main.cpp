@@ -40,6 +40,28 @@ int main(int argc, char *argv[])
         // arma::mat A = triangularMat(n, -1, 2, -1);
         // std::cout << arma::sum(A*solution - btilde) << std::endl;
     }
+
+    for (unsigned int n = 10; n <= 1e3; n *= 10) {
+        double h = 1/(static_cast<double>(n+1));
+        std::cout << "Solving " << n << "×" << n << " with stepsize " << h << " using LU decomposition" << std::endl;
+
+        arma::vec btilde = h*arma::linspace(0, n+2, n+2); // Armadillo lacks arange :(
+        // Using f(x) = 100exp(-10x)
+        btilde.transform([](double x){return 100*exp(-10*x);});
+        btilde *= h*h; // b~ = f(x)h^2
+
+        arma::mat A = triangularMat(n+2, -1, 2, -1);
+        arma::mat L, U;
+        arma::vec x, y;
+        // Ax = b -> LUx = b -> Ly = b -> Ux = y
+        arma::lu(L,U,A);
+        y = arma::solve(L, btilde);
+        x = arma::solve(U, y);
+
+        std::stringstream name;
+        name << "n" << n << "_LU.txt";
+        x.save(name.str(), arma::raw_ascii);
+    }
     return 0;
 }
 
