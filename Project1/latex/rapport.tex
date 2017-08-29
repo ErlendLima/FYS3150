@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt, norsk, twoside]{article}
+\documentclass[a4paper,11pt, norsk, twoside, twocolumn]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[norsk]{babel}
 \usepackage[T1]{fontenc}
@@ -31,6 +31,9 @@
 \usepackage{pdfpages}
 \usepackage{lipsum}
 \usepackage{pythontex}
+\usepackage{authblk}
+\floatstyle{plaintop}
+\restylefloat{table}
 
 
 \newcommand{\mc}[2]{\multicolumn{#1}{c}{#2}}
@@ -64,14 +67,20 @@
 \DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\textwidth}{#1#2#3}}}
 \captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white}
 
-\title{Project 1} \author{Erlend Lima\\ erlenlim}
+\title{Project 1}
 
 % Biber for references
 \addbibresource{references.bib}
 
 \begin{document}
+\author[1]{Erlend Lima}
+\author[2]{Frederik J. Mellbye}
+\author[3]{Aram Salihi}
+\affil[1,2,3]{Oslo University}
 \maketitle
+
 \begin{pycode}
 print(r'\emph{Hello}, world!')
 \end{pycode}
+
 \end{document}

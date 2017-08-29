@@ -10,8 +10,16 @@ from glob import glob
 import re
 from tabulate import tabulate
 import operator
+from latextools import plotable
 
 sns.set()
+SHOWPLOTS = False
+
+
+def plotwrap(*args, **kwargs):
+    """ Wrapper decorator currying the plotable decorator """
+    return plotable(*args, savepath='../latex/figures',
+                    show=SHOWPLOTS, **kwargs)
 
 
 class Analyzer:
@@ -34,6 +42,7 @@ class Analyzer:
         y = 1 - (1-np.exp(-10))*x - np.exp(-10*x)
         return (x, y)
 
+    @plotwrap(saveas='function.eps')
     def plot(self):
         def make_label(n):
             if n == 10:
@@ -47,7 +56,6 @@ class Analyzer:
             ax.plot(x, data, label=make_label(n))
         ax.plot(*self.analytic, label=r'Analytic')
         ax.legend()
-        plt.show()
 
     def compute_relative_error(self):
         rows = []
