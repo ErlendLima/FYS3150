@@ -34,7 +34,8 @@ class Analyzer:
         self.data = {}
         for match in matches:
             n = re.search('n(\d+)\.txt', match)
-            self.data[int(n.group(1))] = np.loadtxt(match)
+            if n is not None:
+                self.data[int(n.group(1))] = np.loadtxt(match)
         self.data = sorted(self.data.items(), key=operator.itemgetter(0))
 
     def compute_analytic_solution(self, n=1000):
@@ -77,4 +78,4 @@ if __name__ == '__main__':
                         help="Directory to search for input files")
     args = parser.parse_args()
     analyzer = Analyzer(args.search_path)
-    analyzer.plot()
+    analyzer.plot(show=True)
