@@ -49,6 +49,7 @@ class Analyzer:
                 return '$n = 10$'
             else:
                 return '$n = 10^{%g}$' % (np.log10(n))
+
         fig, ax = plt.subplots()
         for n, data in self.data:
             x = np.linspace(0, 1, n+2)
