@@ -10,7 +10,7 @@ from glob import glob
 import re
 from tabulate import tabulate
 import operator
-from latextools import plotable
+from latextools import plotable, tag, untag, untag_all
 
 sns.set()
 SHOWPLOTS = False
@@ -66,7 +66,9 @@ class Analyzer:
             maxerr = np.max(err)
             rows.append([n, maxerr])
 
-        print(tabulate(rows, headers=["n", "log error"], tablefmt="latex"))
+        table = tag('error_table', tabulate(rows, headers=["n", "log error"],
+                                            tablefmt="latex"))
+        print(table)
 
 
 if __name__ == '__main__':
