@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import matplotlib.pyplot as splot
 from os.path import join
+import re
 
 
 class plotable:
@@ -36,3 +37,21 @@ class plotable:
                 splot.savefig(join(self.savepath, path), dpi=1200)
             return res
         return decorator
+
+
+def tag(identifier, msg):
+    return "<{id}>{msg}</{id}>".format(id=identifier, msg=msg)
+
+
+def untag(tagged_msg):
+    match = re.search(r"<(.+?)>([\s\S]*?)</\1>", tagged_msg)
+    if match is None:
+        raise RuntimeError("Malformed tag message: {}".format(tagged_msg))
+    tag = match.group(1)
+    msg = match.group(2)
+    return tag, msg
+
+
+def untag_all(tagged_msg):
+    match = re.findall(r"<(.+?)>([\s\S]*?)</\1>", tagged_msg)
+    return {tag: msg for tag, msg in match}

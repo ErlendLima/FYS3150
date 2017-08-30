@@ -10,7 +10,7 @@ from glob import glob
 import re
 from tabulate import tabulate
 import operator
-from latextools import plotable
+from latextools import plotable, tag, untag, untag_all
 
 sns.set()
 SHOWPLOTS = False
@@ -33,8 +33,9 @@ class Analyzer:
         matches.sort()
         self.data = {}
         for match in matches:
-            n = re.search('n(\d+).*?\.txt', match)
-            self.data[int(n.group(1))] = np.loadtxt(match)
+            n = re.search('n(\d+)\.txt', match)
+            if n is not None:
+                self.data[int(n.group(1))] = np.loadtxt(match)
         self.data = sorted(self.data.items(), key=operator.itemgetter(0))
 
     def compute_analytic_solution(self, n=1000):
@@ -66,7 +67,9 @@ class Analyzer:
             maxerr = np.max(err)
             rows.append([n, maxerr])
 
-        print(tabulate(rows, headers=["n", "log error"], tablefmt="latex"))
+        table = tag('error_table', tabulate(rows, headers=["n", "log error"],
+                                            tablefmt="latex"))
+        print(table)
 
 
 if __name__ == '__main__':
@@ -75,4 +78,4 @@ if __name__ == '__main__':
                         help="Directory to search for input files")
     args = parser.parse_args()
     analyzer = Analyzer(args.search_path)
-    analyzer.plot()
+    analyzer.plot(show=True)

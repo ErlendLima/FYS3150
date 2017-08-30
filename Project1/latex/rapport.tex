@@ -1,7 +1,26 @@
-\documentclass[a4paper,11pt, norsk, twoside, twocolumn]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[norsk]{babel}
-\usepackage[T1]{fontenc}
+\documentclass[a4paper,11pt, english, twoside, twocolumn]{article}
+% Engine-specific settings
+% Detect pdftex/xetex/luatex, and load appropriate font packages.
+% This is inspired by the approach in the iftex package.
+% pdftex:
+\ifx\pdfmatch\undefined
+\else
+    \usepackage[T1]{fontenc}
+    \usepackage[utf8]{inputenc}
+\fi
+% xetex:
+\ifx\XeTeXinterchartoks\undefined
+\else
+    \usepackage{fontspec}
+    \defaultfontfeatures{Ligatures=TeX}
+\fi
+% luatex:
+\ifx\directlua\undefined
+\else
+    \usepackage{fontspec}
+\fi
+% End engine-specific settings
+\usepackage[english]{babel}
 \usepackage{csquotes}
 \usepackage[backend=biber, sortcites]{biblatex}
 \usepackage{url}
@@ -79,8 +98,32 @@
 \affil[1,2,3]{Oslo University}
 \maketitle
 
+\begin{abstract}
+
+\end{abstract}
+
+% Get all of the data from the script into a dictionary
 \begin{pycode}
-print(r'\emph{Hello}, world!')
+from subprocess import Popen, PIPE
+from latextools import untag_all
+p = Popen(['python', '../analysis/analyze.py', '../cpp'],
+stdout=PIPE, stderr=PIPE)
+output, err = p.communicate()
+data = output.decode('utf8')
+latex_data = untag_all(data)
 \end{pycode}
+
+\begin{table}[ht]
+  \centering
+  \pyc{print(latex_data['error_table'])}
+  \caption{Summary of the errors}
+  \label{tab:error}
+\end{table}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[scale=0.5]{figures/function.eps}
+  \caption{\label{fig:general} Caption}
+\end{figure}
 
 \end{document}

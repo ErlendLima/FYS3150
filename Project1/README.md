@@ -31,8 +31,24 @@ compiled program, type `./solve`. The resulting data can then be analyzed
 by the python script in the analysis directory using `python analyze.py ../cpp`.
 
 For running the Julia script, type 
+
 ```console
 julia solve.jl
+```
+
+The rapport and all supporting material is located in the `latex` directory. As 
+science is based on reproducibility, the latex document is written in PythonTeX, 
+allowing arbitrary Python code to be run from the same document. This allows
+all of the simulation data, tables, figures, etc to be re-generated on the fly. One
+downside of this is that it makes compilation of the latex file more involved. 
+
+The document is compatible with pdflatex, luatex and xelatex. Pdflatex is used for demonstration
+purposes:
+
+```console
+pdflatex rapport.tex
+pythontex rapport.tex
+pdflatex rapport.tex
 ```
 ## Credits
 The contributors of this project are Erlend Lima, Frederik Johan Mellbye and Aram Salihi.
