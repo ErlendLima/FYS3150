@@ -3,6 +3,8 @@
 <p align="center">
 <b><a href="#usage">Usage</a></b>
 |
+<b><a href="#testing">Testing</a></b>
+|
 <b><a href="#credits">Credits</a></b>
 |
 <b><a href="#license">License</a></b>
@@ -50,9 +52,16 @@ pdflatex rapport.tex
 pythontex rapport.tex
 pdflatex rapport.tex
 ```
+
+## Testing
+The framework [Google Test](https://github.com/google/googletest) is used to write unit tests.
+This is fully integrated into CMake, making it easy to both add and run the tests. In order
+to compile the tests, type `cmake -Dtest=ON`. For actually running the tests, run `./runUnitTests` or
+`make tests`.
+
 ## Credits
 The contributors of this project are Erlend Lima, Frederik Johan Mellbye and Aram Salihi.
 
 ## License
 This project is licensed under the terms of the **MIT** license.
-You can check out the full license [here][license]
+You can check out the full license [here](../LICENSE)

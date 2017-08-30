@@ -6,8 +6,6 @@
 #include "solver.h"
 #include "solve.h"
 
-using pvec = std::unique_ptr<arma::vec>;
-
 Solver::Solver(double (*function)(double)){
     fn = function;
 }
@@ -15,9 +13,10 @@ Solver::Solver(double (*function)(double)){
 Solver::~Solver(){};
 
 void Solver::setup(unsigned int n){
-    double h = 1/(static_cast<double>(n+1));
+    double h = 1/(static_cast<double>(n+2));
+    domain = h*arma::linspace(0, n+2, n+2); // Armadillo lacks arange :(
 
-    btilde = h*arma::linspace(0, n+2, n+2); // Armadillo lacks arange :(
+    btilde = domain;
     btilde.transform(fn);
     btilde *= h*h; // b~ = f(x)h^2
 
@@ -27,24 +26,28 @@ void Solver::setup(unsigned int n){
 
 void Solver::solve(Method method, unsigned int low, unsigned int high, unsigned int step) {
     char identifier;
+    void (Solver::*targetSolver)(unsigned int);
+    switch (method) {
+    case Method::GENERAL:
+        std::cout << "=== Using the general method ===" << std::endl;
+        targetSolver = &Solver::solveGeneral;
+        identifier = 'G';
+        break;
+    case Method::SPECIAL:
+        std::cout << "=== Using the specialized method ===" << std::endl;
+        identifier = 'S';
+        break;
+    case Method::LU:
+        std::cout << "=== Using LU decomposition === " << std::endl;
+        targetSolver = &Solver::solveLU;
+        identifier = 'L';
+        break;
+    }
+
     for(unsigned int n = low; n <= high; n *= step){
-        std::cout << "Solving for " << n << "×" << n << " ";
-        switch (method) {
-        case Method::GENERAL:
-            std::cout << "using the general method\n";
-            solveGeneral(n);
-            identifier = 'G';
-            break;
-        case Method::SPECIAL:
-            std::cout << "using the specialized method\n";
-            identifier = 'S';
-            break;
-        case Method::LU:
-            std::cout << "using LU decomposition\n";
-            solveLU(n);
-            identifier = 'L';
-            break;
-        }
+        std::cout << "Solving for " << n << "×" << n << " matrix using "
+                  << repetitions << " repetitions\n";
+        (this->*targetSolver)(n);
         if(saveFlag){
             std::stringstream name;
             name << identifier << n << ".txt";
@@ -60,13 +63,10 @@ void Solver::solveGeneral(unsigned int n) {
     arma::vec c = arma::vec(n+2); c.fill(-1);
     b[0] = 1; c[0] = 0; b[n+1] = 1; a[n+1] = 0;
 
-    auto startWallTime = std::chrono::high_resolution_clock::now();
-    auto startCPUTime  = std::clock();
-    solution = thomas(a, b, c, btilde);
-    auto CPUTime = (std::clock() - startCPUTime)/static_cast<double>(CLOCKS_PER_SEC);
-    std::chrono::duration<double> wallTime = (std::chrono::high_resolution_clock::now() - startWallTime);
-    std::cout << "Wall time: " << wallTime.count() << "s\n"
-              << "CPU time:  " << CPUTime << "s" << std::endl;
+    startTiming();
+    for(unsigned int r = 0; r < repetitions; r++)
+        solution = thomas(a, b, c, btilde);
+    endTiming();
 }
 
 void Solver::solveLU(unsigned int n) {
@@ -74,12 +74,29 @@ void Solver::solveLU(unsigned int n) {
     arma::mat A = tridiagonalMat(n+2, -1, 2, -1);
     arma::mat L, U;
     arma::vec y;
+
     // Ax = b -> LUx = b -> Ly = b -> Ux = y
-    arma::lu(L,U,A);
-    y = arma::solve(L, btilde);
-    solution = arma::solve(U, y);
+    startTiming();
+    for(unsigned int r = 0; r < repetitions; r++){
+        arma::lu(L,U,A);
+        y = arma::solve(L, btilde);
+        solution = arma::solve(U, y);
+    }
+    endTiming();
 }
 
 void Solver::save(const std::string& identifier){
     solution.save(savepath+identifier, arma::raw_ascii);
+}
+
+void Solver::startTiming(){
+    startWallTime = std::chrono::high_resolution_clock::now();
+    startCPUTime  = std::clock();
+}
+
+void Solver::endTiming(){
+    auto CPUTime = (std::clock() - startCPUTime)/static_cast<double>(CLOCKS_PER_SEC);
+    std::chrono::duration<double> wallTime = (std::chrono::high_resolution_clock::now() - startWallTime);
+    std::cout << "Average wall time: " << wallTime.count()/repetitions << "s\n"
+              << "Average CPU time:  " << CPUTime/repetitions << "s" << std::endl;
 }

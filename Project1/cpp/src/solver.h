@@ -17,15 +17,24 @@ public:
     void doSave(bool flag){saveFlag = flag;};
     void setBounds(double lower, double upper){lowerBound = lower; upperBound=upper;};
     void setSavepath(const std::string& path){savepath = path;};
+    void setRepetitions(unsigned int r){repetitions = r;};
     arma::vec& getSolution(){return solution;};
+    arma::vec& getDomain(){return domain;};
 private:
     arma::vec btilde;
     arma::vec solution;
+    arma::vec domain;
     double (*fn)(double);
     double lowerBound = 0;
     double upperBound = 0;
     bool saveFlag = true;
     std::string savepath = "";
+    unsigned int repetitions = 1;
+    std::chrono::high_resolution_clock::time_point startWallTime;
+    double startCPUTime;
+
+    void startTiming();
+    void endTiming();
 };
 
 
