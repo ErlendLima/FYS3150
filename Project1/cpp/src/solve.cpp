@@ -29,7 +29,6 @@ arma::vec thomas(const arma::vec& a, const arma::vec& b, const arma::vec& c, con
 }
 
 
-
 arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double lower){
     auto mat = arma::mat(size, size, arma::fill::zeros);
     for (unsigned int row = 1; row < size-1; row++){
@@ -44,4 +43,23 @@ arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double 
     mat(0,0) = 1;
     mat(size-1, size-1) = 1;
     return mat;
+}
+
+
+arma::vec thomas_special(double upper, double middle, double lower, const arma::vec& f){
+  const size_t n   = arma::numel(f);
+  arma::vec u      = arma::zeros(n);
+  arma::vec a_inv  = arma::zeros(n);
+  arma::vec d      = arma::zeros(n);
+
+  for(unsigned int i = 1; i < n+1; i++){
+      a_inv[i] = (double)i/(i+1);
+      d[i] = f[i] + f[i-1]*a_inv[i];
+  }
+  u[n] = d[n]*a_inv[n];
+
+  for(unsigned int i = n-1; i > 0; i--){
+    u[i] = (d[i] + u[i+1])*a_inv[i];
+  }
+  return u;
 }
