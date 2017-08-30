@@ -9,13 +9,12 @@ int main(int argc, char *argv[])
     double (*func)(double) = [](double x){return 100*exp(-10*x);};
 
     try{
-        solveGeneral(func, 10, 1e6, 10, 3, -1);
+        // solveGeneral(func, 10, 1e6, 10, 3, -1);
         // solveLU(func, 10, 1e3, 10);
+        solveSpecial(func, 10, 1e6, 10, 0, 0);
     } catch (std::exception &ex){
         std::cerr << "Error: " << ex.what() << std::endl;
         return -1;
     }
     return 0;
 }
-
-

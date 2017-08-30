@@ -73,6 +73,37 @@ void solveLU(double (*func)(double),  unsigned int low,  unsigned int high,  uns
     solveLU(func, low, high, step, 0, 0);
 }
 
+void solveSpecial(double (*func)(double),  unsigned int low,  unsigned int high,  unsigned int step,
+                  double lowerBound, double upperBound){
+    for(unsigned int n = low; n <= high; n *= step){
+        double h = 1/(static_cast<double>(n+1));
+        std::cout << "Solving " << n << "×" << n << " with stepsize " << h << "using the specialized Thomas algorithm"<<  std::endl;
+
+        arma::vec btilde = h*arma::linspace(0, n+2, n+2); // Armadillo lacks arange :(
+        btilde.transform(func);
+        btilde *= h*h; // b~ = f(x)h^2
+
+        btilde[0] = lowerBound; btilde[n+1] = upperBound;
+
+        double a = -1;
+        double b = 2;
+        double c = -1;
+
+        auto startWallTime = std::chrono::high_resolution_clock::now();
+        auto startCPUTime  = std::clock();
+        arma::vec solution = thomas_special(a, b, c, btilde);
+        auto CPUTime = (std::clock() - startCPUTime)/static_cast<double>(CLOCKS_PER_SEC);
+        std::chrono::duration<double> wallTime = (std::chrono::high_resolution_clock::now() - startWallTime);
+        std::cout << "Wall time: " << wallTime.count() << "s\n"
+                  << "CPU time:  " << CPUTime << "s" << std::endl;
+
+        // Save result for further analysis
+        std::stringstream name;
+        name << "n" << n << "_special.txt"; //TODO: FIX
+        solution.save(name.str(), arma::raw_ascii);
+    }
+}
+
 arma::vec thomas(const arma::vec& a, const arma::vec& b, const arma::vec& c, const arma::vec& f){
     /* Implementation of Thomas Algorithm as described p. 186*/
     if(arma::numel(a) != arma::numel(b) ||
@@ -101,7 +132,6 @@ arma::vec thomas(const arma::vec& a, const arma::vec& b, const arma::vec& c, con
 }
 
 
-
 arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double lower){
     auto mat = arma::mat(size, size, arma::fill::zeros);
     for (unsigned int row = 1; row < size-1; row++){
@@ -116,4 +146,23 @@ arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double 
     mat(0,0) = 1;
     mat(size-1, size-1) = 1;
     return mat;
+}
+
+
+arma::vec thomas_special(double upper, double middle, double lower, const arma::vec& f){
+  const size_t n   = arma::numel(f);
+  arma::vec u      = arma::zeros(n);
+  arma::vec a_inv  = arma::zeros(n);
+  arma::vec d      = arma::zeros(n);
+
+  for(unsigned int i = 1; i < n+1; i++){
+      a_inv[i] = (double)i/(i+1);
+      d[i] = f[i] + f[i-1]*a_inv[i];
+  }
+  u[n] = d[n]*a_inv[n];
+
+  for(unsigned int i = n-1; i > 0; i--){
+    u[i] = (d[i] + u[i+1])*a_inv[i];
+  }
+  return u;
 }
