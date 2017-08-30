@@ -7,7 +7,8 @@
 #include <ctime>
 #include "solve.h"
 
-void solveGeneral(double (*func)(double), const unsigned int low, const unsigned int high, const unsigned int step){
+void solveGeneral(double (*func)(double),  unsigned int low,  unsigned int high,  unsigned int step,
+                  double lowerBound, double upperBound){
     for(unsigned int n = low; n <= high; n *= step){
         double h = 1/(static_cast<double>(n+1));
         std::cout << "Solving " << n << "×" << n << " with stepsize " << h <<  std::endl;
@@ -16,9 +17,12 @@ void solveGeneral(double (*func)(double), const unsigned int low, const unsigned
         btilde.transform(func);
         btilde *= h*h; // b~ = f(x)h^2
 
+        btilde[0] = lowerBound; btilde[n+1] = upperBound;
+
         arma::vec a = arma::vec(n+2); a.fill(-1);
         arma::vec b = arma::vec(n+2); b.fill(2);
         arma::vec c = arma::vec(n+2); c.fill(-1);
+        b[0] = 1; c[0] = 0; b[n+1] = 1; a[n+1] = 0;
 
         auto startWallTime = std::chrono::high_resolution_clock::now();
         auto startCPUTime  = std::clock();
@@ -35,7 +39,8 @@ void solveGeneral(double (*func)(double), const unsigned int low, const unsigned
     }
 }
 
-void solveLU(double (*func)(double), const unsigned int low, const unsigned int high, const unsigned int step){
+void solveLU(double (*func)(double), unsigned int low, unsigned int high, unsigned int step,
+             double lowerBound, double upperBound){
     for (unsigned int n = low; n <= high; n *= step) {
         double h = 1/(static_cast<double>(n+1));
         std::cout << "Solving " << n << "×" << n << " with stepsize " << h
@@ -44,6 +49,9 @@ void solveLU(double (*func)(double), const unsigned int low, const unsigned int 
         arma::vec btilde = h*arma::linspace(0, n+2, n+2);
         btilde.transform(func);
         btilde *= h*h; // b~ = f(x)h^2
+
+        // Set boundary conditions
+        btilde[0] = lowerBound; btilde[n+1] = upperBound;
 
         arma::mat A = tridiagonalMat(n+2, -1, 2, -1);
         arma::mat L, U;
@@ -59,12 +67,18 @@ void solveLU(double (*func)(double), const unsigned int low, const unsigned int 
     }
 }
 
+
+void solveLU(double (*func)(double),  unsigned int low,  unsigned int high,  unsigned int step){
+    // Use Dirichlet boundary conditions if none are not specified
+    solveLU(func, low, high, step, 0, 0);
+}
+
 arma::vec thomas(const arma::vec& a, const arma::vec& b, const arma::vec& c, const arma::vec& f){
     /* Implementation of Thomas Algorithm as described p. 186*/
     if(arma::numel(a) != arma::numel(b) ||
        arma::numel(b) != arma::numel(c) ||
        arma::numel(c) != arma::numel(f))
-        throw std::runtime_error("Input vectors are of different length");
+        throw std::runtime_error("Input vectors must be of equal length");
 
     const size_t n   = arma::numel(a);
     arma::vec tmp    = arma::zeros(n);
@@ -90,12 +104,16 @@ arma::vec thomas(const arma::vec& a, const arma::vec& b, const arma::vec& c, con
 
 arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double lower){
     auto mat = arma::mat(size, size, arma::fill::zeros);
-    for (unsigned int row = 0; row < size; row++){
+    for (unsigned int row = 1; row < size-1; row++){
         if (row > 0)
             mat(row, row-1) = lower;
         mat(row, row) = middle;
         if (row < size-1)
             mat(row, row+1) = upper;
     }
+
+    // Ensure the boundary conditions
+    mat(0,0) = 1;
+    mat(size-1, size-1) = 1;
     return mat;
 }
