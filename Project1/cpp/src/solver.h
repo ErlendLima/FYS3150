@@ -12,6 +12,7 @@ public:
     void setup(unsigned int n);
     void solve(Method, unsigned int low, unsigned int high, unsigned int step);
     void solveGeneral(unsigned int n);
+    void solveSpecial(unsigned int n);
     void solveLU(unsigned int n);
     void save(const std::string& identifier);
     void doSave(bool flag){saveFlag = flag;};

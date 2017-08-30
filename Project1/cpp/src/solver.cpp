@@ -13,7 +13,7 @@ Solver::Solver(double (*function)(double)){
 Solver::~Solver(){};
 
 void Solver::setup(unsigned int n){
-    double h = 1/(static_cast<double>(n+2));
+    double h = 1/static_cast<double>(n+2);
     domain = h*arma::linspace(0, n+2, n+2); // Armadillo lacks arange :(
 
     btilde = domain;
@@ -35,6 +35,7 @@ void Solver::solve(Method method, unsigned int low, unsigned int high, unsigned 
         break;
     case Method::SPECIAL:
         std::cout << "=== Using the specialized method ===" << std::endl;
+        targetSolver = &Solver::solveSpecial;
         identifier = 'S';
         break;
     case Method::LU:
@@ -66,6 +67,15 @@ void Solver::solveGeneral(unsigned int n) {
     startTiming();
     for(unsigned int r = 0; r < repetitions; r++)
         solution = thomas(a, b, c, btilde);
+    endTiming();
+}
+
+void Solver::solveSpecial(unsigned int n){
+    setup(n);
+
+    startTiming();
+    for(unsigned int r = 0; r < repetitions; r++)
+        solution = thomasSpecial(-1, 2, -1, btilde);
     endTiming();
 }
 

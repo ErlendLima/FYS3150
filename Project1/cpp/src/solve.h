@@ -5,7 +5,7 @@
 
 arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double lower);
 arma::vec thomas(const arma::vec& a, const arma::vec& b, const arma::vec& c, const arma::vec& d);
-arma::vec thomas_special(double upper, double middle, double lower, const arma::vec& f);
+arma::vec thomasSpecial(double upper, double middle, double lower, const arma::vec& f);
 
 
 #endif /* SOLVE_H */
