@@ -29,11 +29,11 @@ class Analyzer:
         self.compute_relative_error()
 
     def load(self, path):
-        matches = glob(os.path.join(path, 'n*_LU.txt'))
+        matches = glob(os.path.join(path, '[G|L|S]*.txt'))
         matches.sort()
         self.data = {}
         for match in matches:
-            n = re.search('n(\d+)\.txt', match)
+            n = re.search('L(\d+)\.txt', match)
             if n is not None:
                 self.data[int(n.group(1))] = np.loadtxt(match)
         self.data = sorted(self.data.items(), key=operator.itemgetter(0))
