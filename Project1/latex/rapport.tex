@@ -65,7 +65,7 @@
 \definecolor{tabletext}{gray}{0.0}
 \definecolor{tablerule}{gray}{0.7}
 \definecolor{titlepagecolor}{cmyk}{1,.60,0,.40}
-\definecolor{namecolor}{cmyk}{1,.50,0,.10} 
+\definecolor{namecolor}{cmyk}{1,.50,0,.10}
 
 % Custom commands
 \newcommand{\unit}[1]{\:\mathrm{#1}}
@@ -99,7 +99,14 @@
 \maketitle
 
 \begin{abstract}
+  In this project we investigate the speed and numerical precision of several methods
+  of solving the one-dimensional Poisson equation with Dirchelet boundary conditions.
+  The equation is discretized and written as a system of linear equations. This equates to
+  a tridiagonal matrix equation, which is solved using the general Thomas algorithm,
+  a specialized version of the Thomas algorithm and by LU-decomposing the matrix.
 
+  The specialization of the algorithm for our specific problem resulted in
+  a x percent reduction in computation time.
 \end{abstract}
 
 % Get all of the data from the script into a dictionary
@@ -126,4 +133,96 @@ latex_data = untag_all(data)
   \caption{\label{fig:general} Caption}
 \end{figure}
 
+\section{Theory}
+\subsection{Discretizing the Poisson equation}
+The one-dimensional Poisson equation with Dirchelet boundary conditions is
+\begin{align*}
+  \frac{d^2 u}{d x^2} = - f
+\end{align*}
+We can approximate the second derivative of $u(x)$ using a Taylor expansion
+and solving for $\frac{d^2 u}{d x^2}$:
+\begin{align*}
+  \frac{d^2 u}{d x^2} \approx \frac{u(x+h) + u(x-h) - 2 u(x)}{h^2} + O(h^2)
+\end{align*}
+We now discretize the equation with grid points $x_1, x_2, \hdots, x_{n}$. Imposing
+Dirchelet boundary conditions forces $x_1 = x_n = 0$, using the handy notation
+$u(x_i + h) = u_{i+1}$ and inserting the approximated second derivative into the
+Poisson equation yields
+\begin{align*}
+  \frac{u_{i+1} + u_{i-1} - 2 u_i}{h^2} = -f_i
+\end{align*}
+where $h = \frac{1}{n+1}$ is the step size, i.e. the distance between grid points, and
+$f_i = f(x_i)$.
+The above equation is a linear system of equations, and can therefore be written
+as the matrix equation
+\begin{align*}
+  A \mathbf{u} = -h^2 \mathbf{f}
+\end{align*}
+where
+\begin{align*}
+  A =
+  \begin{bmatrix}
+    2 & -1 & 0  & \hdots & \hdots &   0    \\
+    -1 & 2 & -1 & 0      & &\vdots \\
+    0 & -1 & 2  & -1     & 0 &  \\
+    \vdots & 0 & -1  & 2     & -1 & 0 \\
+    & & \ddots & \ddots & \ddots & \vdots\\
+    0 & \hdots  &\hdots & 0 &-1 & 2 \\
+\end{bmatrix}
+\end{align*}
+is a $n \times n$ tridiagonal matrix, the only non-zero elements are on,
+directly above or directly below the diagonal. Row reducing the matrix can therefore
+be done in an efficient way using the Thomas algorithm, as we shall see in the next paragraph.
+\subsection{Solving a general tridiagonal matrix problem}
+A general tridiagonal matrix equation is on the form
+\begin{align*}
+  \begin{bmatrix}
+    b_1 & c_1 & 0  & \hdots & \hdots &   0    \\
+    a_2 & b_2 & c_2 & 0      & &\vdots \\
+    0 & a_3 & b_3  & c_3     & 0 &  \\
+    \vdots & 0 & a_4  & b_4     & c_4 & 0 \\
+    & & \ddots & \ddots & \ddots & \vdots\\
+    0 & \hdots  &\hdots & 0 &a_n & b_n \\
+  \end{bmatrix}
+  \begin{bmatrix}
+    u_1 \\ u_2 \\ u_3 \\ \vdots \\ \\ u_n
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    v_1 \\ v_2 \\ v_3 \\ \vdots \\ \\ v_n
+  \end{bmatrix}
+\end{align*}
+where $v_i = h^2 f_i$ in the case examined in this project. To get the matrix
+in row reduced echelon form and solve the problem, we first eliminate the $a_i$'s.
+This is done by subtracting $\frac{a_2}{b_1}$ times the first row from the second.
+We now have
+\begin{align*}
+  \begin{bmatrix}
+    b_1 & c_1 & 0  & \hdots & \hdots &   0    \\
+    0 & b'_2 & c_2 & 0      & &\vdots \\
+    0 & a_3 & b_3  & c_3     & 0 &  \\
+    \vdots & 0 & a_4  & b_4     & c_4 & 0 \\
+    & & \ddots & \ddots & \ddots & \vdots\\
+    0 & \hdots  &\hdots & 0 &a_n & b_n \\
+  \end{bmatrix}
+  \begin{bmatrix}
+    u_1 \\ u_2 \\ u_3 \\ \vdots \\ \\ u_n
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    v_1 \\ v'_2 \\ v_3 \\ \vdots \\ \\ v_n
+  \end{bmatrix}
+\end{align*}
+where $b'_2 = b_2 - \frac{a_2}{b_1} c_1$ and $v'_2 = v_2 - \frac{a_2}{b_1}v_1$.
+We now repeat this operation for every row (i.e. subtract $\frac{a_i}{b'_{i-1}}$ times row $i-1$ from row $i$), which eliminates the $a_i$'s.
+A general expression for the diagonal elements is therefore
+\begin{align*}
+  b'_i = b_i - \frac{a_i}{b'_{i-1}}c_{i-1}
+\end{align*}
+where $b'_1 = b_1$ and $i = 2,3,...,n$. Similarly, elements in the rhs vector
+$\mathbf{v}'$ are
+\begin{align*}
+  v'_{i} = v_i - \frac{a_i}{b'_{i-1}}v_{i-1}
+\end{align*}
+Now, dividing each row by its $b'_i$, A is in row reduced form. 
 \end{document}
