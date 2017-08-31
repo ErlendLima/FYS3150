@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     double (*func)(double) = [](double x){return 100*exp(-10*x);};
     Solver solver(func);
     solver.setSavepath("data/");
-    solver.setRepetitions(1e0);
+    solver.setRepetitions(1e2);
 
     try{
         // solver.solve(Method::GENERAL, 10, 1e6, 10);

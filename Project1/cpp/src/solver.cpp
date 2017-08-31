@@ -75,7 +75,7 @@ void Solver::solveSpecial(unsigned int n){
 
     startTiming();
     for(unsigned int r = 0; r < repetitions; r++)
-        solution = thomasSpecial(-1, 2, -1, btilde);
+        solution = thomasSpecial(btilde);
     endTiming();
 }
 
