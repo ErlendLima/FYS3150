@@ -118,11 +118,8 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned 
     double errors[2][n_iterations] = {0};
     unsigned int i = 0;
 
-<<<<<<< HEAD
     std::ofstream outputFile("data/E.txt");
 
-=======
->>>>>>> e5d6edd72bb65f2481eecc50708d05c03bfafbfc
     for(unsigned int n = n_start; n <= n_stop; n+=step){
         setup(n);          // Reset setup
         arma::vec x_num     = arma::zeros(n);
@@ -141,7 +138,6 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned 
         for(unsigned int i = 1; i <= n-1; i++){
             rel_error[i] = fabs((x_num[i] - x_ana[i])/x_ana[i]);
         }
-<<<<<<< HEAD
 
         errors[0][i] = n;
         errors[1][i] = rel_error.max();
@@ -150,11 +146,4 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned 
         i += 1;
     }
     outputFile.close();
-=======
-        errors[0][i] = n;
-        errors[1][i] = rel_error.max();
-        std::cout << "n = " << errors[0][i] << " Relative error = "<< errors[1][i] << std::endl;
-        i += 1;
-    }
->>>>>>> e5d6edd72bb65f2481eecc50708d05c03bfafbfc
 }
