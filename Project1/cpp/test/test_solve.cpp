@@ -6,127 +6,103 @@
 #define LUTOLERANCE 1e-0
 // LU has so bad accuracy that it is a joke
 
-TEST(LU, ConstantFn){
-    // Function to solve for; Euler-Cauchy equation
-    double (*fn)(double) = [](double x){return 1.0;};
-    // Solution for Dirichlet boundary conditions
-    double (*u)(double) = [](double x){return -0.5*(x-1)*x;};
+double constfn(double x)     {return 1.0;}
+double constfn_sol(double x) {return -0.5*(x-1)*x;}
+double expfn(double x)       {return exp(x);}
+double expfn_sol(double x)   {return exp(1)*x-x-exp(x)+1;}
+double expfn_bounds(double x){return exp(1)*x+4*x-exp(x)-1;};
 
-    Solver solver(fn);
+
+TEST(LU, ConstantFn){
+    Solver solver(constfn);
     solver.doSave(false);
     solver.solve(Method::LU, 1e3, 1e3, 10);
     auto expected = solver.getDomain();
-    expected.transform(u);
+    expected.transform(constfn_sol);
     auto solution = solver.getSolution();
     std::cout << arma::sum(expected-solution) << std::endl;
     ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", LUTOLERANCE));
 }
 
 TEST(General, ConstantFn){
-    // Function to solve for; Constant f(x)=1
-    double (*fn)(double) = [](double x){return 1.0;};
-    // Solution for Dirichlet boundary conditions
-    double (*u)(double) = [](double x){return -0.5*(x-1)*x;};
-
-    Solver solver(fn);
+    Solver solver(constfn);
     solver.doSave(false);
     solver.solve(Method::GENERAL, 1e6, 1e6, 10);
     auto expected = solver.getDomain();
-    expected.transform(u);
+    expected.transform(constfn_sol);
     auto solution = solver.getSolution();
     ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
 }
 
 TEST(Special, ConstantFn){
-    double (*fn)(double) = [](double x){return 1.0;};
-    double (*u)(double) = [](double x){return -0.5*(x-1)*x;};
-
-    Solver solver(fn);
+    Solver solver(constfn);
     solver.doSave(false);
     solver.solve(Method::SPECIAL, 1e6, 1e6, 10);
     auto expected = solver.getDomain();
-    expected.transform(u);
+    expected.transform(constfn_sol);
     auto solution = solver.getSolution();
     ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
 }
 
 TEST(LU, ExpFn){
-    double (*fn)(double) = [](double x){return exp(x);};
-    double (*u)(double) = [](double x){return exp(1)*x-x-exp(x)+1;};
-
-    Solver solver(fn);
+    Solver solver(expfn);
     solver.doSave(false);
     solver.solve(Method::LU, 1e3, 1e3, 10);
     auto expected = solver.getDomain();
-    expected.transform(u);
+    expected.transform(expfn_sol);
     auto solution = solver.getSolution();
     ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", LUTOLERANCE));
 }
 
 TEST(General, ExpFn){
-    double (*fn)(double) = [](double x){return exp(x);};
-    double (*u)(double) = [](double x){return exp(1)*x-x-exp(x)+1;};
-
-    Solver solver(fn);
+    Solver solver(expfn);
     solver.doSave(false);
     solver.solve(Method::GENERAL, 1e6, 1e6, 10);
     auto expected = solver.getDomain();
-    expected.transform(u);
+    expected.transform(expfn_sol);
     auto solution = solver.getSolution();
     ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
 }
 
 TEST(Special, ExpFn){
-    double (*fn)(double) = [](double x){return exp(x);};
-    double (*u)(double) = [](double x){return exp(1)*x-x-exp(x)+1;};
-
-    Solver solver(fn);
+    Solver solver(expfn);
     solver.doSave(false);
     solver.solve(Method::SPECIAL, 1e6, 1e6, 10);
     auto expected = solver.getDomain();
-    expected.transform(u);
+    expected.transform(expfn_sol);
     auto solution = solver.getSolution();
     ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
 }
 
 TEST(LU, Bounds){
-    double (*fn)(double) = [](double x){return exp(x);};
-    double (*u)(double) = [](double x){return exp(1)*x+4*x-exp(x)-1;};
-
-    Solver solver(fn);
-    solver.doSave(true);
+    Solver solver(expfn);
+    solver.doSave(false);
     solver.setBounds(-2, 3);
     solver.solve(Method::LU, 1e3, 1e3, 10);
     auto expected = solver.getDomain();
-    expected.transform(u);
+    expected.transform(expfn_bounds);
     auto solution = solver.getSolution();
     ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", LUTOLERANCE));
 }
 
 TEST(General, Bounds){
-    double (*fn)(double) = [](double x){return exp(x);};
-    double (*u)(double) = [](double x){return exp(1)*x+4*x-exp(x)-1;};
-
-    Solver solver(fn);
-    solver.doSave(false);
+    Solver solver(expfn);
+    solver.doSave(true);
     solver.setBounds(-2, 3);
     solver.solve(Method::GENERAL, 1e6, 1e6, 10);
     auto expected = solver.getDomain();
-    expected.transform(u);
+    expected.transform(expfn_bounds);
     auto solution = solver.getSolution();
     ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
 }
 
 TEST(Special, Bounds){
-    double (*fn)(double) = [](double x){return exp(x);};
-    double (*u)(double) = [](double x){return exp(1)*x+4*x-exp(x)-1;};
-
-    Solver solver(fn);
+    Solver solver(expfn);
     solver.doSave(false);
     solver.setBounds(-2, 3);
     solver.solve(Method::SPECIAL, 1e6, 1e6, 10);
     auto expected = solver.getDomain();
-    expected.transform(u);
+    expected.transform(expfn_bounds);
     auto solution = solver.getSolution();
     ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
 }

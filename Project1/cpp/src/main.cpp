@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
     try{
         // solver.solve(Method::GENERAL, 10, 1e6, 10);
-        solver.solve(Method::LU, 10, 1e3, 10);
+        solver.solve(Method::SPECIAL, 10, 1e6, 10);
     } catch (std::exception &ex){
         std::cerr << "Error: " << ex.what() << std::endl;
         return -1;
