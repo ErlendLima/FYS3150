@@ -110,3 +110,35 @@ void Solver::endTiming(){
     std::cout << "Average wall time: " << wallTime.count()/repetitions << "s\n"
               << "Average CPU time:  " << CPUTime/repetitions << "s" << std::endl;
 }
+
+void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned int step){
+    saveFlag = false;  // Dont dump everything
+    char identifier = 'E';   // Error analysis identifier
+    unsigned int n_iterations = (n_stop - n_start)/step;
+    double errors[2][n_iterations] = {0};
+    unsigned int i = 0;
+
+    for(unsigned int n = n_start; n <= n_stop; n+=step){
+        setup(n);          // Reset setup
+        arma::vec x_num     = arma::zeros(n);
+        arma::vec x_ana     = arma::zeros(n);
+        arma::vec rel_error = arma::zeros(n);
+
+        // TODO: Replace with specialized algorithm, currently an issue with running it
+        arma::vec a = arma::vec(n+2); a.fill(-1);
+        arma::vec b = arma::vec(n+2); b.fill(2);
+        arma::vec c = arma::vec(n+2); c.fill(-1);
+        b[0] = 1; c[0] = 0; b[n+1] = 1; a[n+1] = 0;
+
+        x_ana  = analyticSolution(domain);
+        x_num  = thomas(a,b,c,btilde);
+
+        for(unsigned int i = 1; i <= n-1; i++){
+            rel_error[i] = fabs((x_num[i] - x_ana[i])/x_ana[i]);
+        }
+        errors[0][i] = n;
+        errors[1][i] = rel_error.max();
+        std::cout << "n = " << errors[0][i] << " Relative error = "<< errors[1][i] << std::endl;
+        i += 1;
+    }
+}
