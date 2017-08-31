@@ -50,11 +50,10 @@ arma::vec thomasSpecial(const arma::vec& v){
 
     const size_t n   = arma::numel(v);
     arma::vec u      = arma::zeros(n);
-    double bprime;
     arma::vec c      = arma::zeros(n);
+    double bprime    = 2.0;
 
     u[1] = v[1];
-    bprime = 2;
     for(unsigned int i = 2; i <= n-2; i++){
         c[i]      = -1.0/bprime;
         bprime    = (i+1.0)/i;
@@ -62,6 +61,17 @@ arma::vec thomasSpecial(const arma::vec& v){
     }
     for(unsigned int i = n-3; i > 0; i--){
       u[i] = u[i] - c[i]*u[i+1];
+    }
+    return u;
+}
+
+arma::vec analyticSolution(const arma::vec& x){
+    const size_t n  = arma::numel(x);
+    arma::vec u     = arma::zeros(n);
+    const double e  = 2.71828182846;
+
+    for(unsigned int i = 0; i <= n; i++){
+        u[i] = 1 - (1 - pow(e, -10))*x[i] - pow(e, -10*x[i]);
     }
     return u;
 }
