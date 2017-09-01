@@ -68,10 +68,9 @@ arma::vec thomasSpecial(const arma::vec& v){
 arma::vec analyticSolution(const arma::vec& x){
     const size_t n  = arma::numel(x);
     arma::vec u     = arma::zeros(n);
-    const double e  = 2.71828182846;
 
     for(unsigned int i = 0; i <= n; i++){
-        u[i] = 1 - (1 - pow(e, -10))*x[i] - pow(e, -10*x[i]);
+        u[i] = 1 - (1 - exp(-10))*x[i] - exp(-10*x[i]);
     }
     return u;
 }

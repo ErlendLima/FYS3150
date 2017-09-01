@@ -24,16 +24,17 @@ def plotwrap(*args, **kwargs):
 
 class Analyzer:
     def __init__(self, path):
-        self.load(path)
-        self.analytic = self.compute_analytic_solution()
-        self.compute_relative_error()
+        # self.load(path)
+        # self.analytic = self.compute_analytic_solution()
+        # self.compute_relative_error()
+        self.make_relative_error_plot()
 
     def load(self, path):
         matches = glob(os.path.join(path, '[G|L|S]*.txt'))
         matches.sort()
         self.data = {}
         for match in matches:
-            n = re.search('G(\d+)\.txt', match)
+            n = re.search('S(\d+)\.txt', match)
             if n is not None:
                 self.data[int(n.group(1))] = np.loadtxt(match)
         self.data = sorted(self.data.items(), key=operator.itemgetter(0))
@@ -41,7 +42,7 @@ class Analyzer:
     def compute_analytic_solution(self, n=1000):
         x = np.linspace(0, 1, n)
         y = 1 - (1-np.exp(-10))*x - np.exp(-10*x)
-        y = np.exp(1)*x-x-np.exp(x)+1
+        #y = np.exp(1)*x-x-np.exp(x)+1
         return (x, y)
 
     @plotwrap(saveas='function.eps')
@@ -72,6 +73,11 @@ class Analyzer:
                                             tablefmt="latex"))
         print(table)
 
+    def make_relative_error_plot(self):
+        arr = np.loadtxt("../cpp/data/E.txt")
+        plt.plot(arr[:,0], arr[:,1])
+        plt.show()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Analyzes data for project 1')
@@ -79,4 +85,4 @@ if __name__ == '__main__':
                         help="Directory to search for input files")
     args = parser.parse_args()
     analyzer = Analyzer(args.search_path)
-    analyzer.plot(show=True)
+    # analyzer.plot(show=True)
