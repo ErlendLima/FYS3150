@@ -24,7 +24,7 @@ void Solver::setup(unsigned int n){
     btilde[0] = lowerBound; btilde[n+1] = upperBound;
 }
 
-void Solver::solve(Method method, unsigned int low, unsigned int high, unsigned int step) {
+int Solver::solve(Method method, unsigned int low, unsigned int high, unsigned int step) {
     char identifier;
     void (Solver::*targetSolver)(unsigned int);
     switch (method) {
@@ -43,6 +43,9 @@ void Solver::solve(Method method, unsigned int low, unsigned int high, unsigned 
         targetSolver = &Solver::solveLU;
         identifier = 'L';
         break;
+    default:
+        std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
+        return -1;
     }
 
     for(unsigned int n = low; n <= high; n *= step){
@@ -55,6 +58,7 @@ void Solver::solve(Method method, unsigned int low, unsigned int high, unsigned 
             save(name.str());
         }
     }
+    return 0;
 }
 
 void Solver::solveGeneral(unsigned int n) {
@@ -113,7 +117,6 @@ void Solver::endTiming(){
 
 void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned int step){
     saveFlag = false;  // Dont dump everything
-    char identifier = 'E';   // Error analysis identifier
     unsigned int n_iterations = (n_stop - n_start)/step;
     double errors[2][n_iterations] = {0};
     unsigned int yo = 0;
