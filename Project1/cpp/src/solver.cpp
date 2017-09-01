@@ -117,7 +117,6 @@ void Solver::endTiming(){
 
 void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned int step){
     saveFlag = false;  // Dont dump everything
-    char identifier = 'E';   // Error analysis identifier
     unsigned int n_iterations = (n_stop - n_start)/step;
     double errors[2][n_iterations] = {0};
     unsigned int i = 0;
