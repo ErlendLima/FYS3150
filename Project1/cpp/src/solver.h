@@ -14,6 +14,7 @@ public:
     void solveGeneral(unsigned int n);
     void solveSpecial(unsigned int n);
     void solveLU(unsigned int n);
+    void calculateError(unsigned int n_start, unsigned int n_stop, unsigned int n_step);
     void save(const std::string& identifier);
     void doSave(bool flag){saveFlag = flag;};
     void setBounds(double lower, double upper){lowerBound = lower; upperBound=upper;};

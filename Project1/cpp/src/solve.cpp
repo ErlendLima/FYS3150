@@ -72,20 +72,32 @@ arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double 
 }
 
 
-arma::vec thomasSpecial(double upper, double middle, double lower, const arma::vec& f){
-  const size_t n   = arma::numel(f);
-  arma::vec u      = arma::zeros(n);
-  arma::vec bprime = arma::zeros(n);
-  arma::vec d      = arma::zeros(n);
+arma::vec thomasSpecial(const arma::vec& v){
 
-  for(unsigned int i = 2; i < n; i++){
-      bprime[i] = (static_cast<double>(i)+1)/i;
-      d[i] = f[i] + f[i-1]*bprime[i];
-  }
-  u[n] = d[n]*bprime[n];
+    const size_t n   = arma::numel(v);
+    arma::vec u      = arma::zeros(n);
+    arma::vec c      = arma::zeros(n);
+    double bprime    = 2.0;
 
-  for(unsigned int i = n-1; i > 0; i--){
-    u[i] = (d[i] + u[i+1])*bprime[i];
-  }
-  return u;
+    u[1] = v[1];
+    for(unsigned int i = 2; i <= n-2; i++){
+        c[i]      = -1.0/bprime;
+        bprime    = (i+1.0)/i;
+        u[i]      = (v[i]+u[i-1])/bprime;
+    }
+    for(unsigned int i = n-3; i > 0; i--){
+      u[i] = u[i] - c[i]*u[i+1];
+    }
+    return u;
+}
+
+arma::vec analyticSolution(const arma::vec& x){
+    const size_t n  = arma::numel(x);
+    arma::vec u     = arma::zeros(n);
+    const double e  = 2.71828182846;
+
+    for(unsigned int i = 0; i <= n; i++){
+        u[i] = 1 - (1 - pow(e, -10))*x[i] - pow(e, -10*x[i]);
+    }
+    return u;
 }
