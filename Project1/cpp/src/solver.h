@@ -10,7 +10,7 @@ public:
     Solver(double (*function)(double));
     virtual ~Solver();
     void setup(unsigned int n);
-    void solve(Method, unsigned int low, unsigned int high, unsigned int step);
+    int solve(Method, unsigned int low, unsigned int high, unsigned int step);
     void solveGeneral(unsigned int n);
     void solveSpecial(unsigned int n);
     void solveLU(unsigned int n);
