@@ -33,7 +33,7 @@ class Analyzer:
         matches.sort()
         self.data = {}
         for match in matches:
-            n = re.search('G(\d+)\.txt', match)
+            n = re.search('S(\d+)\.txt', match)
             if n is not None:
                 self.data[int(n.group(1))] = np.loadtxt(match)
         self.data = sorted(self.data.items(), key=operator.itemgetter(0))
