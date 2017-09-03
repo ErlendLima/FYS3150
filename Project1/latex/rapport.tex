@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt, english, twoside, twocolumn]{article}
+\documentclass[a4paper,11pt, english, twoside]{article}
 % Engine-specific settings
 % Detect pdftex/xetex/luatex, and load appropriate font packages.
 % This is inspired by the approach in the iftex package.
@@ -95,18 +95,23 @@
 \author[1]{Erlend Lima}
 \author[2]{Frederik J. Mellbye}
 \author[3]{Aram Salihi}
-\affil[1,2,3]{Oslo University}
+\author[4]{Halvard Sutterud}
+\affil[1,2,3,4]{University of Oslo, Oslo, Norway}
 \maketitle
 
 \begin{abstract}
-  In this project we investigate the speed and numerical precision of several methods
-  of solving the one-dimensional Poisson equation with Dirchelet boundary conditions.
-  The equation is discretized and written as a system of linear equations. This equates to
-  a tridiagonal matrix equation, which is solved using the general Thomas algorithm,
+  In this project three methods of solving the one-dimensional Poisson equation with
+  Dirchelet boundary conditions are investigated. The equation was discretized,
+  and written as a system of linear equations. This equates to
+  a tridiagonal matrix equation, which was solved using the general Thomas algorithm,
   a specialized version of the Thomas algorithm and by LU-decomposing the matrix.
 
   The specialization of the algorithm for our specific problem resulted in
-  a x percent reduction in computation time.
+  a x percent reduction in the amount of floating point operations. For large
+  matrices ($n \sim 10^5$) the LU-decomposition requires
+  more memory than what was available, which was not a problem with the Thomas
+  algorithm. Therefore the Thomas is more suited for solving the problem
+  examined in this paper.
 \end{abstract}
 
 % Get all of the data from the script into a dictionary
@@ -133,6 +138,10 @@ latex_data = untag_all(data)
   \caption{\label{fig:general} Caption}
 \end{figure}
 
+\section{Introduction}
+Introducing where the Poisson equation comes from, why it valuable to solve it,
+how it is solved in this paper and explaining speed and error analysis.
+
 \section{Theory}
 \subsection{Discretizing the Poisson equation}
 The one-dimensional Poisson equation with Dirchelet boundary conditions is
@@ -144,7 +153,7 @@ and solving for $\frac{d^2 u}{d x^2}$:
 \begin{align*}
   \frac{d^2 u}{d x^2} \approx \frac{u(x+h) + u(x-h) - 2 u(x)}{h^2} + O(h^2)
 \end{align*}
-We now discretize the equation with grid points $x_1, x_2, \hdots, x_{n}$. Imposing
+The equation is discretized with grid points $x_1, x_2, \hdots, x_{n}$. Imposing
 Dirchelet boundary conditions forces $x_1 = x_n = 0$, using the handy notation
 $u(x_i + h) = u_{i+1}$ and inserting the approximated second derivative into the
 Poisson equation yields
@@ -152,11 +161,11 @@ Poisson equation yields
   \frac{u_{i+1} + u_{i-1} - 2 u_i}{h^2} = -f_i
 \end{align*}
 where $h = \frac{1}{n+1}$ is the step size, i.e. the distance between grid points, and
-$f_i = f(x_i)$.
-The above equation is a linear system of equations, and can therefore be written
+$f_i = f(x_i)$. This discretized version of the one dimensional Poisson equation is
+conveniently a linear system of equations, and can therefore be written
 as the matrix equation
 \begin{align*}
-  A \mathbf{u} = -h^2 \mathbf{f}
+  A \mathbf{u} = h^2 \mathbf{f}
 \end{align*}
 where
 \begin{align*}
@@ -193,9 +202,10 @@ A general tridiagonal matrix equation is on the form
   \end{bmatrix}
 \end{align*}
 where $v_i = h^2 f_i$ in the case examined in this project. To get the matrix
-in row reduced echelon form and solve the problem, we first eliminate the $a_i$'s.
-This is done by subtracting $\frac{a_2}{b_1}$ times the first row from the second.
-We now have
+in row reduced echelon form and solve the problem, the $a_i$'s are first eliminated
+by Gaussian elimination.
+First, $\frac{a_2}{b_1}$ times the first row is subtracted from the second.
+This gives
 \begin{align*}
   \begin{bmatrix}
     b_1 & c_1 & 0  & \hdots & \hdots &   0    \\
@@ -214,15 +224,129 @@ We now have
   \end{bmatrix}
 \end{align*}
 where $b'_2 = b_2 - \frac{a_2}{b_1} c_1$ and $v'_2 = v_2 - \frac{a_2}{b_1}v_1$.
-We now repeat this operation for every row (i.e. subtract $\frac{a_i}{b'_{i-1}}$ times row $i-1$ from row $i$), which eliminates the $a_i$'s.
-A general expression for the diagonal elements is therefore
+For the next row, exactly the same operation is used, but notice how the previous
+elements $b'_2$ and $v'_2$ now have been updated in the last iteration. Generalizing this
+argument for each row, a general expression for the diagonal elements is
 \begin{align*}
   b'_i = b_i - \frac{a_i}{b'_{i-1}}c_{i-1}
 \end{align*}
-where $b'_1 = b_1$ and $i = 2,3,...,n$. Similarly, elements in the rhs vector
-$\mathbf{v}'$ are
+where $b'_1 = b_1$ and $i = 2,3,...,n$. Similarly, elements in the right-hand side vector
+$\mathbf{v}'$ are modified to
 \begin{align*}
   v'_{i} = v_i - \frac{a_i}{b'_{i-1}}v_{i-1}
 \end{align*}
-Now, dividing each row by its $b'_i$, A is in row reduced form. 
+where $v'_1 = v_1$ and $i = 2,\hdots,n$. After completing the forward substitution,
+the matrix equation reads
+\begin{align*}
+  \begin{bmatrix}
+    b'_1 & c_1 & 0  & \hdots & \hdots &   0    \\
+    0 & b'_2 & c_2 & 0      & &\vdots \\
+    0 & 0 & b'_3  & c_3     & 0 &  \\
+    \vdots & 0 & 0  & b'_4     & c_4 & 0 \\
+    & & \ddots & \ddots & \ddots & \vdots\\
+    0 & \hdots  &\hdots & 0 &0 & b'_n \\
+  \end{bmatrix}
+  \begin{bmatrix}
+    u_1 \\ u_2 \\ u_3 \\ \vdots \\ \\ u_n
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    v'_1 \\ v'_2 \\ v'_3 \\ \vdots \\ \\ v'_n
+  \end{bmatrix}
+\end{align*}
+By inspection, the solution for the final point $u_n$ is explicitly given by the
+bottom row:
+\begin{align*}
+  b'_n u_n = v'_n \rightarrow u_n = \frac{v'_n}{b'_n}
+\end{align*}
+The rest of the solution $u(x_i)$ is then computed by backward substitution, given
+$u_i$ one can compute $u_{i-1}$. For instance, row $n-1$ reads
+\begin{align*}
+  b'_{n-1} u_{n-1} + c_{n-1} u_n &= v'_{n-1} \\
+  u_{n-1} &= \frac{v'_{n-1} - c_{n-1} u_n}{b'_{n-1}}
+\end{align*}
+In general then, the back substitution is done by
+\begin{align*}
+  u_i = \frac{v'_i - c_i u_{i+1}}{b'_i}
+\end{align*}
+where $i = n-1, n-2, \hdots, 1$.
+\subsection{Optimizing the Thomas algorithm for a specific case}
+In the case presented in this project, $a_i = c_i = -1$ and $b_i = 2$. The fact
+that there are just two different values in the matrix greatly simplifies the
+calculations, since all the calculations involving only $a_i$, $b_i$ and $c_i$
+can be done beforehand. Also, it is possible to derive an analytic expression for
+$b'_i$. This is given by
+\begin{align*}
+  b'_i =
+\end{align*}
+and is found and proved by induction in appendix A?.
+\subsection{Solving the general tridiagonal matrix problem by LU-decomposition}
+Another way to solve matrix equations is LU-decomposing A, and then solving
+two matrix equations. This is a frequently used method for solving more general
+sets of linear equations. The LU-decomposition is a form of Gaussian elimination,
+where A is factored into matrices L and U. L is lower triangular with 1 in each
+element on the diagonal, and U is upper triangular. The matrix equation is
+\begin{align*}
+  A\mathbf{u} &= \mathbf{v} \\
+  LU \mathbf{u} &= \mathbf{v}
+\end{align*}
+Introducing $\mathbf{y} = U\mathbf{u}$, the solution $\mathbf{u}$ can now be
+computed in two steps. First, $\mathbf{y}$ is found by solving
+\begin{align*}
+  L\mathbf{y} = \mathbf{v}
+\end{align*}
+which is then inserted in LABEL
+\begin{align*}
+  U\mathbf{u} = \mathbf{y}
+\end{align*}
+and solved for $\mathbf{u}$.
+\subsection{Analytic solution for a specific problem}
+In this paper the following special case of the Poisson equation is examined:
+\begin{align}
+  - \frac{d^2 u}{dx^2} = 100 e^{-10x}
+\end{align}
+where $0 < x < 1$ and $u(0) = u(1) = 0$, i.e. Dirchelet boundaries. An analytic
+solution is obtained by integrating with respect to $x$ twice
+\begin{align*}
+  u(x) = -e^{-10x} + A + Bx
+\end{align*}
+Imposing the boundary condition $x(0) = 0$ gives $u(0) = 0 = -1 + A$, so
+$A = 1$. Applying $x(1) = 0$ gives $0 = -e^{-10} + 1 + B$, so $B = e^{-10} - 1$.
+Inserting the integration constants gives the analytical solution
+\begin{align}
+  u(x) = 1 - (1 - e^{-10})x - e^{-10x}
+\end{align}
+where $0 < x < 1$ and $u(0) = u(1) = 0$.
+\section{Method}
+The algorithms were implemented in C++, Julia and Fortran, with the purpose of
+learning more languages and verifying the correctness of the implementations.
+The source code is available in the attatched GIT-repository. The calculations
+were timed and performed several times. The implementations are explained and listed
+in the following sections with pseudocode.
+\subsection{The general Thomas algorithm}
+Pseudocode.
+\subsection{The tailored algorithm}
+Pseudocode.
+\subsection{The LU-decomposition}
+Armadillo functions lu and solve.
+\subsection{Error analysis}
+\begin{align*}
+  \epsilon_i = \text{log}_{10} \left( \left| \frac{v_i - u_i}{u_i} \right| \right)
+\end{align*}
+where $v_i$ is the numerically calculated value at $x_i$, and $u_i$ is the analytic value.
+\section{Results and discussion}
+\subsection{Solution using the algorithms}
+Plot osv.
+\subsection{Error and error analysis}
+Plot av feil for mange $n$.
+\subsection{Computational speed}
+Tabell med hastigheter. kjør mange ganger, ta avg.
+
+\section{Conclusion}
+
+\section{References}
+
+
+
+
 \end{document}
