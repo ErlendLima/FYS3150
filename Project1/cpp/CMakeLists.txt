@@ -46,7 +46,7 @@ add_executable(solve src/main.cpp)
 # own executable. Separating out main() means you can add this library to be
 # used elsewhere.
 
-target_link_libraries(solve blas lapack armadillo project1_lib)
+target_link_libraries(solve project1_lib blas lapack -O1 armadillo )
 
 ################################
 # Testing
@@ -75,7 +75,7 @@ if (test)
   target_link_libraries(runUnitTests gtest gtest_main)
 
   # # Extra linking for the project.
-  target_link_libraries(runUnitTests blas lapack armadillo project1_lib)
+  target_link_libraries(runUnitTests project1_lib blas lapack -O1 armadillo)
 
   # This is so you can do 'make test' to see all your tests run, instead of
   # manually running the executable runUnitTests to see those specific tests.

@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     solver.setRepetitions(1e0);
     try{
         // retval = solver.solve(Method::LU, 10, 1e3, 10);
-        // solver.setBounds(-2, 3);
         retval = solver.solve(Method::GENERAL, 10, 1e6, 10);
         // retval = solver.solve(Method::SPECIAL, 10, 1e6, 10);
         solver.calculateError(1e1, 1e6, 1e2);

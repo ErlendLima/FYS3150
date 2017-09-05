@@ -13,7 +13,7 @@ import operator
 from latextools import plotable, tag, untag, untag_all
 
 sns.set()
-SHOWPLOTS = False
+SHOWPLOTS = True
 
 
 def plotwrap(*args, **kwargs):
@@ -27,7 +27,7 @@ class Analyzer:
         self.load(path)
         self.analytic = self.compute_analytic_solution()
         self.compute_relative_error()
-        self.make_relative_error_plot()
+        # self.make_relative_error_plot()
 
     def load(self, path):
         matches = glob(os.path.join(path, '[G|L|S]*.txt'))
