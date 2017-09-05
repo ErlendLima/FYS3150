@@ -34,7 +34,7 @@ class Analyzer:
         matches.sort()
         self.data = {}
         for match in matches:
-            n = re.search('S(\d+)\.txt', match)
+            n = re.search('G(\d+)\.txt', match)
             if n is not None:
                 self.data[int(n.group(1))] = np.loadtxt(match)
         self.data = sorted(self.data.items(), key=operator.itemgetter(0))
@@ -75,7 +75,9 @@ class Analyzer:
 
     def make_relative_error_plot(self):
         arr = np.loadtxt("../cpp/data/E.txt")
-        plt.plot(arr[:,0], arr[:,1])
+        ar = arr[1:, :]
+        ar = ar[ar[:,1].argsort()]
+        plt.loglog(ar[:,0], ar[:,1])
         plt.show()
 
 

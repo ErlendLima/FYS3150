@@ -1,127 +1,90 @@
 #include <gtest/gtest.h>
 #include <armadillo>
+#include <memory>
 #include "../src/solver.h"
 
-#define TOLERANCE 1e-5
-#define LUTOLERANCE 1e-0
+#define TOLERANCE 1e-6
+#define LUTOLERANCE 1e-3
 // LU has so bad accuracy that it is a joke
 
+using sptr = std::shared_ptr<Solver>;
 double constfn(double x)     {return 1.0;}
 double constfn_sol(double x) {return -0.5*(x-1)*x;}
 double expfn(double x)       {return exp(x);}
 double expfn_sol(double x)   {return exp(1)*x-x-exp(x)+1;}
 double expfn_bounds(double x){return exp(1)*x+4*x-exp(x)-1;};
 
+class SolverTest : public ::testing::Test{
+protected:
+    virtual void SetUp(){
+        constSolver = std::make_unique<Solver>(constfn);
+        expSolver   = std::make_unique<Solver>(expfn);
+        boundSolver = std::make_unique<Solver>(expfn);
 
-TEST(LU, ConstantFn){
-    Solver solver(constfn);
-    solver.doSave(false);
-    solver.solve(Method::LU, 1e3, 1e3, 10);
-    auto expected = solver.getDomain();
-    expected.transform(constfn_sol);
-    auto solution = solver.getSolution();
-    std::cout << arma::sum(expected-solution) << std::endl;
-    ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", LUTOLERANCE));
+        constSolver->setAnalytical(constfn_sol);
+        expSolver  ->setAnalytical(expfn_sol);
+        boundSolver->setAnalytical(expfn_bounds);
+
+        constSolver->doSave(false);
+        expSolver  ->doSave(false);
+        boundSolver->doSave(false);
+
+        boundSolver->setBounds(-2, 3);
+    }
+    // virtual void TearDown(){}
+    sptr constSolver;
+    sptr expSolver;
+    sptr boundSolver;
+
+    // Helper function to compare calculated to analytic solution
+    bool _approx_equal(arma::vec A, arma::vec B, double tolerance){
+        if (arma::numel(A) != arma::numel(B))
+            throw std::runtime_error("Input vectors must be of equal size");
+
+        for(unsigned int n = 0; n < arma::numel(A); n++){
+            // auto diff =  fabs(A(n)-B(n))/fmax(fabs(A(n)), fabs(B(n)));
+            auto diff =  fabs(A(n)-B(n));
+            if (diff >= tolerance){
+                std::cout << "A,B = " << A(n) << '\t' << B(n) << '\n';
+                return false;
+            }
+        }
+        return true;
+    }
+    bool compareNumericToAnalytic(sptr solver, int steps, double tolerance){
+        auto expected = solver->makeDomain(steps);
+        expected->transform(solver->getAnalytical());
+        auto solution = solver->getSolution();
+        return _approx_equal(solution, *expected, tolerance);
+    }
+};
+
+TEST_F(SolverTest, LU){
+    int steps = 1e3;
+    constSolver->solve(Method::LU, steps, steps, 10);
+    expSolver  ->solve(Method::LU, steps, steps, 10);
+    boundSolver->solve(Method::LU, steps, steps, 10);
+    ASSERT_TRUE(compareNumericToAnalytic(constSolver, steps, LUTOLERANCE));
+    ASSERT_TRUE(compareNumericToAnalytic(expSolver,   steps, LUTOLERANCE));
+    ASSERT_TRUE(compareNumericToAnalytic(boundSolver, steps, LUTOLERANCE));
 }
 
-TEST(General, ConstantFn){
-    Solver solver(constfn);
-    solver.doSave(false);
-    solver.solve(Method::GENERAL, 1e6, 1e6, 10);
-    auto expected = solver.getDomain();
-    expected.transform(constfn_sol);
-    auto solution = solver.getSolution();
-    ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
+TEST_F(SolverTest, General){
+    int steps = 1e6;
+    constSolver->solve(Method::GENERAL, steps, steps, 10);
+    expSolver  ->solve(Method::GENERAL, steps, steps, 10);
+    boundSolver->solve(Method::GENERAL, steps, steps, 10);
+    ASSERT_TRUE(compareNumericToAnalytic(constSolver, steps, TOLERANCE));
+    ASSERT_TRUE(compareNumericToAnalytic(expSolver,   steps, TOLERANCE));
+    ASSERT_TRUE(compareNumericToAnalytic(boundSolver, steps, TOLERANCE));
 }
 
-TEST(Special, ConstantFn){
-    Solver solver(constfn);
-    solver.doSave(false);
-    solver.solve(Method::SPECIAL, 1e6, 1e6, 10);
-    auto expected = solver.getDomain();
-    expected.transform(constfn_sol);
-    auto solution = solver.getSolution();
-    ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
-}
-
-TEST(LU, ExpFn){
-    Solver solver(expfn);
-    solver.doSave(false);
-    solver.solve(Method::LU, 1e3, 1e3, 10);
-    auto expected = solver.getDomain();
-    expected.transform(expfn_sol);
-    auto solution = solver.getSolution();
-    ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", LUTOLERANCE));
-}
-
-TEST(General, ExpFn){
-    Solver solver(expfn);
-    solver.doSave(false);
-    solver.solve(Method::GENERAL, 1e6, 1e6, 10);
-    auto expected = solver.getDomain();
-    expected.transform(expfn_sol);
-    auto solution = solver.getSolution();
-    ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
-}
-
-TEST(Special, ExpFn){
-    Solver solver(expfn);
-    solver.doSave(false);
-    solver.solve(Method::SPECIAL, 1e6, 1e6, 10);
-    auto expected = solver.getDomain();
-    expected.transform(expfn_sol);
-    auto solution = solver.getSolution();
-    ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
-}
-
-TEST(LU, Bounds){
-    Solver solver(expfn);
-    solver.doSave(false);
-    solver.setBounds(-2, 3);
-    solver.solve(Method::LU, 1e3, 1e3, 10);
-    auto expected = solver.getDomain();
-    expected.transform(expfn_bounds);
-    auto solution = solver.getSolution();
-    ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", LUTOLERANCE));
-}
-
-TEST(General, Bounds){
-    Solver solver(expfn);
-    solver.doSave(true);
-    solver.setBounds(-2, 3);
-    solver.solve(Method::GENERAL, 1e6, 1e6, 10);
-    auto expected = solver.getDomain();
-    expected.transform(expfn_bounds);
-    auto solution = solver.getSolution();
-    ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
-}
-
-TEST(Special, Bounds){
-    Solver solver(expfn);
-    solver.doSave(false);
-    solver.setBounds(-2, 3);
-    solver.solve(Method::SPECIAL, 1e6, 1e6, 10);
-    auto expected = solver.getDomain();
-    expected.transform(expfn_bounds);
-    auto solution = solver.getSolution();
-    ASSERT_TRUE(arma::approx_equal(solution, expected, "reldiff", TOLERANCE));
-}
-TEST(Solve, Consistent){
-    // Function to solve for
-    double (*fn)(double) = [](double x){return x/2+1.0;};
-
-    Solver solver(fn);
-    solver.doSave(false);
-
-    solver.solve(Method::GENERAL, 1e6, 1e6, 10);
-    auto general = solver.getSolution();
-    solver.solve(Method::SPECIAL, 1e6, 1e6, 10);
-    auto special = solver.getSolution();
-    // solver.solve(Method::LU, 1e3, 1e3, 10);
-    // auto lu = solver.getSolution();
-
-    bool generalNspecial = arma::approx_equal(general, special, "reldiff", TOLERANCE);
-    // bool specialNLU = arma::approx_equal(special, lu, "reldiff", TOLERANCE);
-    ASSERT_TRUE(generalNspecial);
-    // ASSERT_TRUE(specialNLU);
+TEST_F(SolverTest, Special){
+    int steps = 1e6;
+    constSolver->solve(Method::SPECIAL, steps, steps, 10);
+    expSolver  ->solve(Method::SPECIAL, steps, steps, 10);
+    boundSolver->solve(Method::SPECIAL, steps, steps, 10);
+    ASSERT_TRUE(compareNumericToAnalytic(constSolver, steps, TOLERANCE));
+    ASSERT_TRUE(compareNumericToAnalytic(expSolver,   steps, TOLERANCE));
+    ASSERT_TRUE(compareNumericToAnalytic(boundSolver, steps, TOLERANCE));
 }
