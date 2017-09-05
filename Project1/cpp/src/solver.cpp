@@ -146,23 +146,20 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned 
         arma::vec x_ana     = *(makeDomain(n));
         arma::vec rel_error = arma::zeros(n);
 
-        // TODO: Replace with specialized algorithm, currently an issue with running it
-        arma::vec a = arma::vec(n+2); a.fill(-1);
-        arma::vec b = arma::vec(n+2); b.fill(2);
-        arma::vec c = arma::vec(n+2); c.fill(-1);
-        b[0] = 1; c[0] = 0; b[n+1] = 1; a[n+1] = 0;
-
         x_ana.transform(fnAnalytical);
-        x_num  = thomas(a, b, c, *btilde);
+        x_num  = thomasSpecial(*btilde);
 
-        for(unsigned int i = 2; i <= n-2; i++){
-            rel_error[i] = fabs((x_num[i] - x_ana[i])/x_ana[i]);
+        
+
+        for(unsigned int i = 1; i <= n-2; i++){
+            // rel_error(i) = fabs((x_num(i) - x_ana(i))/x_ana(i));
+            rel_error(i) = fabs(x_num(i) - x_ana(i));
         }
 
         errors[0][j] = 1.0/(n+1);
         errors[1][j] = rel_error.max();
         std::cout << "h = " << errors[0][j];
-        std::cout << " Log Relative error = "<< errors[1][j] << '\n';
+        // std::cout << " Log Relative error = "<< errors[1][j] << '\n';
     }
     for(unsigned int n = 0; n < n_iterations; n++){
         outputFile << errors[0][n] << " " << errors[1][n] << '\n';
