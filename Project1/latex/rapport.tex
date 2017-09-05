@@ -104,13 +104,15 @@
   Dirchelet boundary conditions are investigated. The equation was discretized,
   and written as a system of linear equations. This equates to
   a tridiagonal matrix equation, which was solved using the general Thomas algorithm,
-  a specialized version of the Thomas algorithm and by LU-decomposing the matrix.
+  a specialized version of the Thomas algorithm and by LU-decomposing the matrix. The
+  numerical error is then analyzed for both methods, and the algorithm speeds are investigated and discussed.
 
   The specialization of the algorithm for our specific problem resulted in
   a x percent reduction in the amount of floating point operations. For large
   matrices ($n \sim 10^5$) the LU-decomposition requires
   more memory than what was available, which was not a problem with the Thomas
-  algorithm. Therefore the Thomas is more suited for solving the problem
+  algorithm. Also, the Thomas algorithm produced solutions with smaller errors
+  than the LU method. Therefore the Thomas is deemed most suited for solving the problem
   examined in this paper.
 \end{abstract}
 
@@ -312,17 +314,19 @@ solution is obtained by integrating with respect to $x$ twice
 \end{align*}
 Imposing the boundary condition $x(0) = 0$ gives $u(0) = 0 = -1 + A$, so
 $A = 1$. Applying $x(1) = 0$ gives $0 = -e^{-10} + 1 + B$, so $B = e^{-10} - 1$.
-Inserting the integration constants gives the analytical solution
+Inserting the integration constants returns the analytical solution
 \begin{align}
   u(x) = 1 - (1 - e^{-10})x - e^{-10x}
 \end{align}
 where $0 < x < 1$ and $u(0) = u(1) = 0$.
+
 \section{Method}
 The algorithms were implemented in C++, Julia and Fortran, with the purpose of
-learning more languages and verifying the correctness of the implementations.
+learning multiple programming languages and verifying the correctness of the implementations.
 The source code is available in the attatched GIT-repository. The calculations
-were timed and performed several times. The implementations are explained and listed
-in the following sections with pseudocode.
+were performed several times, and for each method the algorithm times were averaged to produce a
+mean time. The implementations are explained and listed in the following sections with pseudocode.
+
 \subsection{The general Thomas algorithm}
 Pseudocode.
 \subsection{The tailored algorithm}
@@ -339,14 +343,46 @@ where $v_i$ is the numerically calculated value at $x_i$, and $u_i$ is the analy
 Plot osv.
 \subsection{Error and error analysis}
 Plot av feil for mange $n$.
-\subsection{Computational speed}
+\subsection{Timing the algorithms}
 Tabell med hastigheter. kjør mange ganger, ta avg.
 
 \section{Conclusion}
 
 \section{References}
 
+\section{Appendix}
+\subsection{Deriving a general expression for the diagonal elements after forward substituting}
+The general expression for the diagonal elements in $A$ after forward substituting was
+\begin{align*}
+  b'_i = b_i - \frac{a_i}{b'_{i-1} c_i}
+\end{align*}
+for $i = 2, \hdots, n$. Since $a_i = c_i$ for all $i$ in the special case examined in this paper,
+ the expression for $b'_i$ simplifies to
+\begin{align*}
+  b'_i = b_i - \frac{1}{b'_{i-1}}
+\end{align*}
+In an attempt at further simplify the expression, a few iterations are calculated, and
+a pattern seems to emerge:
+\begin{align*}
+  b'_1 &= b_1 = 2\\
+  b'_2 &= b_2 - \frac{1}{b'_1} = 2 - \frac{1}{2} = \frac{3}{2}\\
+  b'_3 &= b_3 - \frac{1}{b'_2} = 2 - \frac{2}{3} = \frac{4}{3}\\
+  b'_4 &= b_4 - \frac{1}{b'_3} = 2 - \frac{3}{4} = \frac{5}{4}
+\end{align*}
+By inspection, $b'_i$ seems to follow the pattern
+\begin{align*}
+  b'_i &= \frac{i+1}{i}
+\end{align*}
+which is assumed valid for $i = 1,2,\hdots,n$. A proof by induction is used to
+show that the formula is indeed correct for all $i \geq 1$.
+\\[12pt]
+For any integer $i \geq 1$, let $S(i)$ denote the statement
+\begin{align*}
+  S(i): b'_i = 2 - \frac{1}{b'_{i-1}} = \frac{i+1}{i}
+\end{align*}
+where we have defined $b'_{1} = 2$.
 
+$S(1)$ says $b_1 = 2 - \frac{1}{b'_{i-1}} = 2$, which is correct by the simple fact that $b'_1 = b_i = 2$.
 
-
+For some fixed $j \geq
 \end{document}
