@@ -13,48 +13,41 @@ arma::vec thomas(const arma::vec& a, const arma::vec& b, const arma::vec& c, con
     arma::vec u      = arma::zeros(n);
 
     // Forward sweep
-    double btmp = b[1];
-    u[1]        = f[1]/btmp;
-    for(unsigned int i = 2; i <= n-2; i++){
+    double btmp = b[0];
+    u[0]        = f[0]/btmp;
+
+    for(unsigned int i = 1; i <= n-1; i++){
         tmp[i] = c[i-1]/btmp;
         btmp   = b[i]-a[i]*tmp[i];
         u[i]   = (f[i]-a[i]*u[i-1])/btmp;
     }
 
     // Backward substitution
-    for(unsigned int i = n-3; i > 0; i--)
+    for(unsigned int i = n-1; i >= 1; i--)
         u[i] -= tmp[i+1]*u[i+1];
 
     return u;
 }
 
-
-arma::vec thomast(const arma::vec& a, const arma::vec& b, const arma::vec& c, const arma::vec& f){
-    /* Implementation of Thomas Algorithm as described p. 186*/
-    if(arma::numel(a) != arma::numel(b) ||
-       arma::numel(b) != arma::numel(c) ||
-       arma::numel(c) != arma::numel(f))
-        throw std::runtime_error("Input vectors must be of equal length");
-
-    const size_t n   = arma::numel(a);
-    arma::vec tmp    = arma::zeros(n);
+arma::vec thomasSpecial(const arma::vec& v){
+    const size_t n   = arma::numel(v);
     arma::vec u      = arma::zeros(n);
+    arma::vec c      = arma::zeros(n);
+    double bprime    = 2.0;
 
-    // Forward sweep
-    double btmp = b[1];
-    u[1]        = f[1]/btmp;
+    u[1] = v[1];
     for(unsigned int i = 2; i <= n-2; i++){
-        tmp[i] = c[i-1]/btmp;
-        btmp   = b[i]-a[i]*tmp[i];
-        u[i]   = (f[i]-a[i]*u[i-1])/btmp;
+        c[i]      = -1.0/bprime;
+        bprime    = (i+1.0)/i;
+        u[i]      = (v[i]+u[i-1])/bprime;
     }
 
-    // Backward substitution
-    for(unsigned int i = n-3; i > 0; i--)
-        u[i] -= tmp[i+1]*u[i+1];
-
+    for(unsigned int i = n-3; i > 0; i--){
+      u[i] = u[i] - c[i]*u[i+1];
+    }
     return u;
 }
+
 arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double lower){
     auto mat = arma::mat(size, size, arma::fill::zeros);
     for (unsigned int row = 1; row < size-1; row++){
@@ -69,34 +62,4 @@ arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double 
     mat(0,0) = 1;
     mat(size-1, size-1) = 1;
     return mat;
-}
-
-
-arma::vec thomasSpecial(const arma::vec& v){
-
-    const size_t n   = arma::numel(v);
-    arma::vec u      = arma::zeros(n);
-    arma::vec c      = arma::zeros(n);
-    double bprime    = 2.0;
-
-    u[1] = v[1];
-    for(unsigned int i = 2; i <= n-2; i++){
-        c[i]      = -1.0/bprime;
-        bprime    = (i+1.0)/i;
-        u[i]      = (v[i]+u[i-1])/bprime;
-    }
-    for(unsigned int i = n-3; i > 0; i--){
-      u[i] = u[i] - c[i]*u[i+1];
-    }
-    return u;
-}
-
-arma::vec analyticSolution(const arma::vec& x){
-    const size_t n  = arma::numel(x);
-    arma::vec u     = arma::zeros(n);
-
-    for(unsigned int i = 0; i <= n; i++){
-        u[i] = 1 - (1 - exp(-10))*x[i] - exp(-10*x[i]);
-    }
-    return u;
 }

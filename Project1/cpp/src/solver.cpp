@@ -7,7 +7,7 @@
 #include "solver.h"
 #include "solve.h"
 
-Solver::Solver(double (*function)(double)){
+Solver::Solver(const std::function<double(double)>& function){
     fn = function;
 }
 
@@ -27,7 +27,6 @@ std::unique_ptr<arma::vec> Solver::makeBtilde(unsigned int n){
 
     // Set the boundary conditions
     (*btilde)[0] = lowerBound; (*btilde)[n+1] = upperBound;
-
     return std::move(btilde);
 }
 
@@ -130,6 +129,7 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned 
 
     std::ofstream outputFile("data/E.txt");
 
+    std::cout << "=== Running error calculations ===" << std::endl;
     #pragma omp parallel for
     for(unsigned int n = n_start; n <= n_stop; n+=step){
 

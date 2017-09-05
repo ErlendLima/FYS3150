@@ -24,9 +24,9 @@ def plotwrap(*args, **kwargs):
 
 class Analyzer:
     def __init__(self, path):
-        # self.load(path)
-        # self.analytic = self.compute_analytic_solution()
-        # self.compute_relative_error()
+        self.load(path)
+        self.analytic = self.compute_analytic_solution()
+        self.compute_relative_error()
         self.make_relative_error_plot()
 
     def load(self, path):
@@ -73,12 +73,12 @@ class Analyzer:
                                             tablefmt="latex"))
         print(table)
 
+    @plotwrap(saveas='error.eps')
     def make_relative_error_plot(self):
         arr = np.loadtxt("../cpp/data/E.txt")
         ar = arr[1:, :]
-        ar = ar[ar[:,1].argsort()]
+        # ar = ar[ar[:,1].argsort()]
         plt.loglog(ar[:,0], ar[:,1])
-        plt.show()
 
 
 if __name__ == '__main__':
@@ -87,4 +87,4 @@ if __name__ == '__main__':
                         help="Directory to search for input files")
     args = parser.parse_args()
     analyzer = Analyzer(args.search_path)
-    # analyzer.plot(show=True)
+    analyzer.plot(show=True)
