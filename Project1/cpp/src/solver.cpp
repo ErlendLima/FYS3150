@@ -107,6 +107,7 @@ void Solver::solveLU(unsigned int n) {
 }
 
 void Solver::save(const std::string& identifier){
+  std::cout << solution(arma::numel(solution)-1) << std::endl;
     solution.save(savepath+identifier, arma::raw_ascii);
 }
 

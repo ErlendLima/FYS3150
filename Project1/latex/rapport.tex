@@ -279,7 +279,7 @@ calculations, since all the calculations involving only $a_i$, $b_i$ and $c_i$
 can be done beforehand. Also, it is possible to derive an analytic expression for
 $b'_i$. This is given by
 \begin{align*}
-  b'_i =
+  b'_i = \frac{i+1}{i}
 \end{align*}
 and is found and proved by induction in appendix A?.
 \subsection{Solving the general tridiagonal matrix problem by LU-decomposition}
@@ -381,8 +381,15 @@ For any integer $i \geq 1$, let $S(i)$ denote the statement
   S(i): b'_i = 2 - \frac{1}{b'_{i-1}} = \frac{i+1}{i}
 \end{align*}
 where we have defined $b'_{1} = 2$.
-
-$S(1)$ says $b_1 = 2 - \frac{1}{b'_{i-1}} = 2$, which is correct by the simple fact that $b'_1 = b_i = 2$.
-
-For some fixed $j \geq
+\\[12pt]
+In the case $i = 1$, $S(1)$ is obviously true because $b'_1$ is defined as $b'_1 = b_i = 2$.
+Now, for some fixed $j \geq 1$, assume that $S(j)$ holds. Then, $b_{j+1}$ is given by
+\begin{align*}
+  b'_{j+1} = 2 - \frac{1}{b'_j}
+\end{align*}
+But since $S(j)$ holds, $b'_j = \frac{j+1}{j}$, and
+\begin{align*}
+  b'_{j+1} = 2 - \frac{j}{j+1} = \frac{j+2}{j+1} = \frac{(j+1) + 1}{(j+1)}
+\end{align*}
+which proves $S(i)$ is true for all $i \geq 1$.
 \end{document}
