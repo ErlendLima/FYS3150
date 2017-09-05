@@ -7,7 +7,9 @@
 #include "solver.h"
 #include "solve.h"
 
-Solver::Solver(double (*function)(double)){
+using namespace std::placeholders;
+
+Solver::Solver(const std::function<double(double)>& function){
     fn = function;
 }
 
@@ -27,27 +29,27 @@ std::unique_ptr<arma::vec> Solver::makeBtilde(unsigned int n){
 
     // Set the boundary conditions
     (*btilde)[0] = lowerBound; (*btilde)[n+1] = upperBound;
-
     return std::move(btilde);
 }
 
 int Solver::solve(Method method, unsigned int low, unsigned int high, unsigned int step) {
     char identifier;
-    void (Solver::*targetSolver)(unsigned int);
+    // void (Solver::*targetSolver)(unsigned int);
+    std::function<void(unsigned int)> targetSolver;
     switch (method) {
     case Method::GENERAL:
         std::cout << "=== Using the general method ===" << std::endl;
-        targetSolver = &Solver::solveGeneral;
+        targetSolver = std::bind(&Solver::solveGeneral, this, _1);
         identifier = 'G';
         break;
     case Method::SPECIAL:
         std::cout << "=== Using the specialized method ===" << std::endl;
-        targetSolver = &Solver::solveSpecial;
+        targetSolver = std::bind(&Solver::solveSpecial, this, _1);
         identifier = 'S';
         break;
     case Method::LU:
         std::cout << "=== Using LU decomposition === " << std::endl;
-        targetSolver = &Solver::solveLU;
+        targetSolver = std::bind(&Solver::solveLU, this, _1);
         identifier = 'L';
         break;
     default:
@@ -58,7 +60,7 @@ int Solver::solve(Method method, unsigned int low, unsigned int high, unsigned i
     for(unsigned int n = low; n <= high; n *= step){
         std::cout << "Solving for " << n << "×" << n << " matrix using "
                   << repetitions << " repetitions\n";
-        (this->*targetSolver)(n);
+        targetSolver(n);
         if(saveFlag){
             std::stringstream name;
             name << identifier << n << ".txt";
@@ -131,6 +133,7 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned 
 
     std::ofstream outputFile("data/E.txt");
 
+    std::cout << "=== Running error calculations ===" << std::endl;
     #pragma omp parallel for
     for(unsigned int n = n_start; n <= n_stop; n+=step){
 

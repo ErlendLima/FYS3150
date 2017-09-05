@@ -26,7 +26,11 @@ class Analyzer:
     def __init__(self, path):
         self.load(path)
         self.analytic = self.compute_analytic_solution()
+<<<<<<< HEAD
         # self.compute_relative_error()
+=======
+        self.compute_relative_error()
+>>>>>>> 9285eeb912a917daa438682445d3cc983d36dfad
         self.make_relative_error_plot()
 
     def load(self, path):
@@ -73,12 +77,12 @@ class Analyzer:
                                             tablefmt="latex"))
         print(table)
 
+    @plotwrap(saveas='error.eps')
     def make_relative_error_plot(self):
         arr = np.loadtxt("../cpp/data/E.txt")
         ar = arr[1:, :]
         ar = ar[ar[:,1].argsort()]
         plt.loglog(ar[:,0], ar[:,1])
-        plt.show()
 
 
 if __name__ == '__main__':
