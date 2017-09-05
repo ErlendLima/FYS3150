@@ -27,7 +27,7 @@ class Analyzer:
         self.load(path)
         self.analytic = self.compute_analytic_solution()
         self.compute_relative_error()
-        # self.make_relative_error_plot()
+        self.make_relative_error_plot()
 
     def load(self, path):
         matches = glob(os.path.join(path, '[G|L|S]*.txt'))
@@ -77,7 +77,7 @@ class Analyzer:
     def make_relative_error_plot(self):
         arr = np.loadtxt("../cpp/data/E.txt")
         ar = arr[1:, :]
-        # ar = ar[ar[:,1].argsort()]
+        ar = ar[ar[:,1].argsort()]
         plt.loglog(ar[:,0], ar[:,1])
 
 

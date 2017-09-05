@@ -28,26 +28,6 @@ arma::vec thomas(const arma::vec& a, const arma::vec& b, const arma::vec& c, con
     return u;
 }
 
-arma::vec thomasSpecial(const arma::vec& v){
-    const size_t n   = arma::numel(v);
-    arma::vec u      = arma::zeros(n);
-    arma::vec c      = arma::zeros(n);
-    double bprime    = 2.0;
-
-    u[1] = v[1];
-    for(unsigned int i = 2; i <= n-2; i++){
-        tmp(i) = c(i-1)/btmp;
-        btmp   = b(i)-a(i)*tmp(i);
-        u(i)   = (f(i)-a(i)*u(i-1))/btmp;
-    }
-
-    // Backward substitution
-    for(unsigned int i = n-3; i > 0; i--)
-        u(i) -= tmp[i+1]*u[i+1];
-
-    return u;
-}
-
 arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double lower){
     auto mat = arma::mat(size, size, arma::fill::zeros);
     for (unsigned int row = 1; row < size-1; row++){
