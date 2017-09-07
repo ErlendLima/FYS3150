@@ -59,12 +59,9 @@ arma::vec thomasSpecial(const arma::vec& v){
       b_prime[i] = static_cast<double>(i+1)/i;
       v_prime(i) = v(i) + (v_prime(i-1)/b_prime[i]);
   }
-  // u[n] = v_prime[n]/b_prime[n];
-  std::cout << u(n-1);
 
   for(unsigned int i = n-2; i >= 1; i--){
       u(i) = (v_prime(i) + u(i+1))/b_prime[i];
   }
-  std::cout << u(n-1);
   return u;
 }

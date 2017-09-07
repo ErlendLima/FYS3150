@@ -54,6 +54,39 @@
 \floatstyle{plaintop}
 \restylefloat{table}
 
+% SET LISTING STUFF (FRED)
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{dred}{rgb}{0.545,0,0}
+\definecolor{dblue}{rgb}{0,0,0.545}
+\definecolor{lgrey}{rgb}{0.9,0.9,0.9}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\lstdefinelanguage{cpp}{
+      backgroundcolor=\color{lgrey},
+      basicstyle=\footnotesize \ttfamily \color{black} \bfseries,
+      breakatwhitespace=false,
+      breaklines=true,
+      captionpos=b,
+      commentstyle=\color{dkgreen},
+      deletekeywords={...},
+      escapeinside={\%*}{*)},
+      frame=single,
+      language=C++,
+      keywordstyle=\color{purple},
+      morekeywords={BRIEFDescriptorConfig,string,TiXmlNode,DetectorDescriptorConfigContainer,istringstream,cerr,exit},
+      identifierstyle=\color{black},
+      stringstyle=\color{blue},
+      numbers=left,
+      numbersep=5pt,
+      numberstyle=\tiny\color{black},
+      rulecolor=\color{black},
+      showspaces=false,
+      showstringspaces=false,
+      showtabs=false,
+      stepnumber=1,
+      tabsize=5,
+      title=\lstname,
+    }
 
 \newcommand{\mc}[2]{\multicolumn{#1}{c}{#2}}
 \definecolor{Gray}{gray}{0.90}
@@ -282,6 +315,7 @@ $b'_i$. This is given by
   b'_i = \frac{i+1}{i}
 \end{align*}
 and is found and proved by induction in appendix A?.
+
 \subsection{Solving the general tridiagonal matrix problem by LU-decomposition}
 Another way to solve matrix equations is LU-decomposing A, and then solving
 two matrix equations. This is a frequently used method for solving more general
@@ -302,6 +336,10 @@ which is then inserted in LABEL
   U\mathbf{u} = \mathbf{y}
 \end{align*}
 and solved for $\mathbf{u}$.
+
+\subsection{Comparison of number of floating point operations for the three methods}
+Calculation of number of floating point operations.
+
 \subsection{Analytic solution for a specific problem}
 In this paper the following special case of the Poisson equation is examined:
 \begin{align}
@@ -328,16 +366,71 @@ were performed several times, and for each method the algorithm times were avera
 mean time. The implementations are explained and listed in the following sections with pseudocode.
 
 \subsection{The general Thomas algorithm}
-Pseudocode.
-\subsection{The tailored algorithm}
-Pseudocode.
+The general Thomas algorithm consists of the forward and backward substitutions
+examined in the theory section. In pseudocode the loop was implemented as
+\begin{lstlisting}[language=cpp, caption={Thomas algorithm implementation for a general tridiagonal matrix}]
+b_prime[0] = b[0];
+v_prime[0] = v[0];
+
+// Forward substitution
+for(i = 1; i <= n-1; i++)
+    b_prime[i] = b[i] - (a[i]/b_prime[i-1])*c[i-1];
+    v_prime[i] = v[i] - (a[i]/b_prime[i-1])*v_prime[i-1];
+}
+// Backward substitution
+for(i = n-2; i >= 1; i--){
+    u[i] = (v_prime[i] - c[i]*u[i+1])/b_prime[i];
+}
+\end{lstlisting}
+\subsection{The optimized algorithm}
+Because of the fact that the matrix examined in this paper is both tridiagonal and
+symmetric, further optimizations to the algorithm can be made. Since $a_i = c_i = -1$
+and $b'_i = (i+1)/i$ can be precomputed, the algorithm simplifies to
+\begin{lstlisting}[language=cpp, caption={Optimized version of Thomas algorithm for a symmetrix tridiagonal matrix}]
+// b_prime is now precomputed
+for(i = 1; i <= n-1; i++)
+    b_prime[i] = (i+1)/i;
+
+v_prime[0] = v[0];
+
+// Forward substitution
+for(i = 1; i <= n-1; i++)
+    v_prime[i] = v[i] + (v_prime[i-1]/b_prime[i-1]);
+}
+// Backward substitution
+for(i = n-2; i >= 1; i--){
+    u[i] = (v_prime[i] + u[i+1])/b_prime[i];
+}
+\end{lstlisting}
 \subsection{The LU-decomposition}
-Armadillo functions lu and solve.
+Solving the matrix equation using the LU-decomposition method was done with
+functions from the Armadillo C++ Linear Algebra Library. First, the tridiagonal
+matrix A is implemented, and then the Armadillo functions \texttt{lu()} and \texttt{solve()}
+are used to solve the two factored matrix equations. In pseudocode, the implementation is
+\begin{lstlisting}[language=cpp, caption={Pseudocode of LU-decomposition method implementation}]
+#include <armadillo>
+
+for (row = 0; row < size-1; row++){
+    A(row, row) = 2;
+    if (row > 0)
+        A(row, row-1) = -1;
+    if (row < size-1)
+        A(row, row+1) = -1;
+
+lu(L,U,A);
+y = solve(L, btilde);
+u = solve(U, y);
+\end{lstlisting}
 \subsection{Error analysis}
+The relative error of the numerical solution at $x_i$ is given by
 \begin{align*}
-  \epsilon_i = \text{log}_{10} \left( \left| \frac{v_i - u_i}{u_i} \right| \right)
+  \epsilon_i = \left| \frac{v_i - u_i}{u_i} \right|
 \end{align*}
-where $v_i$ is the numerically calculated value at $x_i$, and $u_i$ is the analytic value.
+where $v_i$ is the numerically calculated value and $u_i$ is the analytic value.
+The implementation of the analytic solution is rather straightforward. For several
+$n$ the errors $\epsilon_i$ are calculated using the above formula, and the
+maximum error $\epsilon_\text{n,max}$ is extracted, saved and later plotted against $n$.
+For obvious reasons, these calculations the optimized version of the Thomas algorithm were used.
 \section{Results and discussion}
 \subsection{Solution using the algorithms}
 Plot osv.
