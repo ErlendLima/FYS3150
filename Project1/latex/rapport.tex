@@ -35,6 +35,7 @@
 \usepackage{pstool} \usepackage{pgfplots}
 \usepackage{wrapfig} \usepackage{graphicx} \usepackage{epstopdf}
 \usepackage{afterpage}
+\usepackage{physics}
 \usepackage{multirow}
 \usepackage{gensymb}
 \usepackage{algorithm}
@@ -430,7 +431,7 @@ where $v_i$ is the numerically calculated value and $u_i$ is the analytic value.
 The implementation of the analytic solution is rather straightforward. For several
 $n$ the errors $\epsilon_i$ are calculated using the above formula, and the
 maximum error $\epsilon_\text{n,max}$ is extracted, saved and later plotted against $n$.
-For obvious reasons, these calculations the optimized version of the Thomas algorithm were used.
+For obvious reasons, for these calculations the optimized version of the Thomas algorithm was used.
 \section{Results and discussion}
 \subsection{Solution using the algorithms}
 Plot osv.
@@ -444,6 +445,31 @@ Tabell med hastigheter. kjør mange ganger, ta avg.
 \section{References}
 
 \section{Appendix}
+\subsection{Second derivative}
+In section 2 we introduced a approximated expression for the second derivative. To derive this expression, consider a general Taylor expansion
+\begin{align*}
+f(x) = \sum_{n = 0}^{\infty}\frac{f^{n}(a)}{n!}(x-a)^{n}
+\end{align*}
+Let $u(x)$ be real valued function and $x\in \mathbb{R}$. We will now expand the function $u(x+h)$ and $u(x-h)$ around $a = x$
+to third order
+\begin{align*}
+u(x+h) \approx u(x)  + \dv{u}{x}h + \dv[2]{u}{x}\frac{h^2}{2!} + \dv[3]{u}{x}\frac{h^3}{3!} + \mathbb{O}(h^4)
+\\
+u(x-h) \approx u(x) - \dv{u}{x}h + \dv[2]{u}{x}\frac{h^2}{2!} - \dv[3]{u}{x}\frac{h^3}{3!} + \mathbb{O}(h^4)
+\end{align*}
+Notice, the reason why $u(x-h)$ and $u(x+h)$ was expanded to third order is because the third derivatives cancel each other out, and therefore the error must lie around the fourth term expansion. Now add $u(x-h)$ to $u(x+h)$
+\begin{align*}
+u(x+h) + u(x-h) \approx 2u(x) + \dv[2]{u}{x}h^2 + 2\mathbb{O}(h^4)
+\end{align*}
+Taking the $2$ inside $\mathbb{O}(h^4)$ and solving it for $\dv[2]{u}{x}$
+\begin{align*}
+\dv[2]{u}{x} \approx \frac{u(x+h) + u(x-h) - 2u(x)}{h^2} + \mathbb{O}(h^2)
+\end{align*}
+note that $\frac{\mathbb{O}(h^4)}{h^2} = \mathbb{O}(h^2)$. If we let \(h \to 0\)
+we will get an exact expression for the second derivative.
+\begin{align*}
+  \dv[2]{u}{x} = \lim_{h \to 0} \frac{u(x+h) + u(x-h) - 2u(x))}{h^{2}} + \mathbb{O}(h^{2})
+\end{align*}
 \subsection{Deriving a general expression for the diagonal elements after forward substituting}
 The general expression for the diagonal elements in $A$ after forward substituting was
 \begin{align*}
