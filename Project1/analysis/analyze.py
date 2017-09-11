@@ -26,15 +26,15 @@ class Analyzer:
     def __init__(self, path):
         self.load(path)
         self.analytic = self.compute_analytic_solution()
-        self.compute_relative_error()
+        # self.compute_relative_error()
         self.make_relative_error_plot()
 
-    def load(self, path):
+    def load(self, path, tag='S'):
         matches = glob(os.path.join(path, '[G|L|S]*.txt'))
         matches.sort()
         self.data = {}
         for match in matches:
-            n = re.search('G(\d+)\.txt', match)
+            n = re.search('{}(\d+)\.txt'.format(tag), match)
             if n is not None:
                 self.data[int(n.group(1))] = np.loadtxt(match)
         self.data = sorted(self.data.items(), key=operator.itemgetter(0))
@@ -78,7 +78,8 @@ class Analyzer:
         arr = np.loadtxt("../cpp/data/E.txt")
         ar = arr[1:, :]
         ar = ar[ar[:,1].argsort()]
-        plt.loglog(ar[:,0], ar[:,1])
+        plt.loglog(ar[1:,0], ar[1:,1])
+        plt.scatter(ar[1:,0], ar[1:,1])
 
 
 if __name__ == '__main__':

@@ -49,22 +49,20 @@ arma::vec thomasSpecial(const arma::vec& v){
 
   const size_t n   = arma::numel(v);
 
-  double b_prime[n];
+  // double b_prime[n];
+  arma::vec b_prime = arma::zeros(n);
   arma::vec v_prime = arma::zeros(n);
   arma::vec u       = arma::zeros(n);
 
   v_prime(0) = v(0);
 
   for(unsigned int i = 1; i <= n-1; i++){
-      b_prime[i] = static_cast<double>(i+1)/i;
-      v_prime(i) = v(i) + (v_prime(i-1)/b_prime[i]);
+      b_prime(i) = static_cast<double>(i+1)/i;
+      v_prime(i) = v(i) + (v_prime(i-1)/b_prime(i));
   }
-  // u[n] = v_prime[n]/b_prime[n];
-  std::cout << u(n-1);
 
   for(unsigned int i = n-2; i >= 1; i--){
-      u(i) = (v_prime(i) + u(i+1))/b_prime[i];
+      u(i) = (v_prime(i) + u(i+1))/b_prime(i);
   }
-  std::cout << u(n-1);
   return u;
 }

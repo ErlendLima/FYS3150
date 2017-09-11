@@ -109,7 +109,6 @@ void Solver::solveLU(unsigned int n) {
 }
 
 void Solver::save(const std::string& identifier){
-  std::cout << solution(arma::numel(solution)-1) << std::endl;
     solution.save(savepath+identifier, arma::raw_ascii);
 }
 
@@ -125,17 +124,21 @@ void Solver::endTiming(){
               << "Average CPU time:  " << CPUTime/repetitions << "s" << std::endl;
 }
 
-void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned int step){
+void Solver::calculateError(unsigned int n_start, unsigned int n_stop){
     saveFlag = false;  // Dont dump everything
-    unsigned int n_iterations = (n_stop - n_start)/step;
-    double errors[2][n_iterations] = {0};
+    unsigned int n_iterations = 50;
+    unsigned int step       = (n_stop - n_start)/n_iterations;
+    double errors[2][n_iterations];
     unsigned int M = 0;
+    unsigned int i = 0;
 
     std::ofstream outputFile("data/E.txt");
 
     std::cout << "=== Running error calculations ===" << std::endl;
     #pragma omp parallel for
     for(unsigned int n = n_start; n <= n_stop; n+=step){
+        std::cout << "------------------------" << std::endl;
+        std::cout << "Calculating for n = " << n << std::endl;
 
         unsigned int j;
         #pragma omp atomic capture
@@ -149,23 +152,22 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned 
         arma::vec x_ana     = *(makeDomain(n));
         arma::vec rel_error = arma::zeros(n);
 
-        // TODO: Replace with specialized algorithm, currently an issue with running it
-        arma::vec a = arma::vec(n+2); a.fill(-1);
-        arma::vec b = arma::vec(n+2); b.fill(2);
-        arma::vec c = arma::vec(n+2); c.fill(-1);
-        b[0] = 1; c[0] = 0; b[n+1] = 1; a[n+1] = 0;
-
+        // std::cout << "Got here1" << std::endl;
         x_ana.transform(fnAnalytical);
-        x_num  = thomas(a, b, c, *btilde);
+        // std::cout << "got here 2" << std::endl;
+        x_num  = thomasSpecial(*btilde);
+        // std::cout << "Got here3" << std::endl;
 
-        for(unsigned int i = 2; i <= n-2; i++){
-            rel_error[i] = fabs((x_num[i] - x_ana[i])/x_ana[i]);
+
+        for(unsigned int i = 1; i <= n-2; i++){
+            rel_error(i) = fabs((x_num(i) - x_ana(i))/x_ana(i));
+            // rel_error(i) = fabs(x_num(i) - x_ana(i));
         }
 
-        errors[0][j] = 1.0/(n+1);
-        errors[1][j] = rel_error.max();
-        std::cout << "h = " << errors[0][j]  << '\t' << x_ana[rel_error.index_max()] << '\t' << x_num[rel_error.index_max()]<< std::endl;
-        std::cout << " Log Relative error = "<< errors[1][j] << '\n';
+        errors[0][i] = n;
+        errors[1][i] = rel_error.max();
+        std::cout << "Relative error = "<< errors[1][i] << std::endl;;
+        i++;
     }
     for(unsigned int n = 0; n < n_iterations; n++){
         outputFile << errors[0][n] << " " << errors[1][n] << '\n';

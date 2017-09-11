@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     Solver solver(func);
     solver.setAnalytical(funcAnalytic);
     solver.setSavepath("data/");
-    solver.setRepetitions(1e0);
+    solver.setRepetitions(100);
     try{
         // retval = solver.solve(Method::LU, 10, 1e3, 10);
         // retval = solver.solve(Method::GENERAL, 10, 1e7, 10);
