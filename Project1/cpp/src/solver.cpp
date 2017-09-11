@@ -164,7 +164,7 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop, unsigned 
 
         errors[0][j] = 1.0/(n+1);
         errors[1][j] = rel_error.max();
-        std::cout << "h = " << errors[0][j];
+        std::cout << "h = " << errors[0][j]  << '\t' << x_ana[rel_error.index_max()] << '\t' << x_num[rel_error.index_max()]<< std::endl;
         std::cout << " Log Relative error = "<< errors[1][j] << '\n';
     }
     for(unsigned int n = 0; n < n_iterations; n++){
