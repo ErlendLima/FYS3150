@@ -16,19 +16,18 @@ Solver::Solver(const std::function<double(double)>& function){
 Solver::~Solver(){};
 
 std::unique_ptr<arma::vec> Solver::makeDomain(unsigned int n){
-    double h = 1/static_cast<double>(n+2);
-    auto domain = std::make_unique<arma::vec>(h*arma::linspace(0, n+2, n+2)); // Armadillo lacks arange :(
+    double h = 1/static_cast<double>(n-1);
+    auto domain = std::make_unique<arma::vec>(h*arma::linspace(0, n, n)); // Armadillo lacks arange :(
     return std::move(domain);
 }
 
 std::unique_ptr<arma::vec> Solver::makeBtilde(unsigned int n){
-    double h = 1/static_cast<double>(n+2);
+    double h = 1/static_cast<double>(n-1);
     std::unique_ptr<arma::vec> btilde = makeDomain(n);
     btilde->transform(fn);
     (*btilde) *= h*h; // b~ = f(x)h^2
 
     // Set the boundary conditions
-    (*btilde)[0] = lowerBound; (*btilde)[n+1] = upperBound;
     return std::move(btilde);
 }
 
@@ -72,10 +71,9 @@ int Solver::solve(Method method, unsigned int low, unsigned int high, unsigned i
 
 void Solver::solveGeneral(unsigned int n) {
     auto btilde = makeBtilde(n);
-    arma::vec a = arma::vec(n+2); a.fill(-1);
-    arma::vec b = arma::vec(n+2); b.fill(2);
-    arma::vec c = arma::vec(n+2); c.fill(-1);
-    b[0] = 1; c[0] = 0; b[n+1] = 1; a[n+1] = 0;
+    arma::vec a = arma::vec(n); a.fill(-1);
+    arma::vec b = arma::vec(n); b.fill(2);
+    arma::vec c = arma::vec(n); c.fill(-1);
 
     startTiming();
     for(unsigned int r = 0; r < repetitions; r++)
@@ -94,7 +92,7 @@ void Solver::solveSpecial(unsigned int n){
 
 void Solver::solveLU(unsigned int n) {
     auto btilde = makeBtilde(n);
-    arma::mat A = tridiagonalMat(n+2, -1, 2, -1);
+    arma::mat A = tridiagonalMat(n, -1, 2, -1);
     arma::mat L, U;
     arma::vec y;
 
@@ -135,17 +133,9 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop){
     std::ofstream outputFile("data/E.txt");
 
     std::cout << "=== Running error calculations ===" << std::endl;
-    #pragma omp parallel for
     for(unsigned int n = n_start; n <= n_stop; n+=step){
         std::cout << "------------------------" << std::endl;
         std::cout << "Calculating for n = " << n << std::endl;
-
-        unsigned int j;
-        #pragma omp atomic capture
-        {
-            j = M;
-            M++;
-        }
 
         auto btilde = makeBtilde(n);          // Reset makeBtilde
         arma::vec x_num     = arma::zeros(n);
@@ -161,7 +151,6 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop){
 
         for(unsigned int i = 1; i <= n-2; i++){
             rel_error(i) = fabs((x_num(i) - x_ana(i))/x_ana(i));
-            // rel_error(i) = fabs(x_num(i) - x_ana(i));
         }
 
         errors[0][i] = n;
