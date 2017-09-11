@@ -13,12 +13,12 @@ int main(int argc, char *argv[])
     Solver solver(func);
     solver.setAnalytical(funcAnalytic);
     solver.setSavepath("data/");
-    solver.setRepetitions(100);
+    // solver.setRepetitions(100);
     try{
         // retval = solver.solve(Method::LU, 10, 1e3, 10);
-        // retval = solver.solve(Method::GENERAL, 10, 1e7, 10);
+        retval = solver.solve(Method::GENERAL, 10, 1e6, 2);
         // retval = solver.solve(Method::SPECIAL, 10, 1e6, 10);
-        solver.calculateError(1e6, 1e7, 1e5);
+        // solver.calculateError(1e6, 1e7);
     } catch (std::exception &ex){
         std::cerr << "Error: " << ex.what() << std::endl;
         return -1;

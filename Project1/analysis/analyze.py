@@ -23,19 +23,26 @@ def plotwrap(*args, **kwargs):
 
 
 class Analyzer:
-    def __init__(self, path):
-        self.load(path)
+    def __init__(self, path, *, loadLU=False, loadSpecial=False,
+                 loadGeneral=False):
+        self.load(path, loadLU, loadSpecial, loadGeneral)
         self.analytic = self.compute_analytic_solution()
         # self.compute_relative_error()
-        self.make_relative_error_plot()
+        self.investigate_error()
+        # self.make_relative_error_plot()
 
-    def load(self, path, tag='S'):
+    def load(self, path, loadLU=False, loadSpecial=False, loadGeneral=False):
         matches = glob(os.path.join(path, '[G|L|S]*.txt'))
         matches.sort()
         self.data = {}
+        tag = 'L' if loadLU else (
+            'G' if loadGeneral else 'S')
+
+        print(tag)
         for match in matches:
             n = re.search('{}(\d+)\.txt'.format(tag), match)
             if n is not None:
+                print(n)
                 self.data[int(n.group(1))] = np.loadtxt(match)
         self.data = sorted(self.data.items(), key=operator.itemgetter(0))
 
@@ -73,6 +80,16 @@ class Analyzer:
                                             tablefmt="latex"))
         print(table)
 
+    def investigate_error(self):
+        for n, data in self.data:
+            x, y = self.compute_analytic_solution(n+2)
+            x, y = x[1:-1], y[1:-1]
+            err = np.log10(np.abs((data[1:-1] - y)/y))
+            ind = np.argmax(err)
+            plt.plot(x[ind], y[ind], 'o')
+            print('lol')
+
+
     @plotwrap(saveas='error.eps')
     def make_relative_error_plot(self):
         arr = np.loadtxt("../cpp/data/E.txt")
@@ -86,6 +103,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Analyzes data for project 1')
     parser.add_argument('search_path', type=os.path.abspath,
                         help="Directory to search for input files")
+    parser.add_argument('-L', '--LU', action='store_true',
+                        help="Analyze LU")
+    parser.add_argument('-S', '--SP', action='store_true',
+                        help="Analyze special")
+    parser.add_argument('-G', '--GR', action='store_true',
+                        help="Analyze general")
     args = parser.parse_args()
-    analyzer = Analyzer(args.search_path)
-    analyzer.plot(show=True)
+    analyzer = Analyzer(args.search_path, loadLU=args.LU, loadSpecial=args.SP,
+                        loadGeneral=args.GR)
+    analyzer.plot()
