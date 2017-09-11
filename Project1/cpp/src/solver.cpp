@@ -16,8 +16,8 @@ Solver::Solver(const std::function<double(double)>& function){
 Solver::~Solver(){};
 
 std::unique_ptr<arma::vec> Solver::makeDomain(unsigned int n){
-    double h = 1/static_cast<double>(n-1);
-    auto domain = std::make_unique<arma::vec>(h*arma::linspace(0, n, n)); // Armadillo lacks arange :(
+    double h = 1/static_cast<double>(n+1);
+    auto domain = std::make_unique<arma::vec>(h*arma::linspace(0, n-1, n)); // Armadillo lacks arange :(
     return std::move(domain);
 }
 
@@ -95,6 +95,7 @@ void Solver::solveLU(unsigned int n) {
     arma::mat A = tridiagonalMat(n, -1, 2, -1);
     arma::mat L, U;
     arma::vec y;
+    std::cout << '\n';
 
     // Ax = b -> LUx = b -> Ly = b -> Ux = y
     startTiming();
@@ -104,6 +105,7 @@ void Solver::solveLU(unsigned int n) {
         solution = arma::solve(U, y);
     }
     endTiming();
+    solution.print();
 }
 
 void Solver::save(const std::string& identifier){
@@ -127,8 +129,7 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop){
     unsigned int n_iterations = 50;
     unsigned int step       = (n_stop - n_start)/n_iterations;
     double errors[2][n_iterations];
-    unsigned int M = 0;
-    unsigned int i = 0;
+    unsigned int j = 0;
 
     std::ofstream outputFile("data/E.txt");
 
@@ -153,10 +154,10 @@ void Solver::calculateError(unsigned int n_start, unsigned int n_stop){
             rel_error(i) = fabs((x_num(i) - x_ana(i))/x_ana(i));
         }
 
-        errors[0][i] = n;
-        errors[1][i] = rel_error.max();
-        std::cout << "Relative error = "<< errors[1][i] << std::endl;;
-        i++;
+        errors[0][j] = n;
+        errors[1][j] = rel_error.max();
+        std::cout << "Relative error = "<< errors[1][j] << std::endl;;
+        j++;
     }
     for(unsigned int n = 0; n < n_iterations; n++){
         outputFile << errors[0][n] << " " << errors[1][n] << '\n';

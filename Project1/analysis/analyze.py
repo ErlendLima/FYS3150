@@ -38,11 +38,9 @@ class Analyzer:
         tag = 'L' if loadLU else (
             'G' if loadGeneral else 'S')
 
-        print(tag)
         for match in matches:
             n = re.search('{}(\d+)\.txt'.format(tag), match)
             if n is not None:
-                print(n)
                 self.data[int(n.group(1))] = np.loadtxt(match)
         self.data = sorted(self.data.items(), key=operator.itemgetter(0))
 
@@ -62,7 +60,7 @@ class Analyzer:
 
         fig, ax = plt.subplots()
         for n, data in self.data:
-            x = np.linspace(0, 1, n+2)
+            x = np.linspace(0, 1, n)
             ax.plot(x, data, label=make_label(n))
         ax.plot(*self.analytic, label=r'Analytic')
         ax.legend()
@@ -71,7 +69,7 @@ class Analyzer:
         rows = []
         for n, data in self.data:
             # Ignoring boundary terms since they are correct
-            analytic = self.compute_analytic_solution(n+2)[1][1:-1]
+            analytic = self.compute_analytic_solution(n)[1][1:-1]
             err = np.log10(np.abs((data[1:-1] - analytic)/analytic))
             maxerr = np.max(err)
             rows.append([n, maxerr])
@@ -82,12 +80,12 @@ class Analyzer:
 
     def investigate_error(self):
         for n, data in self.data:
-            x, y = self.compute_analytic_solution(n+2)
+            x, y = self.compute_analytic_solution(n)
             x, y = x[1:-1], y[1:-1]
-            err = np.log10(np.abs((data[1:-1] - y)/y))
+            err = np.abs((data[1:-1] - y)/y)
+            plt.plot(x, err)
             ind = np.argmax(err)
             plt.plot(x[ind], y[ind], 'o')
-            print('lol')
 
 
     @plotwrap(saveas='error.eps')
