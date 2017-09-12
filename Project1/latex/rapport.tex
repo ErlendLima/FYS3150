@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt, english, twoside]{article}
+\documentclass[a4paper,11pt, english, twoside, toc]{article}
 % Engine-specific settings
 % Detect pdftex/xetex/luatex, and load appropriate font packages.
 % This is inspired by the approach in the iftex package.
@@ -52,6 +52,7 @@
 \usepackage{lipsum}
 \usepackage{pythontex}
 \usepackage{authblk}
+\usepackage[toc,page]{appendix}
 \floatstyle{plaintop}
 \restylefloat{table}
 
@@ -150,29 +151,33 @@
   examined in this paper.
 \end{abstract}
 
-% Get all of the data from the script into a dictionary
-\begin{pycode}
-from subprocess import Popen, PIPE
-from latextools import untag_all
-p = Popen(['python', '../analysis/analyze.py', '../cpp'],
-stdout=PIPE, stderr=PIPE)
-output, err = p.communicate()
-data = output.decode('utf8')
-latex_data = untag_all(data)
-\end{pycode}
+\newpage
+\tableofcontents
+\newpage
 
-\begin{table}[ht]
-  \centering
-  \pyc{print(latex_data['error_table'])}
-  \caption{Summary of the errors}
-  \label{tab:error}
-\end{table}
-
-\begin{figure}[ht]
-  \centering
-  \includegraphics[scale=0.5]{figures/function.eps}
-  \caption{\label{fig:general} Caption}
-\end{figure}
+% % Get all of the data from the script into a dictionary
+% \begin{pycode}
+% from subprocess import Popen, PIPE
+% from latextools import untag_all
+% p = Popen(['python', '../analysis/analyze.py', '../cpp'],
+% stdout=PIPE, stderr=PIPE)
+% output, err = p.communicate()
+% data = output.decode('utf8')
+% latex_data = untag_all(data)
+% \end{pycode}
+%
+% \begin{table}[ht]
+%   \centering
+%   \pyc{print(latex_data['error_table'])}
+%   \caption{Summary of the errors}
+%   \label{tab:error}
+% \end{table}
+%
+% \begin{figure}[ht]
+%   \centering
+%   \includegraphics[scale=0.5]{figures/function.eps}
+%   \caption{\label{fig:general} Caption}
+% \end{figure}
 
 \section{Introduction}
 Introducing where the Poisson equation comes from, why it valuable to solve it,
@@ -269,7 +274,7 @@ argument for each row, a general expression for the diagonal elements is
 where $b'_1 = b_1$ and $i = 2,3,...,n$. Similarly, elements in the right-hand side vector
 $\mathbf{v}'$ are modified to
 \begin{align*}
-  v'_{i} = v_i - \frac{a_i}{b'_{i-1}}v_{i-1}
+  v'_{i} = v_i - \frac{a_i}{b'_{i-1}}v'_{i-1}
 \end{align*}
 where $v'_1 = v_1$ and $i = 2,\hdots,n$. After completing the forward substitution,
 the matrix equation reads
@@ -338,8 +343,47 @@ which is then inserted in LABEL
 \end{align*}
 and solved for $\mathbf{u}$.
 
-\subsection{Comparison of number of floating point operations for the three methods}
-Calculation of number of floating point operations.
+\subsection{Counting the number of FLOPS for each method}
+A simple way of determining the computational speed of an algorith is simply
+counting the number of floating point operations. The fewer calculations the
+computer has to make, the faster an algorithm will run. In this section approximate numbers
+for the amount of floating point operations (flops) are determined.
+\subsubsection{The general Thomas algorithm}
+The general algorithm with arbitrary tridiagonal elements consists of two steps,
+the forward substitution (two equations) and the backward substitution (one equation).
+In the forward substitution, some of the operations can be precomputed. Since
+$a_i$, $c_i$ is known for all $i$ considered, the product
+$a_i c_{i-1}$ can be precomputed and does not provide any flops.
+Therefore, computing a $b'_i$ requires only two operations, and
+these are done $(n-1)$ times. Computing a $v'_i$ requires three flops, one
+product, one division and an addition. These operations are also repeated $(n-1)$ times,
+so the total amount of flops in the forward substitution is:
+\begin{align*}
+  2(n-1) + 3(n-1) = 5(n-1)
+\end{align*}
+In the backward substitution, no quantities can be precomputed as they are
+produced by the algorithm itself. Counting the number of operatons yields $3(n-1)$ flops.
+In total, then, the number of flops required in the general Thomas algorithm is
+\begin{align*}
+  \text{flops}_\text{Thomas} = 8(n-1)
+\end{align*}
+\subsubsection{The special case Thomas algorithm}
+For the specialized algorithm, even more quantities can be precomuted and the
+amount of flops can therefore be reduced further. First of all, an analytic
+expression for $b'_i$, the diagonal elements, does not contribute with any flops
+as they can now be fully precomputed. The computation of $v'_i$ now only requires two
+operations, since $a_i = -1$ simply changes the sign. The backward substitution
+now consists of one subtraction and one division operation, so the total amount of
+flops for the tailored algorithm is
+\begin{align}
+  4(n-1)
+\end{align}
+This should therefore cut the running time of the algorithm approximately in half.
+\subsubsection{The LU decomposition method}
+Compared to the Thomas algorithm, the LU decomposition requires a much larger
+amount of flops. Where the Thomas neatly avoids dealing with all the $\sim (n^2 - 3n)$
+zeros, the LU algorithm consideres every element in every row of the matrix. It is
+possible to show that the number of flops for this method is in the order $\frac{2}{3}N^3$.
 
 \subsection{Analytic solution for a specific problem}
 In this paper the following special case of the Poisson equation is examined:
@@ -360,11 +404,12 @@ Inserting the integration constants returns the analytical solution
 where $0 < x < 1$ and $u(0) = u(1) = 0$.
 
 \section{Method}
-The algorithms were implemented in C++, Julia and Fortran, with the purpose of
-learning multiple programming languages and verifying the correctness of the implementations.
+The algorithms were implemented in C++ and Julia, with the purpose of
+learning multiple programming languages and verifying that the implementations were correct.
 The source code is available in the attatched GIT-repository. The calculations
-were performed several times, and for each method the algorithm times were averaged to produce a
-mean time. The implementations are explained and listed in the following sections with pseudocode.
+were performed several times, and for each method the algorithm times were averaged to produce an
+average time. The implementations are explained and listed in the following paragraphs with pseudocode.
+The analysis of the solutions and errors was done in Python.
 
 \subsection{The general Thomas algorithm}
 The general Thomas algorithm consists of the forward and backward substitutions
@@ -387,7 +432,7 @@ for(i = n-2; i >= 1; i--){
 Because of the fact that the matrix examined in this paper is both tridiagonal and
 symmetric, further optimizations to the algorithm can be made. Since $a_i = c_i = -1$
 and $b'_i = (i+1)/i$ can be precomputed, the algorithm simplifies to
-\begin{lstlisting}[language=cpp, caption={Optimized version of Thomas algorithm for a symmetrix tridiagonal matrix}]
+\begin{lstlisting}[language=cpp, caption={Optimized version of Thomas algorithm for a symmetric tridiagonal matrix}]
 // b_prime is now precomputed
 for(i = 1; i <= n-1; i++)
     b_prime[i] = (i+1)/i;
@@ -443,6 +488,8 @@ Tabell med hastigheter. kjør mange ganger, ta avg.
 \section{Conclusion}
 
 \section{References}
+
+\begin{appendices}
 
 \section{Appendix}
 \subsection{Second derivative}
@@ -511,4 +558,5 @@ But since $S(j)$ holds, $b'_j = \frac{j+1}{j}$, and
   b'_{j+1} = 2 - \frac{j}{j+1} = \frac{j+2}{j+1} = \frac{(j+1) + 1}{(j+1)}
 \end{align*}
 which proves $S(i)$ is true for all $i \geq 1$.
+\end{appendices}
 \end{document}
