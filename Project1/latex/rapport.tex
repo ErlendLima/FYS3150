@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt, english, twoside, toc]{article}
+\documentclass[a4paper,10pt, english, twoside, twocolumn, toc]{article}
 % Engine-specific settings
 % Detect pdftex/xetex/luatex, and load appropriate font packages.
 % This is inspired by the approach in the iftex package.
@@ -132,28 +132,34 @@
 \author[3]{Aram Salihi}
 \author[4]{Halvard Sutterud}
 \affil[1,2,3,4]{University of Oslo, Oslo, Norway}
-\maketitle
 
-\begin{abstract}
-  In this project three methods of solving the one-dimensional Poisson equation with
-  Dirchelet boundary conditions are investigated. The equation was discretized,
-  and written as a system of linear equations. This equates to
-  a tridiagonal matrix equation, which was solved using the general Thomas algorithm,
-  a specialized version of the Thomas algorithm and by LU-decomposing the matrix. The
-  numerical error is then analyzed for both methods, and the algorithm speeds are investigated and discussed.
+\twocolumn[
+  \begin{@twocolumnfalse}
+    \maketitle
+    \begin{abstract}
+      In this project three methods of solving the one-dimensional Poisson equation with
+      Dirchelet boundary conditions are investigated. The equation was discretized,
+      and written as a system of linear equations. This equates to
+      a tridiagonal matrix equation, which was solved using the general Thomas algorithm,
+      a specialized version of the Thomas algorithm and by LU-decomposing the matrix. The
+      numerical error is then analyzed for both methods, and the algorithm speeds are investigated and discussed.
 
-  The specialization of the algorithm for our specific problem resulted in
-  a x percent reduction in the amount of floating point operations. For large
-  matrices ($n \sim 10^5$) the LU-decomposition requires
-  more memory than what was available, which was not a problem with the Thomas
-  algorithm. Also, the Thomas algorithm produced solutions with smaller errors
-  than the LU method. Therefore the Thomas is deemed most suited for solving the problem
-  examined in this paper.
-\end{abstract}
-
+      The specialization of the algorithm for our specific problem halved the
+      amount of floating point operations. For large
+      matrices ($n \sim 10^5$) the LU-decomposition requires
+      more memory than what was available, which was not a problem with the Thomas
+      algorithm. Also, the Thomas algorithm produced solutions with smaller errors
+      than the LU method. Therefore the Thomas is deemed most suited for solving the problem
+      examined in this paper.
+    \end{abstract}
+  \end{@twocolumnfalse}
+]
 \newpage
-\tableofcontents
-\newpage
+\twocolumn[
+\begin{@twocolumnfalse}
+  \tableofcontents
+\end{@twocolumnfalse}
+]
 
 % % Get all of the data from the script into a dictionary
 % \begin{pycode}
@@ -180,8 +186,8 @@
 % \end{figure}
 
 \section{Introduction}
-Introducing where the Poisson equation comes from, why it valuable to solve it,
-how it is solved in this paper and explaining speed and error analysis.
+In this paper numerical solutions to the one-dimensional Poisson equation are
+examined. Many important differential equations in science can be re-written  
 
 \section{Theory}
 \subsection{Discretizing the Poisson equation}
