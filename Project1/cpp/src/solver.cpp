@@ -17,12 +17,12 @@ Solver::~Solver(){};
 
 std::unique_ptr<arma::vec> Solver::makeDomain(unsigned int n){
     double h = 1/static_cast<double>(n+1);
-    auto domain = std::make_unique<arma::vec>(h*arma::linspace(0, n-1, n)); // Armadillo lacks arange :(
+    auto domain = std::make_unique<arma::vec>(h*arma::linspace(0, n+1, n)); // Armadillo lacks arange :(
     return std::move(domain);
 }
 
 std::unique_ptr<arma::vec> Solver::makeBtilde(unsigned int n){
-    double h = 1/static_cast<double>(n-1);
+    double h = 1/static_cast<double>(n+1);
     std::unique_ptr<arma::vec> btilde = makeDomain(n);
     btilde->transform(fn);
     (*btilde) *= h*h; // b~ = f(x)h^2
@@ -118,49 +118,45 @@ void Solver::startTiming(){
 }
 
 void Solver::endTiming(){
-    auto CPUTime = (std::clock() - startCPUTime)/static_cast<double>(CLOCKS_PER_SEC);
+    auto CPUTime = (std::clock() - startCPUTime)/CLOCKS_PER_SEC;
     std::chrono::duration<double> wallTime = (std::chrono::high_resolution_clock::now() - startWallTime);
     std::cout << "Average wall time: " << wallTime.count()/repetitions << "s\n"
               << "Average CPU time:  " << CPUTime/repetitions << "s" << std::endl;
 }
 
-void Solver::calculateError(unsigned int n_start, unsigned int n_stop){
-    saveFlag = false;  // Dont dump everything
-    unsigned int n_iterations = 50;
-    unsigned int step       = (n_stop - n_start)/n_iterations;
-    double errors[2][n_iterations];
-    unsigned int j = 0;
+void Solver::calculateError(unsigned int start, unsigned int stop){
+    unsigned int iterations = 50;
+    unsigned int j          = 0;
+    arma::vec logspace      = arma::logspace(log10(start), log10(stop), iterations);
+    arma::mat errors        = arma::zeros(iterations+1, 2);
 
-    std::ofstream outputFile("data/E.txt");
+    logspace.transform(floor);
+    for (const unsigned int& n: logspace) {
+        // Set up the necessary vectors
+        arma::vec domain     = *makeDomain(n);
+        arma::vec btilde     = *makeBtilde(n);
+        arma::vec analytical = domain;
+        arma::vec error      = arma::zeros(n);
+        analytical.transform(fnAnalytical);
 
-    std::cout << "=== Running error calculations ===" << std::endl;
-    for(unsigned int n = n_start; n <= n_stop; n+=step){
-        std::cout << "------------------------" << std::endl;
-        std::cout << "Calculating for n = " << n << std::endl;
+        // Set up the method
+        arma::vec a = arma::vec(n); a.fill(-1);
+        arma::vec b = arma::vec(n); b.fill(2);
+        arma::vec c = arma::vec(n); c.fill(-1);
 
-        auto btilde = makeBtilde(n);          // Reset makeBtilde
-        arma::vec x_num     = arma::zeros(n);
-        arma::vec x_ana     = *(makeDomain(n));
-        arma::vec rel_error = arma::zeros(n);
+        arma::vec numerical = thomas(a, b, c, btilde);
 
-        // std::cout << "Got here1" << std::endl;
-        x_ana.transform(fnAnalytical);
-        // std::cout << "got here 2" << std::endl;
-        x_num  = thomasSpecial(*btilde);
-        // std::cout << "Got here3" << std::endl;
-
-
-        for(unsigned int i = 1; i <= n-2; i++){
-            rel_error(i) = fabs((x_num(i) - x_ana(i))/x_ana(i));
-        }
-
-        errors[0][j] = n;
-        errors[1][j] = rel_error.max();
-        std::cout << "Relative error = "<< errors[1][j] << std::endl;;
+        // Compute relative error
+        error = arma::abs(analytical - numerical)/analytical;
+        auto i = error(arma::span(0, n-2)).index_max();
+        std::cout << "n = " << n
+                  << ":\t x = " << domain(i)
+                  << "\tN(x) = " << numerical(i)
+                  << "\tf(x) = " << analytical(i)
+                  << "\t|N-f|/f = " << error(i) << '\n';
+        errors(j, 0) = n;
+        errors(j, 1) = error(i);
         j++;
     }
-    for(unsigned int n = 0; n < n_iterations; n++){
-        outputFile << errors[0][n] << " " << errors[1][n] << '\n';
-    }
-    outputFile.close();
+    errors.save(savepath + "E.txt", arma::raw_ascii);
 }

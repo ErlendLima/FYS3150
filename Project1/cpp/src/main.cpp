@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
     try{
         if (calcError)
-            solver.calculateError(1e6, 1e7);
+            solver.calculateError(start, stop);
         else
             retval = solver.solve(method, start, stop, step);
     } catch (std::exception &ex){

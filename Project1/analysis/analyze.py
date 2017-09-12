@@ -10,7 +10,8 @@ from glob import glob
 import re
 from tabulate import tabulate
 import operator
-from latextools import plotable, tag, untag, untag_all
+from latextools import plotable, tag
+import scipy.io
 
 sns.set()
 SHOWPLOTS = True
@@ -25,29 +26,26 @@ def plotwrap(*args, **kwargs):
 class Analyzer:
     def __init__(self, path, *, loadLU=False, loadSpecial=False,
                  loadGeneral=False):
-        self.load(path, loadLU, loadSpecial, loadGeneral)
-        self.analytic = self.compute_analytic_solution()
+        tag = 'G' if loadGeneral else ('L' if loadLU else 'S')
+        self.data = self.load(path, tag)
         # self.compute_relative_error()
-        self.investigate_error()
-        # self.make_relative_error_plot()
+        self.make_relative_error_plot()
 
-    def load(self, path, loadLU=False, loadSpecial=False, loadGeneral=False):
-        matches = glob(os.path.join(path, '[G|L|S]*.txt'))
+    def load(self, path, tag):
+        matches = glob(os.path.join(path, '{}*.txt'.format(tag)))
         matches.sort()
-        self.data = {}
-        tag = 'L' if loadLU else (
-            'G' if loadGeneral else 'S')
+        data = {}
 
         for match in matches:
             n = re.search('{}(\d+)\.txt'.format(tag), match)
             if n is not None:
-                self.data[int(n.group(1))] = np.loadtxt(match)
-        self.data = sorted(self.data.items(), key=operator.itemgetter(0))
+                data[int(n.group(1))] = np.loadtxt(match)
+        data = sorted(data.items(), key=operator.itemgetter(0))
+        return data
 
     def compute_analytic_solution(self, n=1000):
         x = np.linspace(0, 1, n)
         y = 1 - (1-np.exp(-10))*x - np.exp(-10*x)
-        #y = np.exp(1)*x-x-np.exp(x)+1
         return (x, y)
 
     @plotwrap(saveas='function.eps')
@@ -61,8 +59,8 @@ class Analyzer:
         fig, ax = plt.subplots()
         for n, data in self.data:
             x = np.linspace(0, 1, n)
-            ax.plot(x, data, label=make_label(n))
-        ax.plot(*self.analytic, label=r'Analytic')
+            ax.plot(x, data, label=make_label(n), alpha=0.7)
+        ax.plot(*self.compute_analytic_solution(10000), label=r'Analytic')
         ax.legend()
 
     def compute_relative_error(self):
@@ -77,24 +75,21 @@ class Analyzer:
         table = tag('error_table', tabulate(rows, headers=["n", "log error"],
                                             tablefmt="latex"))
         print(table)
-
-    def investigate_error(self):
-        for n, data in self.data:
-            x, y = self.compute_analytic_solution(n)
-            x, y = x[1:-1], y[1:-1]
-            err = np.abs((data[1:-1] - y)/y)
-            plt.plot(x, err)
-            ind = np.argmax(err)
-            plt.plot(x[ind], y[ind], 'o')
+        plt.loglog(rows)
 
 
     @plotwrap(saveas='error.eps')
     def make_relative_error_plot(self):
         arr = np.loadtxt("../cpp/data/E.txt")
-        ar = arr[1:, :]
-        ar = ar[ar[:,1].argsort()]
-        plt.loglog(ar[1:,0], ar[1:,1])
-        plt.scatter(ar[1:,0], ar[1:,1])
+        fig, ax1 = plt.subplots()
+        ax1.loglog(arr[1:, 0], arr[1:, 1])
+        ax2 = ax1.twiny()
+        ax2.scatter(arr[1:, 0], arr[1:, 1], s=10)
+        ax2.set_xscale('log')
+        ax2.set_yscale('log')
+
+        # ax1.set_xlabel(r"$log_{10}h$")
+        # ax2.set_xlabel(r"$log_{10}n$")
 
 
 if __name__ == '__main__':

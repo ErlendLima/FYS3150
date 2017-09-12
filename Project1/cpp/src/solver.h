@@ -34,7 +34,7 @@ private:
     std::string savepath = "";
     unsigned int repetitions = 1;
     std::chrono::high_resolution_clock::time_point startWallTime;
-    double startCPUTime;
+    clock_t startCPUTime;
 
     void startTiming();
     void endTiming();

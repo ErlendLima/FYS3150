@@ -14,14 +14,14 @@ arma::vec thomas(const arma::vec& a, const arma::vec& b, const arma::vec& c, con
     arma::vec v_prime = arma::zeros(n);
     arma::vec u       = arma::zeros(n);
 
-    b_prime[0] = b[0];
-    v_prime[0] = v[0];
+    b_prime(1) = b(1);
+    v_prime(1) = v(1);
 
-    for(unsigned int i = 1; i < n; i++){
+    for(unsigned int i = 2; i < n-1; i++){
         b_prime(i) = b(i) - (a(i)/b_prime(i-1))*c(i-1);
         v_prime(i) = v(i) - (a(i)/b_prime(i-1))*v_prime(i-1);
     }
-    for(int i = n-2; i >= 0; i--){
+    for(int i = n-2; i > 0; i--){
         u(i) = (v_prime(i) - c(i)*u(i+1))/b_prime(i);
     }
 
