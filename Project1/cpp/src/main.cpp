@@ -68,7 +68,8 @@ int handleArguments(int argc, char *argv[], Method& method, int& start, int& sto
         case 'Y': stop  = static_cast<int>(std::stod(optarg)); break;
         case 'Z': step  = static_cast<int>(std::stod(optarg)); break;
         case 'h':
-            std::cout << "Usage: -g for general, -s for special, -l for LU, -e for error calculation and -r N for number of repetitions." << std::endl;
+            std::cout << "Usage: -g for general, -s for special, -l for LU, -e for error calculation and -r N for number of repetitions.\n"
+                      << "The flags -X, -Y, -Z followed by an integer allows one to set the start, stop and steps for the iterations. " << std::endl;
             return -1;
         default:
             abort();
