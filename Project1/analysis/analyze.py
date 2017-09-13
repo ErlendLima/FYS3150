@@ -11,7 +11,6 @@ import re
 from tabulate import tabulate
 import operator
 from latextools import plotable, tag
-import scipy.io
 
 sns.set()
 SHOWPLOTS = True
@@ -48,7 +47,7 @@ class Analyzer:
         y = 1 - (1-np.exp(-10))*x - np.exp(-10*x)
         return (x, y)
 
-    @plotwrap(saveas='function.eps')
+    @plotwrap()
     def plot(self):
         def make_label(n):
             if n == 10:
@@ -58,10 +57,14 @@ class Analyzer:
 
         fig, ax = plt.subplots()
         for n, data in self.data:
+            if n not in [10, 100, 1e5]: continue
             x = np.linspace(0, 1, n)
             ax.plot(x, data, label=make_label(n), alpha=0.7)
         ax.plot(*self.compute_analytic_solution(10000), label=r'Analytic')
         ax.legend()
+        ax.set_xlabel(r'x')
+        ax.set_ylabel(r'y')
+        fig.savefig('../latex/figures/function.eps', dpi=1200)
 
     def compute_relative_error(self):
         rows = []
@@ -77,19 +80,15 @@ class Analyzer:
         print(table)
         plt.loglog(rows)
 
-
-    @plotwrap(saveas='error.eps')
+    @plotwrap()
     def make_relative_error_plot(self):
         arr = np.loadtxt("../cpp/data/E.txt")
         fig, ax1 = plt.subplots()
-        ax1.loglog(arr[1:, 0], arr[1:, 1])
-        ax2 = ax1.twiny()
-        ax2.scatter(arr[1:, 0], arr[1:, 1], s=10)
-        ax2.set_xscale('log')
-        ax2.set_yscale('log')
-
-        # ax1.set_xlabel(r"$log_{10}h$")
-        # ax2.set_xlabel(r"$log_{10}n$")
+        ax1.loglog(1/(1+arr[1:, 0]), arr[1:, 1])
+        ax1.scatter(1/(1+arr[1:, 0]), arr[1:, 1], s=10)
+        ax1.set_xlabel(r"Step size $h$")
+        ax1.set_ylabel('Relative Error')
+        fig.savefig('../latex/figures/error.eps', dpi=1200)
 
 
 if __name__ == '__main__':

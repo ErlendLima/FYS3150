@@ -478,15 +478,31 @@ For obvious reasons, for these calculations the optimized version of the Thomas 
 \label{sec:timingmethod}
 In order to get an accurate timing of the algoritms, each computation was
 repeated \(10^6\) times where this was practical. For the general and special
-algorithms, this limit was at matrices of size \(10^4\). For matrices of size \(10^{5-6}\) 
+algorithms, this limit was at matrices of size \(10^4\). For matrices of size
+\(10^{5-7}\), as well as for all matrices using LU-decomposition, the
+computations were repeated \(10^{3}\) times. The final estimate of their time
+usage was taken as their averages.
 
-\section{Results and discussion}
+\section{Results}
 \subsection{Solution using the algorithms}
-Plot osv.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/function.eps}
+  \caption{\label{fig:general} The plot}
+\end{figure}
+
 \subsection{Error and error analysis}
-Plot av feil for mange $n$.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/error.eps}
+  \caption{\label{fig:error} The error}
+\end{figure}
+
+
 \subsection{Timing the algorithms}
-The time usage of the algorithms
+The time used by each algorithm is summarized in table~\ref{tab:timing}.
 
 \sisetup{
   % table-number-alignment = center,
@@ -505,9 +521,13 @@ The time usage of the algorithms
     \(10^{4}\) & 1.682e-4 & & {-} \\
     \(10^{5}\) & 1.734e-5 & & {-} \\
   \end{tabular}
-  \caption{Time usage of each algorithm}
+  \caption{Time usage of each algorithm. These are averages of the time used by
+    each algorithm.}
   \label{tab:timing}
 \end{table}
+
+\section{Discussion}
+\label{sec:discusison}
 
 \section{Conclusion}
 
