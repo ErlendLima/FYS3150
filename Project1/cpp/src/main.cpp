@@ -62,11 +62,11 @@ int handleArguments(int argc, char *argv[], Method& method, int& start, int& sto
             flag = true;
             break;
         case 'r':
-            repetitions = std::atoi(optarg);
+            repetitions = static_cast<int>(std::stod(optarg));
             break;
-        case 'X': start = std::atoi(optarg); break;
-        case 'Y': stop = std::atoi(optarg); break;
-        case 'Z': step = std::atoi(optarg); break;
+        case 'X': start = static_cast<int>(std::stod(optarg)); break;
+        case 'Y': stop  = static_cast<int>(std::stod(optarg)); break;
+        case 'Z': step  = static_cast<int>(std::stod(optarg)); break;
         case 'h':
             std::cout << "Usage: -g for general, -s for special, -l for LU, -e for error calculation and -r N for number of repetitions." << std::endl;
             return -1;

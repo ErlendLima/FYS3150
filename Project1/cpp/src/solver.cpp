@@ -105,7 +105,6 @@ void Solver::solveLU(unsigned int n) {
         solution = arma::solve(U, y);
     }
     endTiming();
-    solution.print();
 }
 
 void Solver::save(const std::string& identifier){
@@ -118,7 +117,7 @@ void Solver::startTiming(){
 }
 
 void Solver::endTiming(){
-    auto CPUTime = (std::clock() - startCPUTime)/CLOCKS_PER_SEC;
+    auto CPUTime = (std::clock() - startCPUTime)/static_cast<double>(CLOCKS_PER_SEC);
     std::chrono::duration<double> wallTime = (std::chrono::high_resolution_clock::now() - startWallTime);
     std::cout << "Average wall time: " << wallTime.count()/repetitions << "s\n"
               << "Average CPU time:  " << CPUTime/repetitions << "s" << std::endl;
