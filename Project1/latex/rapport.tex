@@ -1,4 +1,4 @@
-\documentclass[aps,prl,reprint,toc]{revtex4-1}
+\documentclass[aps,reprint]{revtex4-1}
 % Engine-specific settings
 % Detect pdftex/xetex/luatex, and load appropriate font packages.
 % This is inspired by the approach in the iftex package.
@@ -49,7 +49,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{lipsum}
-\usepackage{pythontex}
+% \usepackage{pythontex}
 % \usepackage{authblk}
 \usepackage{nth}
 \usepackage{siunitx}
@@ -112,7 +112,7 @@
 
 
 % Biber for references
-% \addbibresource{references.bib}
+% \bibliographystyle{aipauth4-1}
 
 \begin{document}
 \sisetup{detect-all}
@@ -121,20 +121,25 @@
 \author{Frederik J. Mellbye}
 \author{Aram Salihi}
 \author{Halvard Sutterud}
-\affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150}}
+\affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project1}}
 \date{\today}
 
 \begin{abstract}
-      Three numerical methods of solving the one-dimensional Poisson equation with Dirchelet
-      boundary conditions are investigated. The equation is discretized and converted
+      Three numerical methods of solving the one-dimensional Poisson equation with Dirichlet
+      boundary conditions were investigated. The discretized equation was converted
       to a linear algebra problem, solved with the common LU-decomposition and the less
-      common Thomas algorithm. The numerical errors and calculation speeds are discussed.
-      The general and a specialized version of the Thomas algorithm is, as expected,
+      common Thomas algorithm. The ensuing numerical errors and calculation speeds are discussed.
+      The general and a specialized version of the Thomas algorithm was
       shown to be much faster and less memory consuming than using a LU decomposition. Moreover,
       the Thomas algorithm produced solutions with smaller errors than the LU method.
 \end{abstract}
 \maketitle
 \tableofcontents
+\makeatletter
+\let\toc@pre\relax
+\let\toc@post\relax
+\makeatother 
+
 \newpage
 % \newpage
 % \twocolumn[
@@ -166,24 +171,25 @@
 %   \includegraphics[scale=0.5]{figures/function.eps}
 %   \caption{\label{fig:general} Caption}
 % \end{figure}
-\blankpage
-\blankpage
 \section{Introduction}
-In this paper numerical solutions to the one-dimensional Poisson equation are
-examined. Many important differential equations in science can be re-written to
+The Poisson equation is amongst the most important and widely used differential
+equations used in science.
+Many important differential equations can be re-written to
 the form
 \begin{align*}
   \nabla^2 u = f
 \end{align*}
-by variable substitutions. It is therefore interesting to develop algorithms
-and functions that can easily solve these types of equations, with small errors.
+by variable substitutions. It is therefore crucial to develop algorithms
+that can easily solve these types of equations, preferably with small errors.
 
-By discretizing the equation it can be written as
+By discretizing the Poisson equation it can be written as
 a tridiagonal matrix equation, and solving the equation turns into a simpler
 linear algebra problem. The matrix equation can easily be solved using the
 famous LU-decomposition, but because of the tridiagonal nature of the matrix,
-a more efficient (but conceptually equal) approach to solve the problem is possible: the Thomas algorithm.
-First the general version of this algorithm is implemented, and then a
+a more efficient (but conceptually equal) approach to solve the problem is
+possible using the Thomas algorithm.
+
+First the general version of this algorithm is implemented, after which a
 specially tailored version is developed for the particular tridiagonal matrix
 considered in this paper. As the algorithms become more specialized, more
 terms and factors can be precomputed, which saves memory space, and more importantly
@@ -195,13 +201,14 @@ The one-dimensional Poisson equation with Dirchelet boundary conditions is
 \begin{align*}
   \frac{d^2 u}{d x^2} = - f
 \end{align*}
-We can approximate the second derivative of $u(x)$ using a Taylor expansion
+The second derivative of $u(x)$ can be approximated by Taylor expanding \(u(x)\)
 and solving for $\frac{d^2 u}{d x^2}$:
 \begin{align*}
   \frac{d^2 u}{d x^2} \approx \frac{u(x+h) + u(x-h) - 2 u(x)}{h^2} + O(h^2)
 \end{align*}
+See \ref{app:taylor} for the derivation.
 The equation is discretized with grid points $x_1, x_2, \hdots, x_{n}$. Imposing
-Dirchelet boundary conditions forces $x_1 = x_n = 0$, using the handy notation
+Dirichlet boundary conditions forces $x_1 = x_n = 0$, using the handy notation
 $u(x_i + h) = u_{i+1}$ and inserting the approximated second derivative into the
 Poisson equation yields
 \begin{align*}
@@ -316,7 +323,7 @@ In general then, the back substitution is done by
 \begin{align*}
   u_i = \frac{v'_i - c_i u_{i+1}}{b'_i}
 \end{align*}
-where $i = n-1, n-2, \hdots, 1$.
+where $i = n-1, n-2, \hdots, 1$. Some details were taken from~\cite{mortenjensen}.
 \subsection{Optimizing the Thomas algorithm for a specific case}
 In the case presented in this project, $a_i = c_i = -1$ and $b_i = 2$. The fact
 that there are just two different values in the matrix greatly simplifies the
@@ -326,7 +333,7 @@ $b'_i$. This is given by
 \begin{align*}
   b'_i = \frac{i+1}{i}
 \end{align*}
-and is found and proved by induction in section~\ref{sec:diagelm}.
+and is found and proved by induction in section~\ref{app:dager}.
 
 \subsection{Solving the general tridiagonal matrix problem by LU-decomposition}
 Another way to solve matrix equations is LU-decomposing A, and then solving
@@ -343,7 +350,7 @@ computed in two steps. First, $\mathbf{y}$ is found by solving
 \begin{align*}
   L\mathbf{y} = \mathbf{v}
 \end{align*}
-which is then inserted in LABEL
+which is then inserted in
 \begin{align*}
   U\mathbf{u} = \mathbf{y}
 \end{align*}
@@ -512,15 +519,24 @@ usage was taken as their averages.
 All of the three methods converged to the solution, albeit somewhat differently.
 The general method and the LU-decomposition converged upwards while the
 special method converged downwards. Figure~\ref{fig:general} shows a plot where
-the general method is plotted using a differing number of points \(n\).
+the general method is plotted using a differing number of points \(n\), while
+an equivalent plot using the specialized method is shown in figure~\ref{fig:special}.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\columnwidth]{figures/function.eps}
+  \includegraphics[width=\columnwidth]{figures/general.eps}
   \caption{\label{fig:general} The convergence of the numerical method is
-    apparent as the its graph approaches the analytical as the number of points \(n\) grows. When \(n
+    apparent as its graph approaches the analytical as the number of points \(n\) grows. When \(n
     = 10^{5}\), shown as a dashed yellow line, the numerical solution becomes
     indistinguishable from the analytical solution.}
+\end{figure}
+
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/special.eps}
+  \caption{\label{fig:special} The convergence of the special method. Note how
+    the graphs approach the solution from above.}
 \end{figure}
 
 \subsection{Error Analysis}
@@ -531,8 +547,8 @@ figure~\ref{fig:error}, where it is plotted against stepsize on a log-log scale.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/error.eps}
-  \caption{\label{fig:error} The relative error plotted against the step size
-    used in the general method.}
+  \caption{\label{fig:error} The relative error plotted against the step size,
+    produced with the general method.}
 \end{figure}
 
 
@@ -549,7 +565,7 @@ The time used by each algorithm is summarized in table~\ref{tab:timing}.
   \centering
   \begin{tabular}{SSSS}
     {\multirow{2}{*}{N}} & \multicolumn{3}{c}{Time usage [\(s\)]}\\
-                                      & {General} & {Special} & {LU} \\
+               & {General} & {Special} & {LU} \\
     \(10^{1}\) & 1.592e-7 & 1.298e-7 & 1.378e-5\\
     \(10^{2}\) & 1.683e-6 & 1.555e-6 & 9.927e-3\\
     \(10^{3}\) & 1.687e-5 & 1.549e-5 & 6.214e-1\\
@@ -572,7 +588,7 @@ to the known analytical solution as expected. It was noted that the general
 method and LU-decomposition behaved differently than the specialized method. A
 likely reason for this is that some of the algorithms might have small implementation
 errors. This error, most likely in the special algorithm, was not discovered, even
-after extensive attempts to locate the bug and reimplementing the method. Because
+after extensive attempts to locate the bug and re-implementing the method. Because
 the method still rapidly converges to the analytic solution, albeit in a different
 way, the method is still valid as it is implemented. However, because of the
 different convergence patterns, slight optimizations are most likely available
@@ -590,8 +606,7 @@ before further lowering of the step size introduces rapidly increasing trunctati
 errors.
 
 \subsection{Algorithm execution speeds}
-The computation timings are shown in table~\ref{tab:timing}. Solely in terms
-of the timings, the Thomas methods are far superior to the LU decomposition,
+Solely in terms of the timings (see table~\ref{tab:timing}), the Thomas methods are far superior to the LU decomposition,
 by around the same order as predicted by counting the number of FLOPS. Among the
 Thomas algorithm variations, the special algorithm is slightly faster, but not
 by a factor $2$ as predicted in the theory section. There are several possible
@@ -602,7 +617,7 @@ functions might be slower than a more optimal implementation.
 \section{Conclusion}
 As a concluding remark, it is evident that carefully examining the problem at hand,
 and making several simplifications created an algorithm that solved the problem
-faster, for much larger matrices and with remarkably smaller errors. The Thomas algorithm is essentialy
+faster, for much larger matrices and with remarkably smaller errors. The Thomas algorithm is essentially
 the same as the LU-decomposition method, but with all the redundant operations (for instance
 operations including all the zeros) removed.
 
@@ -614,39 +629,43 @@ It is also evident that an important factor in this and similar problems is care
 step size, to balance out numerical errors and the trunctation error. If one is to
 ignore these effects, the solutions might include errors of several orders, there is
 no way to tell as there is no analytic solution to compare to. 
-\section{References}
-
-\newpage
-% \begin{appendices}
+\bibliography{references}
+\blankpage
 \appendix
-\section{Appendix}
-\label{sec:diagelm}
-\subsection{Second derivative}
-In section 2 we introduced a approximated expression for the second derivative. To derive this expression, consider a general Taylor expansion
+\blankpage
+\section{Second derivative}
+\label{app:taylor}
+Section 2 introduced an approximated expression for the second derivative. To
+derive this expression, consider a general Taylor expansion
+of a real valued function \(u(x)\):
 \begin{align*}
-f(x) = \sum_{n = 0}^{\infty}\frac{f^{n}(a)}{n!}(x-a)^{n}
+u(x) = \sum_{n = 0}^{\infty}\frac{u^{n}(a)}{n!}(x-a)^{n}
 \end{align*}
-Let $u(x)$ be real valued function and $x\in \mathbb{R}$. We will now expand the function $u(x+h)$ and $u(x-h)$ around $a = x$
-to third order
+The Taylor expansion of $u(x+h)$ and $u(x-h)$ around $a = x$
+of third order is therefore
 \begin{align*}
-u(x+h) \approx u(x)  + \dv{u}{x}h + \dv[2]{u}{x}\frac{h^2}{2!} + \dv[3]{u}{x}\frac{h^3}{3!} + \mathbb{O}(h^4)
-\\
-u(x-h) \approx u(x) - \dv{u}{x}h + \dv[2]{u}{x}\frac{h^2}{2!} - \dv[3]{u}{x}\frac{h^3}{3!} + \mathbb{O}(h^4)
+u(x+h) &\approx u(x) + h\dv{u}{x} + \frac{h^2}{2!}\dv[2]{u}{x} + \frac{h^3}{3!}\dv[3]{u}{x} - \frac{h^{4}}{4!}\dv[4]{u}{x}\rvert_{\xi_{+}} \\
+u(x-h) &\approx u(x) - h\dv{u}{x} + \frac{h^2}{2!}\dv[2]{u}{x} - \frac{h^3}{3!}\dv[3]{u}{x} + \frac{h^{4}}{4!}\dv[4]{u}{x}\rvert_{\xi_{-}}
 \end{align*}
-Notice, the reason why $u(x-h)$ and $u(x+h)$ was expanded to third order is because the third derivatives cancel each other out, and therefore the error must lie around the fourth term expansion. Now add $u(x-h)$ to $u(x+h)$
+where \(\xi_{\pm}\in [x-h, x+h]\).
+
+Adding these two expression cancels out the first and third derivatives, leaving
 \begin{align*}
-u(x+h) + u(x-h) \approx 2u(x) + \dv[2]{u}{x}h^2 + 2\mathbb{O}(h^4)
+  u(x+h) + u(x-h) \approx 2u(x) + \dv[2]{u}{x}h^2 + \frac{h^{4}}{12}\dv[4]{u}{x}\rvert_{\xi}
 \end{align*}
-Taking the $2$ inside $\mathbb{O}(h^4)$ and solving it for $\dv[2]{u}{x}$
+Solving for $\dv[2]{u}{x}$ then gives
 \begin{align*}
-\dv[2]{u}{x} \approx \frac{u(x+h) + u(x-h) - 2u(x)}{h^2} + \mathbb{O}(h^2)
+  \dv[2]{u}{x} \approx \frac{u(x+h) + u(x-h) - 2u(x)}{h^2} - \frac{h^{2}}{12}\dv[4]{u}{x}\rvert_{\xi}
 \end{align*}
-note that $\frac{\mathbb{O}(h^4)}{h^2} = \mathbb{O}(h^2)$. If we let \(h \to 0\)
-we will get an exact expression for the second derivative.
+
+By letting \(h \to 0\) this expression approaches the an exact expression for the second derivative.
 \begin{align*}
-  \dv[2]{u}{x} = \lim_{h \to 0} \frac{u(x+h) + u(x-h) - 2u(x))}{h^{2}} + \mathbb{O}(h^{2})
+  \dv[2]{u}{x} = \lim_{h \to 0} \frac{u(x+h) + u(x-h) - 2u(x))}{h^{2}} - \frac{h^{2}}{12}\dv[4]{u}{x}\rvert_{\xi}
 \end{align*}
-\subsection{Deriving a general expression for the diagonal elements after forward substituting}
+
+The error term is of order \(\mathcal{O}(h^{2})\). 
+\section{Deriving a general expression for the diagonal elements after forward substituting}
+\label{app:dager}
 The general expression for the diagonal elements in $A$ after forward substituting was
 \begin{align*}
   b'_i = b_i - \frac{a_i}{b'_{i-1} c_i}
@@ -687,5 +706,4 @@ But since $S(j)$ holds, $b'_j = \frac{j+1}{j}$, and
   b'_{j+1} = 2 - \frac{j}{j+1} = \frac{j+2}{j+1} = \frac{(j+1) + 1}{(j+1)}
 \end{align*}
 which proves $S(i)$ is true for all $i \geq 1$.
-% \end{appendices}
 \end{document}

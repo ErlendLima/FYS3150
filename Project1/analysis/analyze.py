@@ -28,7 +28,7 @@ class Analyzer:
         tag = 'G' if loadGeneral else ('L' if loadLU else 'S')
         self.data = self.load(path, tag)
         # self.compute_relative_error()
-        self.make_relative_error_plot()
+        # self.make_relative_error_plot()
 
     def load(self, path, tag):
         matches = glob(os.path.join(path, '{}*.txt'.format(tag)))
@@ -48,7 +48,7 @@ class Analyzer:
         return (x, y)
 
     @plotwrap()
-    def plot(self):
+    def plot(self, savename):
         def make_label(n):
             if n == 10:
                 return '$n = 10$'
@@ -67,7 +67,8 @@ class Analyzer:
         ax.legend()
         ax.set_xlabel(r'x')
         ax.set_ylabel(r'y')
-        fig.savefig('../latex/figures/function.eps', dpi=1200)
+        fig.savefig('../latex/figures/{}.eps'.format(savename),
+                    dpi=1200)
 
     def compute_relative_error(self):
         rows = []
@@ -105,6 +106,8 @@ if __name__ == '__main__':
     parser.add_argument('-G', '--GR', action='store_true',
                         help="Analyze general")
     args = parser.parse_args()
-    analyzer = Analyzer(args.search_path, loadLU=args.LU, loadSpecial=args.SP,
-                        loadGeneral=args.GR)
-    analyzer.plot()
+    analyzer = Analyzer(args.search_path, loadGeneral=True)
+    special = Analyzer(args.search_path, loadSpecial=True)
+    analyzer.plot('general')
+    analyzer.make_relative_error_plot()
+    special.plot('special')
