@@ -25,7 +25,7 @@ cmake . && make
 ```
 
 After initial compilation, typing `make` will make the program. To run the
-compiled program, type `./solve`. Optional flags exist, see './solve -h'.
+compiled program, type `./solve`. Optional flags exist, see `./solve -h`.
 The resulting data can then be analyzed 
 by the python script in the analysis directory using `python analyze.py ../cpp/data`.
 
