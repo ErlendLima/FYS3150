@@ -463,16 +463,17 @@ lu(L,U,A);
 y = solve(L, btilde);
 u = solve(U, y);
 \end{lstlisting}
-\subsection{Error analysis}
+\subsection{Error Analysis}
 The relative error of the numerical solution at $x_i$ is given by
 \begin{align*}
   \epsilon_i = \left| \frac{v_i - u_i}{u_i} \right|
 \end{align*}
-where $v_i$ is the numerically calculated value and $u_i$ is the analytic value.
-The implementation of the analytic solution is rather straightforward. For several
-$n$ the errors $\epsilon_i$ are calculated using the above formula, and the
-maximum error $\epsilon_\text{n,max}$ is extracted, saved and later plotted against $n$.
-For obvious reasons, for these calculations the optimized version of the Thomas algorithm was used.
+where $v_i$ is the numerically calculated value and $u_i$ is the analytic value
+at \(x_{i}\).
+The error $\epsilon_i$ is calculated for multiple values of \(n\), from which the 
+maximum error $\epsilon_\text{n,max} = \max{\epsilon_{i}}$ is saved and plotted
+against the stepsize \(h = \frac{1}{n+1}\). 
+The general method was used for calculating the numerical solution.
 
 \subsection{Timing of the Algorithms}
 \label{sec:timingmethod}
@@ -484,25 +485,37 @@ computations were repeated \(10^{3}\) times. The final estimate of their time
 usage was taken as their averages.
 
 \section{Results}
-\subsection{Solution using the algorithms}
+\subsection{Solution Using the Algorithms}
+
+All of the three methods converged to the solution, albeit somewhat differently.
+The general method and the LU-decomposition converged upwards while the
+special method converged downwards. Figure~\ref{fig:general} shows a plot where
+the general method is plotted using a differing number of points \(n\).
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/function.eps}
-  \caption{\label{fig:general} The plot}
+  \caption{\label{fig:general} The convergence of the numerical method is
+    apparent as the its graph approaches the analytical as the number of points \(n\) grows. When \(n
+    = 10^{5}\), shown as a dashed yellow line, the numerical solution becomes
+    indistinguishable from the analytical solution.}
 \end{figure}
 
-\subsection{Error and error analysis}
+\subsection{Error Analysis}
+
+The relative error produced by the general method is shown in
+figure~\ref{fig:error}, where it is plotted against stepsize on a log-log scale.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/error.eps}
-  \caption{\label{fig:error} The error}
+  \caption{\label{fig:error} The relative error plotted against the step size
+    used in the general method.}
 \end{figure}
 
 
 \subsection{Timing the algorithms}
-The time used by each algorithm is summarized in table~\ref{tab:timing}.
+The time used by each algorithm is summarized in table~\ref{tab:timing}. 
 
 \sisetup{
   % table-number-alignment = center,
@@ -510,24 +523,35 @@ The time used by each algorithm is summarized in table~\ref{tab:timing}.
   table-figures-decimal  = 2,
   table-figures-exponent = 1,
 }
-\begin{table}[h]
+\begin{table*}[h]
   \centering
   \begin{tabular}{SSSS}
     {\multirow{2}{*}{N}} & \multicolumn{3}{c}{Time usage [\(s\)]}\\
                                       & {General} & {Special} & {LU} \\
-    \(10^{1}\) & 1.592e-7 & & 1.378e-5\\
-    \(10^{2}\) & 1.683e-6 & & 9.837e-4\\
-    \(10^{3}\) & 1.687e-5 & & 6.214e-1\\
-    \(10^{4}\) & 1.682e-4 & & {-} \\
-    \(10^{5}\) & 1.734e-5 & & {-} \\
+    \(10^{1}\) & 1.592e-7 & 1.298e-7 & 1.378e-5\\
+    \(10^{2}\) & 1.683e-6 & 1.555e-6 & 9.927e-3\\
+    \(10^{3}\) & 1.687e-5 & 1.549e-5 & 6.214e-1\\
+    \(10^{4}\) & 1.682e-4 & 1.555e-4 & {-} \\
+    \(10^{5}\) & 1.734e-3 & 1.599e-3 & {-} \\
+    \(10^{6}\) & 1.749e-2 & 1.611e-2 & {-} \\
+    \(10^{7}\) & 2.413e-1 & 2.340e-1 & {-} \\
   \end{tabular}
   \caption{Time usage of each algorithm. These are averages of the time used by
-    each algorithm.}
+    each algorithm. Data is lacking for LU decomposition for matrices larger
+    than \(10^{3}\) as the memory consumption became too great.}
   \label{tab:timing}
-\end{table}
+\end{table*}
 
 \section{Discussion}
 \label{sec:discusison}
+
+All three methods for computing the solution to the Poisson equation converged
+to the known analytical solution as expected. It was noted that the general
+method and LU-decomposition behaved differently than the specialized method. A
+likely reason for this is that some of the algorithms are erroneously
+implemented.
+
+
 
 \section{Conclusion}
 

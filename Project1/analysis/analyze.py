@@ -56,11 +56,14 @@ class Analyzer:
                 return '$n = 10^{%g}$' % (np.log10(n))
 
         fig, ax = plt.subplots()
+        ax.plot(*self.compute_analytic_solution(10000), label=r'Analytic')
         for n, data in self.data:
             if n not in [10, 100, 1e5]: continue
             x = np.linspace(0, 1, n)
-            ax.plot(x, data, label=make_label(n), alpha=0.7)
-        ax.plot(*self.compute_analytic_solution(10000), label=r'Analytic')
+            if n == 1e5:
+                ax.plot(x, data, 'y', linestyle='dotted', label=make_label(n))
+            else:
+                ax.plot(x, data, label=make_label(n))
         ax.legend()
         ax.set_xlabel(r'x')
         ax.set_ylabel(r'y')
