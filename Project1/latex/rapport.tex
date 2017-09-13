@@ -488,9 +488,9 @@ usage was taken as their averages.
 \subsection{Solution Using the Algorithms}
 
 All of the three methods converged to the solution, albeit somewhat differently.
-The general algorithm and the LU-decomposition converged upwards while the
+The general method and the LU-decomposition converged upwards while the
 special method converged downwards. Figure~\ref{fig:general} shows a plot where
-the general method is used for different number of points \(n\).
+the general method is plotted using a differing number of points \(n\).
 
 \begin{figure}[ht]
   \centering
@@ -504,7 +504,7 @@ the general method is used for different number of points \(n\).
 \subsection{Error Analysis}
 
 The relative error produced by the general method is shown in
-figure~\ref{fig:error}, where it is plotted against stepsize.
+figure~\ref{fig:error}, where it is plotted against stepsize on a log-log scale.
 
 \begin{figure}[ht]
   \centering
@@ -515,7 +515,7 @@ figure~\ref{fig:error}, where it is plotted against stepsize.
 
 
 \subsection{Timing the algorithms}
-The time used by each algorithm is summarized in table~\ref{tab:timing}.
+The time used by each algorithm is summarized in table~\ref{tab:timing}. 
 
 \sisetup{
   % table-number-alignment = center,
@@ -523,24 +523,35 @@ The time used by each algorithm is summarized in table~\ref{tab:timing}.
   table-figures-decimal  = 2,
   table-figures-exponent = 1,
 }
-\begin{table}[h]
+\begin{table*}[h]
   \centering
   \begin{tabular}{SSSS}
     {\multirow{2}{*}{N}} & \multicolumn{3}{c}{Time usage [\(s\)]}\\
                                       & {General} & {Special} & {LU} \\
-    \(10^{1}\) & 1.592e-7 & & 1.378e-5\\
-    \(10^{2}\) & 1.683e-6 & & 9.837e-4\\
-    \(10^{3}\) & 1.687e-5 & & 6.214e-1\\
-    \(10^{4}\) & 1.682e-4 & & {-} \\
-    \(10^{5}\) & 1.734e-5 & & {-} \\
+    \(10^{1}\) & 1.592e-7 & 1.298e-7 & 1.378e-5\\
+    \(10^{2}\) & 1.683e-6 & 1.555e-6 & 9.927e-3\\
+    \(10^{3}\) & 1.687e-5 & 1.549e-5 & 6.214e-1\\
+    \(10^{4}\) & 1.682e-4 & 1.555e-4 & {-} \\
+    \(10^{5}\) & 1.734e-3 & 1.599e-3 & {-} \\
+    \(10^{6}\) & 1.749e-2 & 1.611e-2 & {-} \\
+    \(10^{7}\) & 2.413e-1 & 2.340e-1 & {-} \\
   \end{tabular}
   \caption{Time usage of each algorithm. These are averages of the time used by
-    each algorithm.}
+    each algorithm. Data is lacking for LU decomposition for matrices larger
+    than \(10^{3}\) as the memory consumption became too great.}
   \label{tab:timing}
-\end{table}
+\end{table*}
 
 \section{Discussion}
 \label{sec:discusison}
+
+All three methods for computing the solution to the Poisson equation converged
+to the known analytical solution as expected. It was noted that the general
+method and LU-decomposition behaved differently than the specialized method. A
+likely reason for this is that some of the algorithms are erroneously
+implemented.
+
+
 
 \section{Conclusion}
 
