@@ -23,7 +23,7 @@ def plotwrap(*args, **kwargs):
 
 
 class Analyzer:
-    def __init__(self, path, *, loadLU=False, loadSpecial=False,
+    def __init__(self, path, loadLU=False, loadSpecial=False,
                  loadGeneral=False):
         tag = 'G' if loadGeneral else ('L' if loadLU else 'S')
         self.data = self.load(path, tag)

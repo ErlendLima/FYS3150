@@ -121,24 +121,17 @@
 \author{Frederik J. Mellbye}
 \author{Aram Salihi}
 \author{Halvard Sutterud}
-\affiliation{University of Oslo, Oslo, Norway}
+\affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150}}
 \date{\today}
 
 \begin{abstract}
-      In this project three methods of solving the one-dimensional Poisson equation with
-      Dirchelet boundary conditions are investigated. The equation was discretized,
-      and written as a system of linear equations. This equates to
-      a tridiagonal matrix equation, which was solved using the general Thomas algorithm,
-      a specialized version of the Thomas algorithm and by LU-decomposing the matrix. The
-      numerical error is then analyzed for both methods, and the algorithm speeds are investigated and discussed.
-
-      The specialization of the algorithm for our specific problem halved the
-      amount of floating point operations. For large
-      matrices ($n \sim 10^5$) the LU-decomposition requires
-      more memory than what was available, which was not a problem with the Thomas
-      algorithm. Also, the Thomas algorithm produced solutions with smaller errors
-      than the LU method. Therefore the Thomas is deemed most suited for solving the problem
-      examined in this paper.
+      Three numerical methods of solving the one-dimensional Poisson equation with Dirchelet
+      boundary conditions are investigated. The equation is discretized and converted
+      to a linear algebra problem, solved with the common LU-decomposition and the less
+      common Thomas algorithm. The numerical errors and calculation speeds are discussed.
+      The general and a specialized version of the Thomas algorithm is, as expected,
+      shown to be much faster and less memory consuming than using a LU decomposition. Moreover,
+      the Thomas algorithm produced solutions with smaller errors than the LU method.
 \end{abstract}
 \maketitle
 \tableofcontents
@@ -177,7 +170,24 @@
 \blankpage
 \section{Introduction}
 In this paper numerical solutions to the one-dimensional Poisson equation are
-examined. Many important differential equations in science can be re-written  
+examined. Many important differential equations in science can be re-written to
+the form
+\begin{align*}
+  \nabla^2 u = f
+\end{align*}
+by variable substitutions. It is therefore interesting to develop algorithms
+and functions that can easily solve these types of equations, with small errors.
+
+By discretizing the equation it can be written as
+a tridiagonal matrix equation, and solving the equation turns into a simpler
+linear algebra problem. The matrix equation can easily be solved using the
+famous LU-decomposition, but because of the tridiagonal nature of the matrix,
+a more efficient (but conceptually equal) approach to solve the problem is possible: the Thomas algorithm.
+First the general version of this algorithm is implemented, and then a
+specially tailored version is developed for the particular tridiagonal matrix
+considered in this paper. As the algorithms become more specialized, more
+terms and factors can be precomputed, which saves memory space, and more importantly
+reduces computation speeds and the size of the numerical errors.
 
 \section{Theory}
 \subsection{Discretizing the Poisson equation}
@@ -316,7 +326,7 @@ $b'_i$. This is given by
 \begin{align*}
   b'_i = \frac{i+1}{i}
 \end{align*}
-and is found and proved by induction in appendix A?.
+and is found and proved by induction in section~\ref{sec:diagelm}.
 
 \subsection{Solving the general tridiagonal matrix problem by LU-decomposition}
 Another way to solve matrix equations is LU-decomposing A, and then solving
@@ -380,6 +390,18 @@ Compared to the Thomas algorithm, the LU decomposition requires a much larger
 amount of flops. Where the Thomas neatly avoids dealing with all the $\sim (n^2 - 3n)$
 zeros, the LU algorithm consideres every element in every row of the matrix. It is
 possible to show that the number of flops for this method is in the order $\frac{2}{3}N^3$.
+This should become apparent when the computation times are analyzed, but the time difference
+of the LU method compared to the Thomas methods might be smaller because the armadillo
+functions are optimized to work faster.
+
+\subsection{Memory usage}
+Since all of the discretized values need to be stored in memory, it is convenient
+to consider the memory required to run the programs. For the Thomas methods,
+arrays with lengths of order $n$ are used to store the arrays. The LU decomposition
+stores values in a $n \times n$ matrix, so the number of entries that need to
+be stored is of order $n^2$. Therefore, it will be possible to solve much
+larger systems of equations with the Thomas algorithm (of course this requires
+the matrix to be tridiagonal) than with the LU decomposition.
 
 \subsection{Analytic solution for a specific problem}
 In this paper the following special case of the Poisson equation is examined:
@@ -470,9 +492,9 @@ The relative error of the numerical solution at $x_i$ is given by
 \end{align*}
 where $v_i$ is the numerically calculated value and $u_i$ is the analytic value
 at \(x_{i}\).
-The error $\epsilon_i$ is calculated for multiple values of \(n\), from which the 
+The error $\epsilon_i$ is calculated for multiple values of \(n\), from which the
 maximum error $\epsilon_\text{n,max} = \max{\epsilon_{i}}$ is saved and plotted
-against the stepsize \(h = \frac{1}{n+1}\). 
+against the stepsize \(h = \frac{1}{n+1}\).
 The general method was used for calculating the numerical solution.
 
 \subsection{Timing of the Algorithms}
@@ -515,7 +537,7 @@ figure~\ref{fig:error}, where it is plotted against stepsize on a log-log scale.
 
 
 \subsection{Timing the algorithms}
-The time used by each algorithm is summarized in table~\ref{tab:timing}. 
+The time used by each algorithm is summarized in table~\ref{tab:timing}.
 
 \sisetup{
   % table-number-alignment = center,
@@ -523,7 +545,7 @@ The time used by each algorithm is summarized in table~\ref{tab:timing}.
   table-figures-decimal  = 2,
   table-figures-exponent = 1,
 }
-\begin{table*}[h]
+\begin{table*}[ht]
   \centering
   \begin{tabular}{SSSS}
     {\multirow{2}{*}{N}} & \multicolumn{3}{c}{Time usage [\(s\)]}\\
@@ -548,19 +570,57 @@ The time used by each algorithm is summarized in table~\ref{tab:timing}.
 All three methods for computing the solution to the Poisson equation converged
 to the known analytical solution as expected. It was noted that the general
 method and LU-decomposition behaved differently than the specialized method. A
-likely reason for this is that some of the algorithms are erroneously
-implemented.
+likely reason for this is that some of the algorithms might have small implementation
+errors. This error, most likely in the special algorithm, was not discovered, even
+after extensive attempts to locate the bug and reimplementing the method. Because
+the method still rapidly converges to the analytic solution, albeit in a different
+way, the method is still valid as it is implemented. However, because of the
+different convergence patterns, slight optimizations are most likely available
+in one of the implementations of the methods, since they should produce the
+same results, even for larger step sizes.
 
+Also, the LU decomposition was not possible for matrices where $n \geq 10^4$,
+because the method requires more memory than what was available. On the other hand,
+the Thomas algorithm variations ran for $n = 10^8$ before memory issues appeared.
 
+\subsection{Error analysis}
+The convergence towards the analytical solution is also evident from figure~\ref{fig:error},
+as $n$ increases. As $n$ is further increased, a minimum error is reached
+before further lowering of the step size introduces rapidly increasing trunctation/round-off
+errors.
+
+\subsection{Algorithm execution speeds}
+The computation timings are shown in table~\ref{tab:timing}. Solely in terms
+of the timings, the Thomas methods are far superior to the LU decomposition,
+by around the same order as predicted by counting the number of FLOPS. Among the
+Thomas algorithm variations, the special algorithm is slightly faster, but not
+by a factor $2$ as predicted in the theory section. There are several possible
+causes for this. For instance, compiler optimizations might speed up the general
+method more than the special method, and the way the arrays are passed between
+functions might be slower than a more optimal implementation.
 
 \section{Conclusion}
+As a concluding remark, it is evident that carefully examining the problem at hand,
+and making several simplifications created an algorithm that solved the problem
+faster, for much larger matrices and with remarkably smaller errors. The Thomas algorithm is essentialy
+the same as the LU-decomposition method, but with all the redundant operations (for instance
+operations including all the zeros) removed.
 
+Furthermore the methods developed in this project are now readily available to
+be used to solve any equation that can be transformed into the one-dimensional
+Poisson equation.
+
+It is also evident that an important factor in this and similar problems is carefully choosing an ideal
+step size, to balance out numerical errors and the trunctation error. If one is to
+ignore these effects, the solutions might include errors of several orders, there is
+no way to tell as there is no analytic solution to compare to. 
 \section{References}
 
 \newpage
 % \begin{appendices}
 \appendix
 \section{Appendix}
+\label{sec:diagelm}
 \subsection{Second derivative}
 In section 2 we introduced a approximated expression for the second derivative. To derive this expression, consider a general Taylor expansion
 \begin{align*}
