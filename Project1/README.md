@@ -25,7 +25,7 @@ cmake . && make
 ```
 
 After initial compilation, typing `make` will make the program. To run the
-compiled program, type `./solve`. Optional flags exist, see './solve -h'.
+compiled program, type `./solve`. Optional flags exist, see `./solve -h`.
 The resulting data can then be analyzed 
 by the python script in the analysis directory using `python analyze.py ../cpp/data`.
 
@@ -41,7 +41,7 @@ to compile the tests, type `cmake -Dtest=ON`. For actually running the tests, ru
 Better support for debugging and stricter compiler flags can be turned on using `cmake -DCMAKE_BUILD_TYPE=DEBUG`.
 
 ## Credits
-The contributors of this project are Erlend Lima, Frederik Johan Mellbye and Aram Salihi.
+The contributors of this project are Erlend Lima, Frederik Johan Mellbye, Aram Salihi and Halvard Sutterud.
 
 ## License
 This project is licensed under the terms of the **MIT** license.
