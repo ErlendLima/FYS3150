@@ -116,7 +116,7 @@
 
 \begin{document}
 \sisetup{detect-all}
-\title{Project 1}
+\title{Numerically Solving the Poisson Equation}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
 \author{Aram Salihi}
@@ -196,7 +196,7 @@ terms and factors can be precomputed, which saves memory space, and more importa
 reduces computation speeds and the size of the numerical errors.
 
 \section{Theory}
-\subsection{Discretizing the Poisson equation}
+\subsection{Discretizing the Poisson Equation}
 The one-dimensional Poisson equation with Dirchelet boundary conditions is
 \begin{align*}
   \frac{d^2 u}{d x^2} = - f
@@ -236,7 +236,7 @@ where
 is a $n \times n$ tridiagonal matrix, the only non-zero elements are on,
 directly above or directly below the diagonal. Row reducing the matrix can therefore
 be done in an efficient way using the Thomas algorithm, as we shall see in the next paragraph.
-\subsection{Solving a general tridiagonal matrix problem}
+\subsection{Solving a General Tridiagonal Matrix Problem}
 A general tridiagonal matrix equation is on the form
 \begin{align*}
   \begin{bmatrix}
@@ -324,7 +324,7 @@ In general then, the back substitution is done by
   u_i = \frac{v'_i - c_i u_{i+1}}{b'_i}
 \end{align*}
 where $i = n-1, n-2, \hdots, 1$. Some details were taken from~\cite{mortenjensen}.
-\subsection{Optimizing the Thomas algorithm for a specific case}
+\subsection{Optimizing the Thomas Algorithm for a Specific Case}
 In the case presented in this project, $a_i = c_i = -1$ and $b_i = 2$. The fact
 that there are just two different values in the matrix greatly simplifies the
 calculations, since all the calculations involving only $a_i$, $b_i$ and $c_i$
@@ -335,7 +335,7 @@ $b'_i$. This is given by
 \end{align*}
 and is found and proved by induction in section~\ref{app:dager}.
 
-\subsection{Solving the general tridiagonal matrix problem by LU-decomposition}
+\subsection{Solving the General Tridiagonal Matrix Problem by LU-decomposition}
 Another way to solve matrix equations is LU-decomposing A, and then solving
 two matrix equations. This is a frequently used method for solving more general
 sets of linear equations. The LU-decomposition is a form of Gaussian elimination,
@@ -356,12 +356,12 @@ which is then inserted in
 \end{align*}
 and solved for $\mathbf{u}$.
 
-\subsection{Counting the number of FLOPS for each method}
+\subsection{Counting the Number of FLOPS for Each Method}
 A simple way of determining the computational speed of an algorith is simply
 counting the number of floating point operations. The fewer calculations the
 computer has to make, the faster an algorithm will run. In this section approximate numbers
 for the amount of floating point operations (flops) are determined.
-\subsubsection{The general Thomas algorithm}
+\subsubsection{The General Thomas Algorithm}
 The general algorithm with arbitrary tridiagonal elements consists of two steps,
 the forward substitution (two equations) and the backward substitution (one equation).
 In the forward substitution, some of the operations can be precomputed. Since
@@ -380,7 +380,7 @@ In total, then, the number of flops required in the general Thomas algorithm is
 \begin{align*}
   \text{flops}_\text{Thomas} = 8(n-1)
 \end{align*}
-\subsubsection{The special case Thomas algorithm}
+\subsubsection{The Special Case Thomas Algorithm}
 For the specialized algorithm, even more quantities can be precomuted and the
 amount of flops can therefore be reduced further. First of all, an analytic
 expression for $b'_i$, the diagonal elements, does not contribute with any flops
@@ -392,7 +392,7 @@ flops for the tailored algorithm is
   4(n-1)
 \end{align}
 This should therefore cut the running time of the algorithm approximately in half.
-\subsubsection{The LU decomposition method}
+\subsubsection{The LU Decomposition Method}
 Compared to the Thomas algorithm, the LU decomposition requires a much larger
 amount of flops. Where the Thomas neatly avoids dealing with all the $\sim (n^2 - 3n)$
 zeros, the LU algorithm consideres every element in every row of the matrix. It is
@@ -401,7 +401,7 @@ This should become apparent when the computation times are analyzed, but the tim
 of the LU method compared to the Thomas methods might be smaller because the armadillo
 functions are optimized to work faster.
 
-\subsection{Memory usage}
+\subsection{Memory Usage}
 Since all of the discretized values need to be stored in memory, it is convenient
 to consider the memory required to run the programs. For the Thomas methods,
 arrays with lengths of order $n$ are used to store the arrays. The LU decomposition
@@ -410,7 +410,7 @@ be stored is of order $n^2$. Therefore, it will be possible to solve much
 larger systems of equations with the Thomas algorithm (of course this requires
 the matrix to be tridiagonal) than with the LU decomposition.
 
-\subsection{Analytic solution for a specific problem}
+\subsection{Analytic Solution for a Specific Problem}
 In this paper the following special case of the Poisson equation is examined:
 \begin{align}
   - \frac{d^2 u}{dx^2} = 100 e^{-10x}
@@ -435,7 +435,7 @@ were performed several times, and for each method the algorithm times were avera
 average time. The implementations are explained and listed in the following paragraphs with pseudocode.
 The analysis of the solutions and errors was done in Python.
 
-\subsection{The general Thomas algorithm}
+\subsection{The General Thomas Algorithm}
 The general Thomas algorithm consists of the forward and backward substitutions
 examined in the theory section. In pseudocode the loop was implemented as
 \begin{lstlisting}[language=cpp, caption={Thomas algorithm implementation for a general tridiagonal matrix}]
@@ -452,7 +452,7 @@ for(i = n-2; i >= 1; i--){
     u[i] = (v_prime[i] - c[i]*u[i+1])/b_prime[i];
 }
 \end{lstlisting}
-\subsection{The optimized algorithm}
+\subsection{The Optimized Algorithm}
 Because of the fact that the matrix examined in this paper is both tridiagonal and
 symmetric, further optimizations to the algorithm can be made. Since $a_i = c_i = -1$
 and $b'_i = (i+1)/i$ can be precomputed, the algorithm simplifies to
@@ -472,7 +472,7 @@ for(i = n-2; i >= 1; i--){
     u[i] = (v_prime[i] + u[i+1])/b_prime[i];
 }
 \end{lstlisting}
-\subsection{The LU-decomposition}
+\subsection{The LU-Decomposition}
 Solving the matrix equation using the LU-decomposition method was done with
 functions from the Armadillo C++ Linear Algebra Library. First, the tridiagonal
 matrix A is implemented, and then the Armadillo functions \texttt{lu()} and \texttt{solve()}
@@ -551,7 +551,7 @@ figure~\ref{fig:error}, where it is plotted against stepsize on a log-log scale.
 \end{figure}
 
 
-\subsection{Timing the algorithms}
+\subsection{Timing the Algorithms}
 The time used by each algorithm is summarized in table~\ref{tab:timing}.
 
 \sisetup{
@@ -598,13 +598,13 @@ Also, the LU decomposition was not possible for matrices where $n \geq 10^4$,
 because the method requires more memory than what was available. On the other hand,
 the Thomas algorithm variations ran for $n = 10^8$ before memory issues appeared.
 
-\subsection{Error analysis}
+\subsection{Error Analysis}
 The convergence towards the analytical solution is also evident from figure~\ref{fig:error},
 as $n$ increases. As $n$ is further increased, a minimum error is reached
 before further lowering of the step size introduces rapidly increasing trunctation/round-off
 errors.
 
-\subsection{Algorithm execution speeds}
+\subsection{Algorithm Execution Speeds}
 Solely in terms of the timings (see table~\ref{tab:timing}), the Thomas methods are far superior to the LU decomposition,
 by around the same order as predicted by counting the number of FLOPS. Among the
 Thomas algorithm variations, the special algorithm is slightly faster, but not
@@ -632,7 +632,7 @@ no way to tell as there is no analytic solution to compare to.
 \blankpage
 \appendix
 \blankpage
-\section{Second derivative}
+\section{Second Derivative}
 \label{app:taylor}
 Section 2 introduced an approximated expression for the second derivative. To
 derive this expression, consider a general Taylor expansion
@@ -663,7 +663,7 @@ By letting \(h \to 0\) this expression approaches the an exact expression for th
 \end{align*}
 
 The error term is of order \(\mathcal{O}(h^{2})\). 
-\section{Deriving a general expression for the diagonal elements after forward substituting}
+\section{Deriving a General Expression for the Diagonal Elements after Forward Substituting}
 \label{app:dager}
 The general expression for the diagonal elements in $A$ after forward substituting was
 \begin{align*}
