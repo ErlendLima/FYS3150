@@ -57,19 +57,13 @@ arma::mat tridiagonalMat(unsigned int size, double upper, double middle, double 
 }
 
 
-arma::vec thomasSpecial(const arma::vec& v){
+arma::vec thomasSpecial(const arma::vec& v, const arma::vec& b_prime, arma::vec& v_prime, arma::vec& u){
 
-  const size_t n   = arma::numel(v);
+  const size_t n = arma::numel(v);
 
-  // double b_prime[n];
-  arma::vec b_prime = arma::zeros(n);
-  arma::vec v_prime = arma::zeros(n);
-  arma::vec u       = arma::zeros(n);
+  v_prime(1) = v(1);
 
-  v_prime(0) = v(0);
-
-  for(unsigned int i = 1; i <= n-1; i++){
-      b_prime(i) = static_cast<double>(i+1)/i;
+  for(unsigned int i = 2; i < n-1; i++){
       v_prime(i) = v(i) + (v_prime(i-1)/b_prime(i));
   }
 

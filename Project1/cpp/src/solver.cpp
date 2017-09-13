@@ -83,10 +83,17 @@ void Solver::solveGeneral(unsigned int n) {
 
 void Solver::solveSpecial(unsigned int n){
     auto btilde = makeBtilde(n);
+    arma::vec b_prime  = arma::zeros(n);
+    arma::vec v_prime = arma::zeros(n);
+    arma::vec u       = arma::zeros(n);
+
+    for(int i = 0; i <= n-1; i++){
+      b_prime(i) = static_cast<double>(i+2)/(i+1);
+    }
 
     startTiming();
     for(unsigned int r = 0; r < repetitions; r++)
-        solution = thomasSpecial((*btilde));
+        solution = thomasSpecial(*btilde, b_prime, v_prime, u);
     endTiming();
 }
 
