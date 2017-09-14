@@ -1,0 +1,16 @@
+*.txt
+*.cmake
+*.el
+*.aux
+*.toc
+*CMakeFiles
+*lazy
+*.pyc
+*.log
+*Makefile
+*.a
+*runUnitTests
+*solve
+**/figures/*
+Project1/latex/pythontex-files-rapport/
+Project1/latex/rapportNotes.bib
