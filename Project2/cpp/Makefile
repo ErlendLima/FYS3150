@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /home/erdos/gits/FYS3150/Project2/cpp
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named project1_lib
+# Target rules for targets named project_lib
 
 # Build rule for target.
-project1_lib: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 project1_lib
-.PHONY : project1_lib
+project_lib: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 project_lib
+.PHONY : project_lib
 
 # fast build rule for target.
-project1_lib/fast:
-	$(MAKE) -f CMakeFiles/project1_lib.dir/build.make CMakeFiles/project1_lib.dir/build
-.PHONY : project1_lib/fast
+project_lib/fast:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/build
+.PHONY : project_lib/fast
 
 #=============================================================================
 # Target rules for targets named solve
@@ -136,16 +136,49 @@ solve/fast:
 	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/build
 .PHONY : solve/fast
 
+src/main.o: src/main.cpp.o
+
+.PHONY : src/main.o
+
+# target to build an object file
+src/main.cpp.o:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/main.cpp.o
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/main.cpp.o
+.PHONY : src/main.cpp.o
+
+src/main.i: src/main.cpp.i
+
+.PHONY : src/main.i
+
+# target to preprocess a source file
+src/main.cpp.i:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/main.cpp.i
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/main.cpp.i
+.PHONY : src/main.cpp.i
+
+src/main.s: src/main.cpp.s
+
+.PHONY : src/main.s
+
+# target to generate assembly for a file
+src/main.cpp.s:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/main.cpp.s
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/main.cpp.s
+.PHONY : src/main.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... project1_lib"
+	@echo "... rebuild_cache"
+	@echo "... project_lib"
 	@echo "... solve"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
 .PHONY : help
 
 
