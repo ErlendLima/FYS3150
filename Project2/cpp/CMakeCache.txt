@@ -28,7 +28,7 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 
 //Choose the type of build, options are: None(CMAKE_CXX_FLAGS or
 // CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.
-CMAKE_BUILD_TYPE:STRING=
+CMAKE_BUILD_TYPE:STRING=RELEASE
 
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
@@ -232,6 +232,9 @@ gtest_main_LIB_DEPENDS:STATIC=general;-pthread;general;gtest;
 
 //Dependencies for target
 project1_lib_LIB_DEPENDS:STATIC=
+
+//Dependencies for target
+project_lib_LIB_DEPENDS:STATIC=
 
 //No help, variable specified on the command line.
 test:UNINITIALIZED=OFF

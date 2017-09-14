@@ -10,13 +10,13 @@ project(${PROJECT_NAME})
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O3 -Wall -fopenmp  -std=c++14 -D_GLIBCXX_PARALLEL -Wextra -Wshadow -Wfloat-equal -Wundef -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual -Wswitch-default -march=native -Wswitch-enum -Wconversion -Wunreachable-code -Wformat=2")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -fopenmp -std=c++14 -D_GLIBCXX_PARALLEL -Wfloat-equal -march=native -Wunreachable-code -Wshadow")
 
-message("Build type is ${CMAKE_BUILD_TYPE}")
-set(include_filesm "")
+set(include_files src/main.cpp)
 set(executable_name solve)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "RELEASE")
 endif(NOT CMAKE_BUILD_TYPE)
+message("Build type is ${CMAKE_BUILD_TYPE}")
 
 # force static runtime libraries for msvc builds
 if(MSVC)
@@ -42,8 +42,9 @@ endif()
 ################################
 find_package(Armadillo REQUIRED)
 include_directories("src")
-add_library(project_lib ${include_src})
-add_executable(${executable_name} ${include_dirs})
+add_library(project_lib ${include_files})
+message("${executable_name} ${include_files}")
+add_executable(${executable_name} ${include_files})
 # Key idea: SEPARATE OUT your main() function into its own file so it can be its
 # own executable. Separating out main() means you can add this library to be
 # used elsewhere.
