@@ -163,6 +163,20 @@
 \label{sec:introduction}
 \section{Theory}
 \label{sec:theory}
+\subsection{Idiotisk navn for å understreke at dette er midlertidig}
+A unitary transformation preserves orthogonality and the dot product. To see
+this, consider an orthogonal basis \(\{\vb{v}_{i}\}\) and an unitary
+transformation \(U\). Defining \(\vb{w}_{i}=U\vb{v}_{i}\), the dot product can
+be computed as
+\begin{align*}
+  \vb{w}_{i}\vdot \vb{w}_{j} &= \vb{w}_{i}\vb{w}_{j}^{T}\\
+                             &= \left( U\vb{v}_{i} \right)\left( U\vb{v}_{j} \right)^{T}\\
+                             &= U\vb{v}_{i}\vb{v}_{j}^{T}U^{T}\\
+                             &= U\delta_{ij}U^{T}\\
+                             &= \delta_{ij}UU^{T}\\
+                             &= \delta_{ij}
+\end{align*}
+where the last step follows since \(U\) is unitary. 
 \section{Method}
 \label{sec:method}
 \section{Results}
