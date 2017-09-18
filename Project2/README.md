@@ -1,4 +1,4 @@
-# Project One
+# Project Two
 
 <p align="center">
 <b><a href="#usage">Usage</a></b>
