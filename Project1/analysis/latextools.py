@@ -34,7 +34,7 @@ class plotable:
 
             if 'saveas' in dcKwargs or self.saveas is not None:
                 path = dcKwargs['saveas'] if 'saveas' in dcKwargs else self.saveas
-                splot.savefig(join(self.savepath, path), dpi=1200)
+                s"plot.savefig(join(self.savepath, path), dpi=1200)
             return res
         return decorator
 

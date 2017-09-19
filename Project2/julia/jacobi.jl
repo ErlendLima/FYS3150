@@ -1,15 +1,15 @@
 module Jacobi
-export offdiagmax, jacobi_rotate!, jacobi!
+export offdiagmax, jacobirotate!, jacobi!
 
 function jacobi!(A::Array)
     R = eye(A)
-    ɛ = 1e-10
+    const ɛ = 1e-10
+    const max_iter = 10000
     iterations = 0
-    max_iter = 100
     maxnondiag = offdiagmax(A)[1]
     while (maxnondiag > ɛ && iterations ≤ max_iter)
-        maxnondiag, row, column = offdiagmax(A)
-        jacobi_rotate!(A, R, row, column)
+        @inbounds maxnondiag, row, column = offdiagmax(A)
+        @inbounds jacobirotate!(A, R, row, column)
         iterations += 1
     end
     return R
@@ -17,8 +17,8 @@ end
 
 function offdiagmax(x)
     max = -1.0
-    max_row = 0
-    max_col = 0
+    maxrow = 0
+    maxcol = 0
     rows, columns = size(x)
     for column in 1:columns
         for row in 1:rows
@@ -26,17 +26,17 @@ function offdiagmax(x)
             y = abs(x[row, column])
             if y > max
                 max = y
-                max_row, max_col = row, column
+                maxrow, maxcol = row, column
             end
         end
     end
-    max, max_row, max_col
+    max, maxrow, maxcol
 end
 
 
-function jacobi_rotate!(A::Array{}, R::Array{}, k, l)
+function jacobirotate!(A::Array, R::Array, k, l)
     s, c = 0.0, 0.0
-    if A[k, l] != 0.0
+    if A[k, l] ≠ 0.0
         τ = (A[l, l] - A[k, k])/(2A[k, l])
         if τ ≥ 0
             t = 1/(τ + √(1 + τ^2))
@@ -51,24 +51,24 @@ function jacobi_rotate!(A::Array{}, R::Array{}, k, l)
         s = 0.0
     end
 
-    a_kk = A[k, k]
-    a_ll = A[l, l]
-    A[k, k] = c^2⋅a_kk - 2c⋅s⋅A[k, l] + s^2⋅a_ll
-    A[l, l] = s^2⋅a_kk + 2c⋅s⋅A[k, l] + c^2⋅a_ll
+    aₖₖ = A[k, k]
+    aₗₗ = A[l, l]
+    A[k, k] = c^2⋅aₖₖ - 2c⋅s⋅A[k, l] + s^2⋅aₗₗ
+    A[l, l] = s^2⋅aₖₖ + 2c⋅s⋅A[k, l] + c^2⋅aₗₗ
     A[k, l], A[l, k] = 0.0, 0.0
     for i in 1:size(A)[1]
-        if i ≠ k && i ≠ l
-            a_ik = A[i, k]
-            a_il = A[i, l]
-            A[i, k] = c⋅a_ik - s⋅a_il
+        if i ≠ k ≠ l
+            aᵢₖ = A[i, k]
+            aᵢₗ = A[i, l]
+            A[i, k] = c⋅aᵢₖ - s⋅aᵢₗ
             A[k, i] = A[i, k]
-            A[i, l] = c⋅a_il + s⋅a_ik
+            A[i, l] = c⋅aᵢₗ + s⋅aᵢₖ
             A[l, i] = A[i, l]
         end
-        r_ik = R[i, k]
-        r_il = R[i, l]
-        R[i, k] = c⋅r_ik - s⋅r_il
-        R[i, l] = c⋅r_il + s⋅r_ik
+        rᵢₖ = R[i, k]
+        rᵢₗ = R[i, l]
+        R[i, k] = c⋅rᵢₖ - s⋅rᵢₗ
+        R[i, l] = c⋅rᵢₗ + s⋅rᵢₖ
     end
 end
 
