@@ -3,7 +3,7 @@
 *.el
 *.aux
 *.toc
-*CMakeFiles
+**/CMakeFiles/*
 *lazy
 *.pyc
 *.log

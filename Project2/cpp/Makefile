@@ -136,6 +136,36 @@ solve/fast:
 	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/build
 .PHONY : solve/fast
 
+src/given_methods.o: src/given_methods.cpp.o
+
+.PHONY : src/given_methods.o
+
+# target to build an object file
+src/given_methods.cpp.o:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/given_methods.cpp.o
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/given_methods.cpp.o
+.PHONY : src/given_methods.cpp.o
+
+src/given_methods.i: src/given_methods.cpp.i
+
+.PHONY : src/given_methods.i
+
+# target to preprocess a source file
+src/given_methods.cpp.i:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/given_methods.cpp.i
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/given_methods.cpp.i
+.PHONY : src/given_methods.cpp.i
+
+src/given_methods.s: src/given_methods.cpp.s
+
+.PHONY : src/given_methods.s
+
+# target to generate assembly for a file
+src/given_methods.cpp.s:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/given_methods.cpp.s
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/given_methods.cpp.s
+.PHONY : src/given_methods.cpp.s
+
 src/main.o: src/main.cpp.o
 
 .PHONY : src/main.o
@@ -176,6 +206,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... project_lib"
 	@echo "... solve"
+	@echo "... src/given_methods.o"
+	@echo "... src/given_methods.i"
+	@echo "... src/given_methods.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

@@ -8,7 +8,7 @@ void jacobirotate(arma::mat& A, arma::mat& R, unsigned int& k, unsigned int& l, 
     double t,tau;
     tau = (A(l,l) - A(k,k))/(2*A(k,l));
     if(tau>0){
-      t = 1.0/(tau + sqrt(1.0 + tau*tau));
+        =    t  1.0/(tau + sqrt(1.0 + tau*tau));
     }else{
       t = -1.0/(-tau + sqrt(1.0 + tau*tau));
     }
