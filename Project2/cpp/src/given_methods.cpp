@@ -1,6 +1,25 @@
 #include <armadillo>
 #include "given_methods.h"
 
+void jacobi(arma::mat& A, unsigned int& n){
+  double maxiter = n*n*n;
+  double epsilon = 1.0e-8;
+  unsigned int iter = 0;
+  unsigned int k, l;
+  double max_offdiag = 1000.0;
+
+  arma::mat R = arma::eye<arma::mat>(n, n); // Eigenvalue matrix
+
+  while(fabs(max_offdiag) > epsilon && static_cast<double>(iter) < maxiter){
+    // Find maximum off diagonal element
+    find_max_offdiag(A, k, l, n);
+    max_offdiag = A(l,k);
+    jacobirotate(A, R, k, l, n);
+
+    iter++;
+  }
+}
+
 void jacobirotate(arma::mat& A, arma::mat& R, unsigned int& k, unsigned int& l, unsigned int& n){
   // Rotate: Find values of cos and sin
   double s,c;
@@ -8,8 +27,9 @@ void jacobirotate(arma::mat& A, arma::mat& R, unsigned int& k, unsigned int& l, 
     double t,tau;
     tau = (A(l,l) - A(k,k))/(2*A(k,l));
     if(tau>0){
-        =    t  1.0/(tau + sqrt(1.0 + tau*tau));
-    }else{
+      t = 1.0/(tau + sqrt(1.0 + tau*tau));
+    }
+    else{
       t = -1.0/(-tau + sqrt(1.0 + tau*tau));
     }
 
