@@ -1,16 +1,15 @@
 module Jacobi
 export offdiagmax, jacobirotate!, jacobi!
 
-function jacobi!(A::Array)
+function jacobi!(A::Array; ɛ=1e-10, maxiter=1e6)
     R = eye(A)
-    const ɛ = 1e-10
-    const max_iter = 10000
     iterations = 0
     maxnondiag = offdiagmax(A)[1]
-    while (maxnondiag > ɛ && iterations ≤ max_iter)
+    while (maxnondiag > ɛ && iterations ≤ maxiter)
         @inbounds maxnondiag, row, column = offdiagmax(A)
         @inbounds jacobirotate!(A, R, row, column)
         iterations += 1
+        println(A)
     end
     return R
 end
@@ -20,6 +19,7 @@ function offdiagmax(x)
     maxrow = 0
     maxcol = 0
     rows, columns = size(x)
+    # Fix later
     for column in 1:columns
         for row in 1:rows
             row == column && continue
@@ -38,6 +38,9 @@ function jacobirotate!(A::Array, R::Array, k, l)
     s, c = 0.0, 0.0
     if A[k, l] ≠ 0.0
         τ = (A[l, l] - A[k, k])/(2A[k, l])
+        # @show k, A[k ,k]
+        # @show l, A[l, l]
+        # @show (A[l, l] - A[k, k])
         if τ ≥ 0
             t = 1/(τ + √(1 + τ^2))
         else
@@ -53,8 +56,8 @@ function jacobirotate!(A::Array, R::Array, k, l)
 
     aₖₖ = A[k, k]
     aₗₗ = A[l, l]
-    A[k, k] = c^2⋅aₖₖ - 2c⋅s⋅A[k, l] + s^2⋅aₗₗ
-    A[l, l] = s^2⋅aₖₖ + 2c⋅s⋅A[k, l] + c^2⋅aₗₗ
+    A[k, k] = c^2⋅aₖₖ - 2.0c⋅s⋅A[k, l] + s^2⋅aₗₗ
+    A[l, l] = s^2⋅aₖₖ + 2.0c⋅s⋅A[k, l] + c^2⋅aₗₗ
     A[k, l], A[l, k] = 0.0, 0.0
     for i in 1:size(A)[1]
         if i ≠ k ≠ l

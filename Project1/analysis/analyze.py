@@ -45,7 +45,7 @@ class Analyzer:
     def compute_analytic_solution(self, n=1000):
         x = np.linspace(0, 1, n)
         y = 1 - (1-np.exp(-10))*x - np.exp(-10*x)
-        return (x, y)
+        return x, y
 
     @plotwrap()
     def plot(self, savename):
