@@ -10,7 +10,7 @@ project(${PROJECT_NAME})
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O3 -Wall -fopenmp  -std=c++14 -D_GLIBCXX_PARALLEL -Wextra -Wshadow -Wfloat-equal -Wundef -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual -Wswitch-default -march=native -Wswitch-enum -Wconversion -Wunreachable-code -Wformat=2")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -fopenmp -std=c++14 -D_GLIBCXX_PARALLEL -Wfloat-equal -march=native -Wunreachable-code -Wshadow")
 
-set(include_files src/main.cpp src/given_methods.cpp)
+set(include_files src/main.cpp src/given_methods.cpp src/schrodinger.cpp)
 set(executable_name solve)
 
 if(NOT CMAKE_BUILD_TYPE)

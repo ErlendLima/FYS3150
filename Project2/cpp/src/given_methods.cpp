@@ -1,7 +1,9 @@
 #include <armadillo>
+#include <cmath>
 #include "given_methods.h"
 
-void jacobi(arma::mat& A, unsigned int& n){
+void jacobi(arma::mat& A){
+  unsigned int n = sqrt(A.size());
   double maxiter = n*n*n;
   double epsilon = 1.0e-8;
   unsigned int iter = 0;
