@@ -4,6 +4,7 @@
 
 arma::mat hamiltonianMat(double rho_min, double rho_max, unsigned int N){
   double h = (rho_max - rho_min)/N;
+  //
   arma::vec V = arma::zeros<arma::vec>(N+1);
   for(unsigned int i = 0; i <= N; i++){
     V(i) = pow(rho_min + i*h, 2);
@@ -22,6 +23,17 @@ arma::mat hamiltonianMat(double rho_min, double rho_max, unsigned int N){
 
 void solve(double rho_min, double rho_max, unsigned int N){
   arma::mat H = hamiltonianMat(rho_min, rho_max, N);
-  jacobi(H);
-  H.diag().print();
+  // H.print();
+  std::cout << "\n";
+  arma::vec eigval;
+  arma::mat eigvec;
+  arma::eig_sym(eigval, eigvec, H);
+  eigval.print();
+  // H.print();
+  std::cout << "\n";
+  arma::vec eigval_2;
+  arma::mat eigvec_2;
+  jacobi(eigval_2, eigvec_2, H);
+  eigval_2.print();
+  // H.print();
 }

@@ -2,24 +2,27 @@
 #include <cmath>
 #include "given_methods.h"
 
-void jacobi(arma::mat& A){
-  unsigned int n = sqrt(A.size());
+void jacobi(arma::vec& eigval, arma::mat& eigvec, arma::mat& A){
+  unsigned int n = A.n_cols;
   double maxiter = n*n*n;
   double epsilon = 1.0e-8;
   unsigned int iter = 0;
   unsigned int k, l;
   double max_offdiag = 1000.0;
 
-  arma::mat R = arma::eye<arma::mat>(n, n); // Eigenvalue matrix
+  arma::mat A_copy = arma::mat(A);
+  eigvec = arma::eye<arma::mat>(n, n); // Eigenvalue matrix
 
   while(fabs(max_offdiag) > epsilon && static_cast<double>(iter) < maxiter){
     // Find maximum off diagonal element
-    find_max_offdiag(A, k, l, n);
+    find_max_offdiag(A_copy, k, l, n);
     max_offdiag = A(l,k);
-    jacobirotate(A, R, k, l, n);
+    jacobirotate(A_copy, eigvec, k, l, n);
 
     iter++;
   }
+  std::cout << "Completed Jacobi eigenvalue algorithm with " << iter << " iterations" << std::endl;
+  eigval = arma::sort(diagvec(A_copy));
 }
 
 void jacobirotate(arma::mat& A, arma::mat& R, unsigned int& k, unsigned int& l, unsigned int& n){
