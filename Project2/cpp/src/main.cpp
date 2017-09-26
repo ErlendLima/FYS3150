@@ -6,22 +6,11 @@
 #include <stdlib.h>
 #include <armadillo>
 #include "given_methods.h"
+#include "schrodinger.h"
 
 int main(int argc, char const *argv[]) {
-  unsigned int n = 5;
-  arma::mat A = arma::zeros<arma::mat>(n, n);
-  for(unsigned int i = 0; i < n; i++){
-    for(unsigned int j = 0; j < n; j++){
-      if(i == j){
-        A(i,j) = 2.0;
-      }
-      else{
-        A(i,j) = 1.0;
-      }
-    }
-  }
+  unsigned int N = 400;
 
-  jacobi(A, n);
-  A.print();
+  solve(1e-4, 400, N);
   return 0;
 }
