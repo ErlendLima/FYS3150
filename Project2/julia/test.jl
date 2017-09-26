@@ -57,16 +57,19 @@ using Base.Test
              -30 300 -675 20
              60 -675 1620 -1050
              -35 20 -1050 700]
-        B = copy(A)
+        E = eigvals(A)
         R = jacobi!(A)
-        @test sort(diag(A)) ≈ sort(eigvals(B))
+        @test sort(diag(A)) ≈ sort(E)
     end
 end
 
 
 @testset "Schroedinger Tests" begin
     @testset "Solve test" begin
-        summary(solve(0, 1, 10))
-        @test true
+        N = 5
+        H, R = solve(0, 1, N)
+        d = sort(diag(H))
+        e = sort(eigvals(hamiltonian(0, 1, N)))
+        @test e ≈ d
     end
 end

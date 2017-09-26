@@ -1,7 +1,7 @@
 module Jacobi
 export offdiagmax, jacobirotate!, jacobi!
 
-function jacobi!(A::Array; ɛ=1e-10, maxiter=1e8)
+function jacobi!(A::Array{Float64}; ɛ=1e-10, maxiter=1e8)
     R = eye(A)
     iterations = 0
     maxnondiag = offdiagmax(A)[1]
@@ -32,7 +32,7 @@ function offdiagmax(x)
 end
 
 
-function jacobirotate!(A::Array, R::Array, k, l)
+function jacobirotate!(A::Array{Float64}, R::Array{Float64}, k, l)
     s, c = 0.0, 0.0
     if A[k, l] ≠ 0.0
         τ = (A[l, l] - A[k, k])/(2A[k, l])
@@ -68,6 +68,7 @@ function jacobirotate!(A::Array, R::Array, k, l)
         R[i, l] = c⋅rᵢₗ + s⋅rᵢₖ
     end
 end
+
 
 
 end
