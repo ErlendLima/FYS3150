@@ -1,10 +1,10 @@
 #include <armadillo>
 #include <cmath>
-#include "given_methods.h"
+#include "jacobi.h"
 
 void jacobi(arma::vec& eigval, arma::mat& eigvec, arma::mat& A){
   unsigned int n = A.n_cols;
-  double maxiter = 1000000;
+  double maxiter = 1e8;
   double epsilon = 1.0e-10;
   unsigned int iter = 0;
   unsigned int k, l;
@@ -16,7 +16,7 @@ void jacobi(arma::vec& eigval, arma::mat& eigvec, arma::mat& A){
   while(fabs(max_offdiag) > epsilon && static_cast<double>(iter) < maxiter){
     // Find maximum off diagonal element
     find_max_offdiag(A_copy, k, l, n);
-    max_offdiag = A(l,k);
+    max_offdiag = A_copy(l,k);
     jacobirotate(A_copy, eigvec, k, l, n);
 
     iter++;

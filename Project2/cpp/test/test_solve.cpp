@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <armadillo>
 #include <memory>
-#include "../src/given_methods.h"
+#include "../src/jacobi.h"
 
 #define TOLERANCE 1e-6
 
