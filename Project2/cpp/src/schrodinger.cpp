@@ -48,14 +48,14 @@ void solve(double rho_min, double rho_max, unsigned int N){
   arma::mat eigvec;
   arma::eig_sym(eigval, eigvec, H);
   // eigval.print();
-  // eigvec.print();
+  eigvec.print();
   // H.print();
   // std::cout << "\n";
   arma::vec eigval_2;
   arma::mat eigvec_2;
   jacobi(eigval_2, eigvec_2, H);
   // eigvec_2.print();
-  eigval_2.print();
+  // eigval_2.print();
   eigvec.save("data/GivenEigvals.txt", arma::raw_ascii);
   // H.print();
 }

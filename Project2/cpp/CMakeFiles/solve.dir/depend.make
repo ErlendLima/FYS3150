@@ -6,4 +6,9 @@ CMakeFiles/solve.dir/src/given_methods.cpp.o: src/given_methods.h
 
 CMakeFiles/solve.dir/src/main.cpp.o: src/given_methods.h
 CMakeFiles/solve.dir/src/main.cpp.o: src/main.cpp
+CMakeFiles/solve.dir/src/main.cpp.o: src/schrodinger.h
+
+CMakeFiles/solve.dir/src/schrodinger.cpp.o: src/given_methods.h
+CMakeFiles/solve.dir/src/schrodinger.cpp.o: src/schrodinger.cpp
+CMakeFiles/solve.dir/src/schrodinger.cpp.o: src/schrodinger.h
 

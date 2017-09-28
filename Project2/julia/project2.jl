@@ -8,9 +8,11 @@ const plt = PyPlot
 @pyimport seaborn as sns
 sns.set()
 
+pprint(x) = show(IOContext(STDOUT, limit=true), "text/plain", x)
 N = 500
 H, R = solve(1e-4, 10, N, method=:julia, potential = :r²)
 E = diag(H)
+pprint(E)
 
 K = 3
 x = 0:K/N:K
