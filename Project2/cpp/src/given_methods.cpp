@@ -4,8 +4,8 @@
 
 void jacobi(arma::vec& eigval, arma::mat& eigvec, arma::mat& A){
   unsigned int n = A.n_cols;
-  double maxiter = n*n*n;
-  double epsilon = 1.0e-8;
+  double maxiter = 1000000;
+  double epsilon = 1.0e-10;
   unsigned int iter = 0;
   unsigned int k, l;
   double max_offdiag = 1000.0;

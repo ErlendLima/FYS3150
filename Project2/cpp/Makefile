@@ -196,6 +196,36 @@ src/main.cpp.s:
 	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/schrodinger.o: src/schrodinger.cpp.o
+
+.PHONY : src/schrodinger.o
+
+# target to build an object file
+src/schrodinger.cpp.o:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/schrodinger.cpp.o
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/schrodinger.cpp.o
+.PHONY : src/schrodinger.cpp.o
+
+src/schrodinger.i: src/schrodinger.cpp.i
+
+.PHONY : src/schrodinger.i
+
+# target to preprocess a source file
+src/schrodinger.cpp.i:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/schrodinger.cpp.i
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/schrodinger.cpp.i
+.PHONY : src/schrodinger.cpp.i
+
+src/schrodinger.s: src/schrodinger.cpp.s
+
+.PHONY : src/schrodinger.s
+
+# target to generate assembly for a file
+src/schrodinger.cpp.s:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/schrodinger.cpp.s
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/schrodinger.cpp.s
+.PHONY : src/schrodinger.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -212,6 +242,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/schrodinger.o"
+	@echo "... src/schrodinger.i"
+	@echo "... src/schrodinger.s"
 .PHONY : help
 
 

@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/erdos/gits/FYS3150/Project2/cpp/src/given_methods.cpp" "/home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles/solve.dir/src/given_methods.cpp.o"
   "/home/erdos/gits/FYS3150/Project2/cpp/src/main.cpp" "/home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles/solve.dir/src/main.cpp.o"
+  "/home/erdos/gits/FYS3150/Project2/cpp/src/schrodinger.cpp" "/home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles/solve.dir/src/schrodinger.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
