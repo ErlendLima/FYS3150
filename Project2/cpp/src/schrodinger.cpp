@@ -1,6 +1,6 @@
 #include <armadillo>
 #include "schrodinger.h"
-#include "given_methods.h"
+#include "jacobi.h"
 
 arma::mat hamiltonianMat(double rho_min, double rho_max, unsigned int N){
   double h = (rho_max - rho_min)/N;

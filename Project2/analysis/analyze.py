@@ -23,14 +23,15 @@ class Analyzer:
         data = np.loadtxt(path)
         return data
 
-    def plot(sfel, savename):
+    def plot(sfel, savename, K = 3):
         fig, ax = plt.subplots()
         n = len(sfel.data[1,:])
         x = np.linspace(0, 1, n)
-        ax.plot(x, sfel.data[1,:])
+        for i in range(K):
+            ax.plot(x, sfel.data[:,i]**2)
         ax.legend()
         ax.set_xlabel(r'$\rho$')
-        ax.set_ylabel(r'$|u(\rho)|$')
+        ax.set_ylabel(r'$|u(\rho)^2|$')
         plt.show()
         fig.savefig('../latex/figures/{}.eps'.format(savename),
                     dpi=1200)

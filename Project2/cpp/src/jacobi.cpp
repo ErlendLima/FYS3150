@@ -1,6 +1,6 @@
 #include <armadillo>
 #include <cmath>
-#include "given_methods.h"
+#include "jacobi.h"
 
 void jacobi(arma::vec& eigval, arma::mat& eigvec, arma::mat& A){
   unsigned int n = A.n_cols;
