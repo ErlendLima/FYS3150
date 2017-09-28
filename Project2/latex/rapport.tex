@@ -116,7 +116,8 @@
 
 \begin{document}
 \sisetup{detect-all}
-\title{Eigenvalue stuff}
+\title{Direct and iterative approaches to solving Schrödinger's equation for
+two electrons in a harmonic oscillator potential}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
 \author{Aram Salihi}
@@ -160,8 +161,41 @@
 % \end{figure}
 \section{Introduction}
 \label{sec:introduction}
+Eigenvalue problems are among the most occuring equations in
+mathematics and science. Many problems are on or can be re-written to the
+form
+\begin{align*}
+  A \mathbf{x} = \lambda \mathbf{x}
+\end{align*}
+For matrices where $n \geq 5$ there is
+no general analytical procedure to obtain the characteristic polynomial, by the
+Abel-Ruffini theorem. In most situations the eigenvalue problems have much
+larger matrices, and numerical algorithms are needed to solve the problems. In
+this paper, the direct Jacobi rotation and iterative Lanczos algorithms
+are investigated.
+
+The methods are then used to solve Schrödinger's equation for two electrons in a
+three-dimensional harmonic oscillator potential, which can be reformulated into
+an eigenvalue problem through scaling and mathematical manipulations. The
+energy eigenvalues and associated eigenstates are then obtained by Jacobi's method.
+
+The study of electrons confined in a potential is a highly active research field,
+because of the possible nano-medical applications, and in the development of semi-conductors
+and quantum computers.
 \section{Theory}
 \label{sec:theory}
+\subsection{Jacobi's rotation algorithm}
+A detailed description of Jacobi's rotation algorithm is available at REFERANSE?.
+The general idea is rather straightforward, and is based on converting the
+matrix $A$ to approximately a diagonal matrix through a series of orthogonal
+matrix transformations on the form:
+\begin{align*}
+  T = S^T A S
+\end{align*}
+where $S$ is a rotation matrix. The rotation angle is conveniently chosen to
+systematically eliminate off-diagonal elements in $A$, until the largest
+offdiagonal element is below some threshhold $\epsilon$. Because the rotations
+are unitary, the 
 \subsection{Idiotisk navn for å understreke at dette er midlertidig}
 A unitary transformation preserves orthogonality and the dot product. To see
 this, consider an orthogonal basis \(\{\vb{v}_{i}\}\) and an unitary
@@ -187,5 +221,6 @@ where the last step follows since \(U\) is unitary.
 \bibliography{references}
 \blankpage
 \appendix
+\section{LOL}
 \blankpage
 \end{document}
