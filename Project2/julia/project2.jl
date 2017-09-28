@@ -9,7 +9,7 @@ const plt = PyPlot
 sns.set()
 
 N = 500
-H, R = solve(0, 10, N, method=:julia)
+H, R = solve(1e-4, 10, N, method=:julia, potential = :r²)
 E = diag(H)
 
 K = 3

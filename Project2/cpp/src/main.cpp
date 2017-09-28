@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <armadillo>
-#include "given_methods.h"
+#include "jacobi.h"
 #include "schrodinger.h"
 
 int main(int argc, char const *argv[]) {
