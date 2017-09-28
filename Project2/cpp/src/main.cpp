@@ -9,8 +9,8 @@
 #include "schrodinger.h"
 
 int main(int argc, char const *argv[]) {
-  unsigned int N = 400;
+  unsigned int N = 500;
 
-  solve(1e-4, 400, N);
+  solve(1e-4, 10, N);
   return 0;
 }
