@@ -116,16 +116,16 @@
 
 \begin{document}
 \sisetup{detect-all}
-\title{Direct and iterative approaches to solving Schrödinger's equation for
-two electrons in a harmonic oscillator potential}
+\title{Numerical approaches to solving Schrödinger's equation for
+two electrons in an external oscillator potential with C++ and Julia}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
-\author{Aram Salihi}
+% \author{Aram Salihi}
 \affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project2}}
 \date{\today}
 
 \begin{abstract}
-  This is really abstract
+  This is really abstract. So abstract it is spooky :O
 \end{abstract}
 \maketitle
 \tableofcontents
@@ -161,23 +161,24 @@ two electrons in a harmonic oscillator potential}
 % \end{figure}
 \section{Introduction}
 \label{sec:introduction}
-Eigenvalue problems are among the most occuring equations in
-mathematics and science. Many problems are on or can be re-written to the
-form
+Eigenvalue problems occur frequently in mathematics and science. Many problems
+are on or can be re-written to the form
 \begin{align*}
   A \mathbf{x} = \lambda \mathbf{x}
 \end{align*}
 For matrices where $n \geq 5$ there is
-no general analytical procedure to obtain the characteristic polynomial, by the
+no general analytical procedure to obtain the roots of the characteristic polynomial, by the
 Abel-Ruffini theorem. In most situations the eigenvalue problems have much
 larger matrices, on the order \(n\sim 10\), and numerical algorithms are needed to solve the problems. In
 this paper, the direct Jacobi rotation and iterative Lanczos method
-are investigated.
+are investigated.The algorithm accuracies are compared to each other and the
+built-in eigenvalue solvers in Armadillo and Julia.
 
-The methods are then used to solve Schrödinger's equation for two electrons in a
+The methods are used to solve Schrödinger's equation for two electrons in a
 three-dimensional harmonic oscillator potential, which can be reformulated into
 an eigenvalue problem through scaling and mathematical manipulations. The
-energy eigenvalues and associated eigenstates are then obtained by Jacobi's method.
+energy eigenvalues and associated eigenstates are then obtained by Jacobi's method,
+and compared to known analytic solutions.
 
 The study of electrons confined in a potential is a highly active research field,
 because of the possible nano-medical applications, and in the development of semi-conductors
@@ -199,6 +200,8 @@ Since eigenvalues are preserved under similarity
 transformations, the eigenvalues of \(A\) can be read off the diagonal of a
 sufficiently diagonalized matrix. For a more detailed description, see REF.
 
+\subsubsection{Jacobi sweep variations}
+Cyclic jacobi (systematically cycle over all elements) and classic Jacobi (the one we are using, find max offdiagonal element)
 \subsection{The Harmonic Oscillator}
 \label{sec:harmonic}
 In the words of Richard Feynman, ``every potential can be reduced to a
@@ -231,7 +234,35 @@ see REF for a more detailed derivation. To solve this equation numerically,
 \end{equation*}
 where \(h\) is the step size.
 bla bla bla
-\subsection{Idiotisk navn for å understreke at dette er midlertidig}
+\subsection{Lanczos algorithm}
+Dududu
+\section{Method}
+\label{sec:method}
+\subsection{Choice of $\omega_r$ to analyze}
+\subsection{Choosing an appropriate value for infinity}
+\subsection{Choice of step size}
+\subsection{Multiple programming languages}
+Implementering i Julia og C++. Trening og god måte å verifisere korrekt implementasjon.
+\subsection{Unit tests}
+Unit tests were implemented to verify that the implemented functions behave
+as intended, and that this behaviour is preserved through changes to the programs.
+\subsubsection{Correct maximum offdiagonal element}
+\subsubsection{Jacobi's method on $3 \times 3$ matrix with known eigenvalues}
+\subsubsection{Preservation of dot product and orthogonality?? Skal vi ta denne?}
+\section{Results}
+\label{sec:results}
+Plott med og uten interaksjon for 4? ulike potensialstyrker, som sammenfaller
+med de oppgitte analytiske uttrykkene i artikkelen.
+\section{Discussion}
+\subsection{Non-interacting case}
+\subsection{Interacting case}
+\label{sec:discussion}
+\section{Conclusion}
+\label{sec:conclusion}
+\bibliography{references}
+\blankpage
+\appendix
+\section{Proof of preservation of orthogonality and dot product for unitary transformations}
 A unitary transformation preserves orthogonality and the dot product. To see
 this, consider an orthogonal basis \(\{\vb{v}_{i}\}\) and an unitary
 transformation \(U\). Defining \(\vb{w}_{i}=U\vb{v}_{i}\), the dot product can
@@ -245,18 +276,6 @@ be computed as
                              &= \delta_{ij}
 \end{align*}
 where the last step follows since \(U\) is unitary.
-\section{Method}
-\label{sec:method}
-\section{Results}
-\label{sec:results}
-\section{Discussion}
-\label{sec:discussion}
-\section{Conclusion}
-\label{sec:conclusion}
-\bibliography{references}
-\blankpage
-\appendix
-\section{LOL}
 \blankpage
 \end{document}
 
