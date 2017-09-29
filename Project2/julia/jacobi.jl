@@ -13,6 +13,10 @@ function jacobi!(A::Array{Float64}; ɛ=1e-10, maxiter=1e8)
     return R
 end
 
+# Skriv om for å ikke bruke offdiag:
+# gå gjennom hele matrisen én gang,
+# regn ut normen, hvis ikke null, gå gjennom alle
+# på nytt
 function offdiagmax(x)
     max = -1.0
     maxrow = 0

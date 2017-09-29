@@ -170,8 +170,8 @@ form
 For matrices where $n \geq 5$ there is
 no general analytical procedure to obtain the characteristic polynomial, by the
 Abel-Ruffini theorem. In most situations the eigenvalue problems have much
-larger matrices, and numerical algorithms are needed to solve the problems. In
-this paper, the direct Jacobi rotation and iterative Lanczos algorithms
+larger matrices, on the order \(n\sim 10\), and numerical algorithms are needed to solve the problems. In
+this paper, the direct Jacobi rotation and iterative Lanczos method
 are investigated.
 
 The methods are then used to solve Schrödinger's equation for two electrons in a
@@ -185,17 +185,52 @@ and quantum computers.
 \section{Theory}
 \label{sec:theory}
 \subsection{Jacobi's rotation algorithm}
-A detailed description of Jacobi's rotation algorithm is available at REFERANSE?.
-The general idea is rather straightforward, and is based on converting the
-matrix $A$ to approximately a diagonal matrix through a series of orthogonal
-matrix transformations on the form:
+The general idea of Jacobi's algorithm is rather straightforward. Finding the
+eigenvalues of any matrix is hard, but finding the eigenvalues of a diagonal
+matrix is trivial. A matrix \(A\) is converted to an approximately a diagonal
+matrix through a series of orthogonal matrix transformations on the form:
 \begin{align*}
   T = S^T A S
 \end{align*}
-where $S$ is a rotation matrix. The rotation angle is conveniently chosen to
-systematically eliminate off-diagonal elements in $A$, until the largest
-offdiagonal element is below some threshhold $\epsilon$. Because the rotations
-are unitary, the 
+where $S$ is a rotation matrix. This amounts to rotating the rotating the matrix
+around hyperplanes in such a way that the off-diagonal elements are reduced to
+fall beneath some threshhold.
+Since eigenvalues are preserved under similarity
+transformations, the eigenvalues of \(A\) can be read off the diagonal of a
+sufficiently diagonalized matrix. For a more detailed description, see REF.
+
+\subsection{The Harmonic Oscillator}
+\label{sec:harmonic}
+In the words of Richard Feynman, ``every potential can be reduced to a
+combination of harmonic oscillators'' REF. The radial part of Schrödinger's
+equation describing an electron in an harmonic oscillator is
+\begin{equation}
+  \label{eq:schroedinger}
+  -\frac{\hbar^{2}}{2m} \left( \frac{1}{r^{2}}\dv{r}r^{2}\dv{r} - \frac{l(l+1)}{r^{2}} \right)R(r) + V(r)R(r) = ER(r)
+\end{equation}
+with potential
+\begin{equation*}
+  V(r) = \frac{1}{2}mω^{2}r^{2}
+\end{equation*}
+and energies
+\begin{equation*}
+  E_{nl} = \hbar\omega\left( 2n+l+\frac{3}{2} \right)
+\end{equation*}
+with \(n=0,1,2,\ldots\) and \(l = 0,1,2,\ldots\)
+
+\eqref{eq:schroedinger} can be scaled and rewritten to a more practical form:
+
+\begin{equation}
+  \label{eq:scaledschroedinger}
+  -\dv[2]{\rho}u(\rho)+\rho^{2}u(\rho) = \lambda u(\rho)
+\end{equation}
+see REF for a more detailed derivation. To solve this equation numerically,
+\(\dv[2]{u}{\rho}\) is computed as
+\begin{equation*}
+  \dv[2]{u}{\rho} \simeq \frac{u(\rho+h\)-2u(\rho)+u(\rho-h)}{h^{2}} + \mathcal{O}(h^{2})
+\end{equation*}
+where \(h\) is the step size.
+bla bla bla
 \subsection{Idiotisk navn for å understreke at dette er midlertidig}
 A unitary transformation preserves orthogonality and the dot product. To see
 this, consider an orthogonal basis \(\{\vb{v}_{i}\}\) and an unitary
@@ -224,3 +259,7 @@ where the last step follows since \(U\) is unitary.
 \section{LOL}
 \blankpage
 \end{document}
+
+% Local Variables:
+% TeX-engine: luatex
+% End:

@@ -64,6 +64,9 @@
    (LaTeX-add-labels
     "sec:introduction"
     "sec:theory"
+    "sec:harmonic"
+    "eq:schroedinger"
+    "eq:scaledschroedinger"
     "sec:method"
     "sec:results"
     "sec:discussion"
