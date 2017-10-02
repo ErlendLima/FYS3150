@@ -1,7 +1,7 @@
 module Jacobi
 export offdiagmax, jacobirotate!, jacobi!
 
-function jacobi!(A::Array{Float64}; ɛ=1e-10, maxiter=1e8)
+function jacobi!(A::Array{Float64}; ɛ=1e-10, maxiter=1e8, getiterations=false)
     R = eye(A)
     iterations = 0
     maxnondiag = offdiagmax(A)[1]
@@ -10,7 +10,11 @@ function jacobi!(A::Array{Float64}; ɛ=1e-10, maxiter=1e8)
         @inbounds jacobirotate!(A, R, row, column)
         iterations += 1
     end
-    return R
+    if getiterations
+        return R, iterations
+    else
+        return R
+    end
 end
 
 # Skriv om for å ikke bruke offdiag:
@@ -41,11 +45,11 @@ function jacobirotate!(A::Array{Float64}, R::Array{Float64}, k, l)
     if A[k, l] ≠ 0.0
         τ = (A[l, l] - A[k, k])/(2A[k, l])
         if τ ≥ 0
-            t = 1/(τ + √(1 + τ^2))
+            t = 1.0/(τ + √(1 + τ^2))
         else
-            t = -1/(-τ + √(1 + τ^2))
+            t = -1.0/(-τ + √(1 + τ^2))
         end
-        c = 1/√(1 + t^2)
+        c = 1.0/√(1 + t^2)
         s = c⋅t
     else
         c = 1.0
@@ -57,7 +61,7 @@ function jacobirotate!(A::Array{Float64}, R::Array{Float64}, k, l)
     A[k, k] = c^2⋅aₖₖ - 2.0c⋅s⋅A[k, l] + s^2⋅aₗₗ
     A[l, l] = s^2⋅aₖₖ + 2.0c⋅s⋅A[k, l] + c^2⋅aₗₗ
     A[k, l], A[l, k] = 0.0, 0.0
-    for i in 1:size(A)[1]
+    for i in 1:size(A, 1)
         if k ≠ i ≠ l
             aᵢₖ = A[i, k]
             aᵢₗ = A[i, l]

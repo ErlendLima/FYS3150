@@ -230,7 +230,7 @@ with \(n=0,1,2,\ldots\) and \(l = 0,1,2,\ldots\)
 see REF for a more detailed derivation. To solve this equation numerically,
 \(\dv[2]{u}{\rho}\) is computed as
 \begin{equation*}
-  \dv[2]{u}{\rho} \simeq \frac{u(\rho+h\)-2u(\rho)+u(\rho-h)}{h^{2}} + \mathcal{O}(h^{2})
+  \dv[2]{u}{\rho} \simeq \frac{u(\rho+h)-2u(\rho)+u(\rho-h)}{h^{2}} + \mathcal{O}(h^{2})
 \end{equation*}
 where \(h\) is the step size.
 bla bla bla
@@ -251,8 +251,44 @@ as intended, and that this behaviour is preserved through changes to the program
 \subsubsection{Preservation of dot product and orthogonality?? Skal vi ta denne?}
 \section{Results}
 \label{sec:results}
-Plott med og uten interaksjon for 4? ulike potensialstyrker, som sammenfaller
-med de oppgitte analytiske uttrykkene i artikkelen.
+
+\subsection{The Algorithm}
+\label{sec:algorithm}
+
+As the code was written on both Python+C++ and Julia, there were two sets of
+results. Since all of the results agree, only one set of results is included.
+The exception to this is the algorithm itself, which although equivalent, behave
+a bit differently.
+
+Figure~\ref{fig:juliatiming} compares the time it takes for the handwritten
+Jacobi algorithm to find to eigenvalues of an \(N\times N\)-matrix, versus the
+time it takes for the standard Julia method to do the same.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/juliatime.eps}
+  \caption{\label{fig:juliatiming} Time and amount of memory required to get the eigenvalues of an
+    \(N\times N\)-matrix for the custom Jacobi method versus Julia's standard method.}
+\end{figure}
+
+The number of similarity transforms needed to make all off-diagonal elements
+less than \(\varepsilon=10^{-10}\) as \(N\) grows is plotted in
+figure~\ref{fig:juliaiterations}.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/iterations.eps}
+  \caption{\label{fig:juliaiterations} Number of iterations, or similarity
+    transforms, needed to make all off-diagonal elements less than \(10^{-10}\).}
+\end{figure}
+
+C++ her
+
+\subsection{Solution of the Hamiltonian}
+\label{sec:hamiltonsol}
+
+
+
 \section{Discussion}
 \subsection{Non-interacting case}
 \subsection{Interacting case}

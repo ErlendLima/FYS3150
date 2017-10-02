@@ -12,8 +12,6 @@ N = 500
 ρ_min, ρ_max = 1e-4, 10
 H, R = solve(1e-4, 10, N, method=:julia, potential=:plain)
 H2, R2 = solve(1e-4, 10, N, method=:julia, potential=:repulsive)
-# E = diag(H2)
-# pprint(E)
 
 x = linspace(ρ_min, ρ_max, N+1)
 fig, (ax1, ax2) = subplots(2, sharex=:true)
@@ -31,13 +29,14 @@ ax2[:legend]()
 fig[:savefig]("../latex/figures/excitation.eps")
 
 
+sns.set_palette("PuBuGn_d")
 fig, ax = subplots(1)
 for ω in [0.01, 0.5, 1, 5]
     H, R = solve(ρ_min, ρ_max, N, method=:julia, potential=:repulsive, ωᵣ=ω)
     ax[:plot](x, R[:, 1].^2, label=latexstring("\$\\omega_r = $ω\$"))
 end
 H, R = solve(ρ_min, ρ_max, N, method=:julia)
-ax[:plot](x, R[:, 1].^2, "--", label="Non-interacting")
+ax[:plot](x, R[:, 1].^2, "g--", label="Non-interacting")
 ax[:set_title](L"Particles in ground states with different values of $\omega_r$")
 ax[:set_xlabel](L"\rho")
 ax[:set_ylabel](L"|u(\rho)|^2")
