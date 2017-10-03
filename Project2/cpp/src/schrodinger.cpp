@@ -40,23 +40,23 @@ arma::mat hamiltonianMat_repulsion(double rho_min, double rho_max, unsigned int 
   return H;
 }
 
-void solve(double rho_min, double rho_max, unsigned int N){
+double solve(double rho_min, double rho_max, unsigned int N){
   // Setup matrix for task
   arma::mat H = hamiltonianMat(rho_min, rho_max, N);
-  // std::cout << "\n";
-  // H.print();
-  // arma::vec eigval;
-  // arma::mat eigvec;
+  // Time and run algo
+  auto start    = std::chrono::system_clock::now(); // Wall time
+  std::clock_t startCPU = std::clock();                          // CPU clock start
+
+  arma::vec eigval;
+  arma::mat eigvec;
+  jacobi(eigval, eigvec, H);
   // arma::eig_sym(eigval, eigvec, H);
-  // eigval.print();
-  // eigvec.print();
-  // H.print();
-  // std::cout << "\n";
-  arma::vec eigval_2;
-  arma::mat eigvec_2;
-  jacobi(eigval_2, eigvec_2, H);
-  // eigvec_2.print();
-  // eigval_2.print();
-  eigvec_2.save("data/GivenEigvals.txt", arma::raw_ascii);
-  // H.print();
+
+  auto end = std::chrono::system_clock::now();
+  std::clock_t endCPU = std::clock();
+  double elapsed_seconds_CPU = static_cast<double>(endCPU - startCPU)/CLOCKS_PER_SEC;
+  std::chrono::duration<double> elapsed_seconds = end-start;
+  // std::cout << "Elapsed wall time: " << elapsed_seconds.count() << "s" << std::endl;
+  // std::cout << "Elapsed CPU time: " << elapsed_seconds_CPU << "s" << std::endl;
+  return elapsed_seconds_CPU;
 }

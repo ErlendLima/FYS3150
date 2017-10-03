@@ -15,23 +15,12 @@ void jacobi(arma::vec& eigval, arma::mat& eigvec, arma::mat& A){
   arma::mat A_copy = arma::mat(A);     // Make copy so input matrix is unchanged
   eigvec = arma::eye<arma::mat>(n, n); // Matrix that will hold eigenvalues
 
-  auto start    = std::chrono::system_clock::now(); // Wall time
-  std::clock_t startCPU = std::clock();                          // CPU clock start
-
   while(fabs(max_offdiag) > epsilon && static_cast<double>(iter) < maxiter){
     find_max_offdiag(A_copy, k, l, n);       // Find max offdiag element
     max_offdiag = A_copy(l,k);               // Fetch for next iteration
     jacobirotate(A_copy, eigvec, k, l, n);   // Perform rotation on largest element
     iter++;
   }
-  // Output timing info
-  auto end = std::chrono::system_clock::now();
-  std::clock_t endCPU = std::clock();
-  double elapsed_seconds_CPU = static_cast<double>(endCPU - startCPU)/CLOCKS_PER_SEC;
-  std::chrono::duration<double> elapsed_seconds = end-start;
-  std::cout << "Completed Jacobi eigenvalue algorithm with " << iter << " iterations" << std::endl;
-  std::cout << "Elapsed wall time: " << elapsed_seconds.count() << "s" << std::endl;
-  std::cout << "Elapsed CPU time: " << elapsed_seconds_CPU << "s" << std::endl;
 
   eigval = arma::sort(diagvec(A_copy));  // Diagonalized A holds eigenvalues
 }

@@ -5,6 +5,6 @@
 
 arma::mat hamiltonianMat(double rho_min, double rho_max, unsigned int N);
 arma::mat hamiltonianMat_repulsion(double rho_min, double rho_max, unsigned int N, double omega_r);
-void solve(double rho_min, double rho_max, unsigned int N);
+double solve(double rho_min, double rho_max, unsigned int N);
 
 #endif /* SCHRODINGER_H */

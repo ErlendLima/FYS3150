@@ -10,8 +10,11 @@
 
 int main(int argc, char const *argv[]) {
 
-  unsigned int N = 300;
+  arma::vec timings = arma::vec(40);
 
-  solve(1e-4, 10, N);
+  for(unsigned int i = 1; i <= 40; i++){
+    timings(i-1) = solve(1e-4, 10, i*5);
+  }
+  timings.save("../data/timings_jacobi.txt", arma::raw_ascii);
   return 0;
 }
