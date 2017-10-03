@@ -1,28 +1,39 @@
 #include <armadillo>
 #include <cmath>
+#include <ctime>
+#include <chrono>
 #include "jacobi.h"
 
 void jacobi(arma::vec& eigval, arma::mat& eigvec, arma::mat& A){
   unsigned int n = A.n_cols;
-  double maxiter = 1e8;
-  double epsilon = 1.0e-10;
+  double maxiter = 1e8;               // Maximum number of iterations
+  double epsilon = 1.0e-10;           // Tolerance for off-diagonal elements
   unsigned int iter = 0;
   unsigned int k, l;
-  double max_offdiag = 1000.0;
+  double max_offdiag = 1000.0;        // Set this larger than epsilon
 
-  arma::mat A_copy = arma::mat(A);
-  eigvec = arma::eye<arma::mat>(n, n); // Eigenvalue matrix
+  arma::mat A_copy = arma::mat(A);     // Make copy so input matrix is unchanged
+  eigvec = arma::eye<arma::mat>(n, n); // Matrix that will hold eigenvalues
+
+  auto start    = std::chrono::system_clock::now(); // Wall time
+  std::clock_t startCPU = std::clock();                          // CPU clock start
 
   while(fabs(max_offdiag) > epsilon && static_cast<double>(iter) < maxiter){
-    // Find maximum off diagonal element
-    find_max_offdiag(A_copy, k, l, n);
-    max_offdiag = A_copy(l,k);
-    jacobirotate(A_copy, eigvec, k, l, n);
-
+    find_max_offdiag(A_copy, k, l, n);       // Find max offdiag element
+    max_offdiag = A_copy(l,k);               // Fetch for next iteration
+    jacobirotate(A_copy, eigvec, k, l, n);   // Perform rotation on largest element
     iter++;
   }
+  // Output timing info
+  auto end = std::chrono::system_clock::now();
+  std::clock_t endCPU = std::clock();
+  double elapsed_seconds_CPU = static_cast<double>(endCPU - startCPU)/CLOCKS_PER_SEC;
+  std::chrono::duration<double> elapsed_seconds = end-start;
   std::cout << "Completed Jacobi eigenvalue algorithm with " << iter << " iterations" << std::endl;
-  eigval = arma::sort(diagvec(A_copy));
+  std::cout << "Elapsed wall time: " << elapsed_seconds.count() << "s" << std::endl;
+  std::cout << "Elapsed CPU time: " << elapsed_seconds_CPU << "s" << std::endl;
+
+  eigval = arma::sort(diagvec(A_copy));  // Diagonalized A holds eigenvalues
 }
 
 void jacobirotate(arma::mat& A, arma::mat& R, unsigned int& k, unsigned int& l, unsigned int& n){
@@ -71,6 +82,7 @@ void jacobirotate(arma::mat& A, arma::mat& R, unsigned int& k, unsigned int& l, 
 }
 
 void find_max_offdiag(arma::mat& A, unsigned int& k, unsigned int& l, unsigned int& n){
+  // Finds maximum element on upper diagonal of a matrix A
   double max = 0.0;
   for(unsigned int i = 0; i < n; i++){
     for(unsigned int j = i+1; j < n; j++){
