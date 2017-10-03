@@ -1,5 +1,4 @@
 # Project Two
-
 <p align="center">
 <b><a href="#usage">Usage</a></b>
 |
@@ -11,7 +10,7 @@
 </p>
 <br>
 
-## Usage
+## Usage (C++)
 The project is divided into source code and the written rapport. The source code
 is located across two different directories: analysis and cpp. The 
 resulting data produced by the C++ program is read by the analysis code located
@@ -32,7 +31,7 @@ by the python script in the analysis directory using `python analyze.py ../cpp/d
 The rapport and all supporting material is located in the `latex` directory. 
 The document is compatible with PdfLaTeX, LuaTeX and XeLaTeX.
 
-## Testing
+## Testing (C++)
 The framework [Google Test](https://github.com/google/googletest) is used to write unit tests.
 This is fully integrated into CMake, making it easy to both add and run the tests. In order
 to compile the tests, type `cmake -Dtest=ON`. For actually running the tests, run `./runUnitTests` or
@@ -40,8 +39,11 @@ to compile the tests, type `cmake -Dtest=ON`. For actually running the tests, ru
 
 Better support for debugging and stricter compiler flags can be turned on using `cmake -DCMAKE_BUILD_TYPE=DEBUG`.
 
+## Usage (Julia)
+To run the Julia code, simply run
+
 ## Credits
-The contributors of this project are Erlend Lima, Frederik Johan Mellbye, Aram Salihi and Halvard Sutterud.
+The contributors of this project are Erlend Lima, Frederik Johan Mellbye and Aram Salihi.
 
 ## License
 This project is licensed under the terms of the **MIT** license.
