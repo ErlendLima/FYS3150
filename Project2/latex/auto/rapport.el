@@ -73,6 +73,7 @@
     "fig:juliatiming"
     "fig:juliaiterations"
     "sec:hamiltonsol"
+    "fig:wavefunctions"
     "sec:discussion"
     "sec:conclusion")
    (LaTeX-add-bibliographies

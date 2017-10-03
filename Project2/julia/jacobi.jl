@@ -1,7 +1,23 @@
 module Jacobi
 export offdiagmax, jacobirotate!, jacobi!
 
-function jacobi!(A::Array{Float64}; ɛ=1e-10, maxiter=1e8, getiterations=false)
+#=
+This module provides different methods to find the eigenvalues for
+matrices. These are taken verbatim from
+https://compphysics.github.io/ComputationalPhysics/doc/pub/eigvalues/pdf/eigvalues-print.pdf
+and only adapted to Julia.
+=#
+
+function jacobi!(A::Array{Float64}; ɛ=1e-10, maxiter=1e8)
+    # Sets up the algorithm and begins a loop finding the max non diagonal element
+    # before performing Given's rotations. It terminates if all non diagonal elements
+    # are less than ε or if maxiter number of iterations are reached.
+    # @Input: A, the array to find the eigenvalues of. To save memory, the
+    #         array is overwritten with the eigenvalues along the diagonal.
+    #         ε, tolerance of non diagonal elements
+    #         maxiter, maximum number of iterations before breaking the loop
+    # @Return: The eigenvectors and the number of iterations that was needed
+    #          to make all off diagonals less than ε
     R = eye(A)
     iterations = 0
     maxnondiag = offdiagmax(A)[1]
@@ -10,18 +26,12 @@ function jacobi!(A::Array{Float64}; ɛ=1e-10, maxiter=1e8, getiterations=false)
         @inbounds jacobirotate!(A, R, row, column)
         iterations += 1
     end
-    if getiterations
-        return R, iterations
-    else
-        return R
-    end
+    R, iterations
 end
 
-# Skriv om for å ikke bruke offdiag:
-# gå gjennom hele matrisen én gang,
-# regn ut normen, hvis ikke null, gå gjennom alle
-# på nytt
 function offdiagmax(x)
+    # Finds the maximum off diagonal element in the lower quadrant
+    # @Input: x, the matrix to find
     max = -1.0
     maxrow = 0
     maxcol = 0
