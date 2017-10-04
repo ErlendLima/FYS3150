@@ -11,6 +11,5 @@
 *.a
 *runUnitTests
 *solve
-**/figures/*
 Project1/latex/pythontex-files-rapport/
 Project1/latex/rapportNotes.bib
