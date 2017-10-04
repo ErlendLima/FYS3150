@@ -67,6 +67,7 @@
     "sec:harmonic"
     "eq:schroedinger"
     "eq:scaledschroedinger"
+    "eq:bigbadmatrix"
     "sec:method"
     "sec:results"
     "sec:algorithm"

@@ -199,11 +199,17 @@ is that finding the largest offdiagonal element is a cumbersome task for large m
 \subsection{The Harmonic Oscillator}
 \label{sec:harmonic}
 In the words of Richard Feynman, ``every potential can be reduced to a
-combination of harmonic oscillators'' REF. The radial part of Schrödinger's
+combination of harmonic oscillators'' REF. The harmonic oscillator is an
+integral part of quantum mechanics, and is the bread and butter when solving
+complex potentials numerically. As such, it is necessary to understand how the
+Hamiltonian of a harmonic oscillator is discretized to make it solvable
+numerically.
+
+The radial part of Schrödinger's
 equation describing an electron in an harmonic oscillator is
 \begin{equation}
   \label{eq:schroedinger}
-  -\frac{\hbar^{2}}{2m} \left( \frac{1}{r^{2}}\dv{r}r^{2}\dv{r} - \frac{l(l+1)}{r^{2}} \right)R(r) + V(r)R(r) = ER(r)
+  -\frac{\hbar^{2}}{2m} \left( \frac{1}{r^{2}}\dv{r}r^{2}\dv{r} - \frac{l(l+1)}{r^{2}} \right) + VR = ER
 \end{equation}
 with potential
 \begin{equation*}
@@ -226,16 +232,70 @@ see \cite{project2} for a more detailed derivation. To solve this equation numer
 \begin{equation*}
   \dv[2]{u}{\rho} \simeq \frac{u(\rho+h)-2u(\rho)+u(\rho-h)}{h^{2}} + \mathcal{O}(h^{2})
 \end{equation*}
-where \(h\) is the step size.
-bla bla bla
+where \(h\) is the step size. Minimal and maximal values are set for \(\rho\).
+As the position can not be negative, \(\rho_{min}=0\). Ideally,
+\(\rho_{max}=\infty\), but as this is impractical on a computer, it is instead
+set to some very, very high number, such as \(\rho_{max}=10\). The continuum between
+\(\rho_{min}\) and \(\rho_{max}\) is discretized into \(N\) mesh points by
+renaming \(\rho_{min}=\rho_{0}\) and \(\rho_{max}=\rho_{N}\) and letting
+\(\rho_{i}\) be defined as
+\begin{equation*}
+  \rho_{i} = \rho_{0}+ih\qquad i=1,2,\ldots,N
+\end{equation*}
+and \(h\) is
+\begin{equation*}
+  h = \frac{\rho_{N}-\rho_{0}}{N}
+\end{equation*}
+Schroedinger's equation can now be rewritten as
+\begin{equation*}
+  - \frac{u_{i+1}-2u_{i}+u_{i-1}}{h^{2}} + V_{i}u_{i} = \lambda u_{i}
+\end{equation*}
+This can be further simplified to
+\begin{equation*}
+  d_{i}u_{i}+e_{i-1}u_{i-1}+e_{i+1}u_{i+1} = \lambda u_{i}
+\end{equation*}
+where
+\begin{equation*}
+  d_{i} = \frac{2}{h^{2}} + V_{i}
+\end{equation*}
+and
+\begin{equation*}
+  e_{i}= \frac{1}{h^{2}}
+\end{equation*}
+
+This equation allows itself to be written onto matrix form as
+\begin{equation}\resizebox{\columnwidth}{!}{$
+  \begin{bmatrix}
+    \frac{2}{h^{2}}+V1 & -\frac{1}{h^{2}}      & 0                & 0 & \cdots & 0 \\
+    -\frac{1}{h^{2}}   & \frac{2}{h^{2}}+V_{2} & -\frac{1}{h^{2}} & 0  & \cdots & 0 \\
+    0 & \frac{1}{h^{2}} & \frac{2}{h^{2}} + V_{3} & -\frac{1}{h^{2}}  &  \cdots & 0 \\
+    \vdots & \ddots & \ddots & \ddots & \ddots & \vdots \\
+    \vdots & \ddots & \ddots&  -\frac{1}{h^{2}} & \frac{2}{h^{2}}+V_{N-2} & -\frac{1}{h^{2}} \\
+    0 & \cdots & \cdots & \cdots & -\frac{1}{h^{2}} & \frac{2}{h^{2}} + V_{N-1} \\
+  \end{bmatrix}
+  $}\label{eq:bigbadmatrix}
+\end{equation}
+
+This is a general form which holds for all potentials of harmonic oscillators.
+When solving for the plain harmonic oscillator potential, the potential terms are simply
+\(V_{i}=\rho_{i}^{2}\). Adding on the repulsive Coulomb potential, the total potential
+becomes \(V_{i}=\omega_{r}\rho_{i}^{2}+1/\rho_{i}^{2}\), where \(\omega_{r}\) is
+a frequency describing the strength of the Coulomb interaction. See Ref for a complete computation.
+
+In order to find the probability of finding the electron(s) at any given
+position, the wavefunction describing the state of the electron(s) must be
+found. These are the eigenvectors of the matrix~\eqref{eq:bigbadmatrix}, while
+the eigenvalues describe the energy of the state. The probability is then
+obtained by squaring the eigenvectors.
 \section{Method}
 \label{sec:method}
 
 \subsection{Solving the Hamiltonian}
 The Hamiltonian solved here describes two electrons trapped in an harmonic oscillator with
-two different types of potential. In the first case, only the Coulomb force is
-acting on the electron, while in the second, the electrons also feel a repulsive
-force from each other.
+two different types of potential. In the first case, only the potential of the
+harmonic oscillator is
+acting on the electron, while in the second, the electrons also feel a repulsive Coulomb
+interaction from each other.
 
 To find the wave functions describing the position of the electrons, the matrix
 described above in REF is set up for some values \(\rho_{\text{min}},
