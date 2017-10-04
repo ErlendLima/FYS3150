@@ -305,7 +305,7 @@ Several values for $\omega_r$ were used in this project to investigate how the
 potential impacts the relative wave function of the electrons. Values tested range
 from $\omega_r = 0.01$ to $5$.
 \subsection{Choosing appropriate boundary values}
-The boundary values for this problems are set at $0$ and infinity. In the
+The boundary values for this problems are set at $0$ and \(\infty\). In the
 implementation of this problem a numerical value is set for $\rho_\text{max} = \infty$.
 This value was tested for each $\omega_r$, and set at a point large enough
 so that the solution doesnt change noticably on changing $\rho_\text{max}$.
@@ -342,7 +342,7 @@ is written in both Julia and C++, while the standard Julia method and Armadillo
 method are used as comparison. Only the memory consumption in Julia is measured
 as C++ provides no easy way to measure this.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/juliatime.eps}
   \caption{\label{fig:juliatiming} Time and amount of memory required to get the eigenvalues of an
@@ -355,11 +355,12 @@ The number of similarity transforms needed to make all off-diagonal elements
 less than \(\varepsilon=10^{-10}\) as \(N\) grows is plotted in
 figure~\ref{fig:juliaiterations}.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/iterations.eps}
   \caption{\label{fig:juliaiterations} Number of iterations, or similarity
-    transforms, needed to make all off-diagonal elements less than \(10^{-10}\).}
+    transforms, needed to make all off-diagonal elements less than \(10^{-10}\).
+  A simple polynomial fit is also shown as a green line.}
 \end{figure}
 
 \subsection{Solution of the Hamiltonian}
@@ -370,7 +371,7 @@ eigenfunction solutions with the Jacobi method. Notice for larger energy
 eigenstates the increase in the number of nodes and the wider nature of
 the wave functions.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/wavefunctions.png}
   \caption{\label{fig:wavefunctions} A visualization of the potentials and the
@@ -383,7 +384,7 @@ the wave functions.
 A comparison of the solutions for the ground state and first excited state is
 shown in figure~\ref{fig:excitation}.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/excitation.eps}
   \caption{\label{fig:excitation} Comparison of the probability of finding the
@@ -393,7 +394,7 @@ shown in figure~\ref{fig:excitation}.
 
 The ground state for varying potential strengths $\omega_r$ is shown in figure~\ref{fig:omegas}.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/omegas.eps}
   \caption{\label{fig:omegas} Probabilities of the position of the electron when

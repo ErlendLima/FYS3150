@@ -51,6 +51,12 @@ end
 
 
 function jacobirotate!(A::Array{Float64}, R::Array{Float64}, k, l)
+    #= Implements Given's rotations of a matrix
+       @Input: A, matrix to be rotated
+               R, contains the eigenvectors after a sufficient number of iterations
+               k, row of the maximal element
+               l, column of the maximal element
+    =#
     s, c = 0.0, 0.0
     if A[k, l] ≠ 0.0
         τ = (A[l, l] - A[k, k])/(2A[k, l])

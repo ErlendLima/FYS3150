@@ -21,16 +21,13 @@ function hamiltonian(ρmin, ρmax, N; lOrbital=0, potential=:plain, μ=1, ωᵣ=
     # Compute the potential of the system
     orbitalFactor = lOrbital⋅(lOrbital + 1.0)
     if potential == :plain
-        # println("Using plain potential")
         potential = ρ.^2
     elseif potential == :exponential
-        # println("Using exponential potential")
         potential = ρ.^2 + exp(-μ*ρ)./ρ.^2
     elseif potential == :repulsive
-        # println("Using repulsive potet")
         potential = ρ.^2*ωᵣ^2 + 1./ρ
     else
-        throw(ArgumentError("Expected either :plain or :repulsion"))
+        throw(ArgumentError("Expected either :plain, :repulsion or :exponential"))
     end
     V = potential + orbitalFactor./ρ.^2
 
