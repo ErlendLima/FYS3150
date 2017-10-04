@@ -5,7 +5,7 @@ using LaTeXStrings
 using PyPlot
 
 @pyimport seaborn as sns
-sns.set(style="whitegrid")
+sns.set(style="white", context="poster")
 
 pprint(x) = show(IOContext(STDOUT, limit=true), "text/plain", x)
 N = 500
@@ -26,7 +26,7 @@ ax1[:set_ylabel](L"|u(\rho)|^2")
 ax2[:set_ylabel](L"|u(\rho)|^2")
 ax1[:legend]()
 ax2[:legend]()
-fig[:savefig]("../latex/figures/excitation.eps")
+fig[:savefig]("../latex/figures/excitation.eps", bbox_inches=:tight)
 
 
 sns.set_palette("PuBuGn_d")
@@ -41,5 +41,5 @@ ax[:set_title](L"Particles in ground states with different values of $\omega_r$"
 ax[:set_xlabel](L"\rho")
 ax[:set_ylabel](L"|u(\rho)|^2")
 ax[:legend]()
-fig[:savefig]("../latex/figures/omegas.eps")
+fig[:savefig]("../latex/figures/omegas.eps", bbox_inches=:tight)
 show()
