@@ -12,9 +12,9 @@
 
 ## Usage (C++)
 The project is divided into source code and the written rapport. The source code
-is located across two different directories: analysis and cpp. The 
+is located across three different directories: analysis, cpp and julia. The 
 resulting data produced by the C++ program is read by the analysis code located
-in analysis. 
+in analysis, while julia does both its own computations and its own plotting.
 
 Compilation of the C++ program requires C++14, Armadillo version 6.7 and CMake version 3.1. If the 
 requirements are satisfied, the makefile can be created and run with
@@ -28,6 +28,7 @@ compiled program, type `./solve`. Optional flags exist, see `./solve -h`.
 The resulting data can then be analyzed 
 by the python script in the analysis directory using `python analyze.py ../cpp/data`.
 
+
 The rapport and all supporting material is located in the `latex` directory. 
 The document is compatible with PdfLaTeX, LuaTeX and XeLaTeX.
 
@@ -40,10 +41,22 @@ to compile the tests, type `cmake -Dtest=ON`. For actually running the tests, ru
 Better support for debugging and stricter compiler flags can be turned on using `cmake -DCMAKE_BUILD_TYPE=DEBUG`.
 
 ## Usage (Julia)
-To run the Julia code, simply run
+The version of Julia required is 0.6.0, along with the packages PyPlot, LaTeXStrings and PyCall. If 
+these are not available on your system, install them by running for example `Pkg.add("PyPlot")` in
+Julia's REPL. 
+
+The most important files are `schroedinger.jl` and `jacobi.jl`. These are modules which implement Jacobi's 
+algorithm and methods from solving the Hamiltonian with several potentials. These can be tested by running 
+`julia test.jl`. The other scripts are only for
+plotting the results. `interactions.jl` plots two plots comparing the ground state and first excited state of
+one/two electrons which do and do not interact through the Coulomb force, `timejacobi.jl` runs
+the Jacobi algorithm several times, recording the time and memory taken and plots the result together
+with equivalent measurements from the C++ program, `wave.jl` creates a rather elegant visualization
+of the potentials and their solutions, and `omegas.jl` compares the eigenvalues for different 
+oscillator frequencies with those given in the article of M. Taut. 
 
 ## Credits
-The contributors of this project are Erlend Lima, Frederik Johan Mellbye and Aram Salihi.
+The contributors of this project are Erlend Lima and Frederik Johan Mellbye.
 
 ## License
 This project is licensed under the terms of the **MIT** license.
