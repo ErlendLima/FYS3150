@@ -243,9 +243,14 @@ bla bla bla
 \label{sec:method}
 
 \subsection{Solving the Hamiltonian}
-Hamiltonian for two systems
-describing electrons trapped in a harmonic oscillator. In the first case, the
-electron(s) only feel the potential well, and does ther
+The Hamiltonian solved here describes two electrons trapped in an harmonic oscillator with
+two different types of potential. In the first case, only the Coulomb force is
+acting on the electron, while in the second, the electrons also feel a repulsive
+force from each other.
+
+To find the wave functions describing the position of the electrons, the matrix
+described above in REF is set up for some values \(\rho_{\text{min}},
+\rho_{\text{max}}, N\) and \(\omega_{r}\).
 \subsection{Choice of $\omega_r$ to analyze}
 Several values for $\omega_r$ were used in this project to investigate how the
 potential impacts the relative wave function of the electrons. Specifically,
@@ -323,6 +328,22 @@ figure~\ref{fig:juliaiterations}.
 \end{figure}
 
 
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/excitation.eps}
+  \caption{\label{fig:excitation} Comparison of the probability of finding the
+    electron at certain positions \(rho\) in the ground state (top) and first
+    excited state (bottom) for both the Coulomb potential and repulsive potential.}
+\end{figure}
+
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/omegas.eps}
+  \caption{\label{fig:omegas} Probabilities of the position of the electron when
+  the repulsive potential is present.}
+\end{figure}
 
 \section{Discussion}
 

@@ -74,6 +74,8 @@
     "fig:juliaiterations"
     "sec:hamiltonsol"
     "fig:wavefunctions"
+    "fig:excitation"
+    "fig:omegas"
     "sec:discussion"
     "sec:conclusion")
    (LaTeX-add-bibliographies
