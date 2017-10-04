@@ -120,7 +120,7 @@
 two electrons in an external oscillator potential with C++ and Julia}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
-\author{Aram Salihi}
+% \author{Aram Salihi}
 \affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project2}}
 \date{\today}
 
@@ -176,7 +176,7 @@ because of the possible nano-medical applications, and in the development of sem
 and quantum computers.
 \section{Theory}
 \label{sec:theory}
-\subsection{Jacobi's rotation algorithm}
+\subsection{Jacobi's Rotation Algorithm}
 The general idea of Jacobi's algorithm is rather straightforward. Finding the
 eigenvalues of any matrix is hard, but finding the eigenvalues of a diagonal
 matrix is trivial. A matrix \(A\) is converted to an approximately a diagonal
@@ -186,10 +186,10 @@ matrix through a series of orthogonal matrix transformations on the form:
 \end{align*}
 where $S$ is a rotation matrix. This amounts to rotating the rotating the matrix
 around hyperplanes in such a way that the off-diagonal elements are reduced to
-fall beneath some threshhold.
+fall beneath some threshold.
 Since eigenvalues are preserved under similarity
 transformations, the eigenvalues of \(A\) can be read off the diagonal of a
-sufficiently diagonalized matrix. For a more detailed description, see \cite{mortenjensen}.
+sufficiently diagonalized matrix. For a more detailed description, see~\cite{mortenjensen}.
 
 There are several ways to iterate through the matrix to eliminate the offdiagonal
 elements, for instance a full systematic iteration over all matrix elements. In this paper,
@@ -300,22 +300,22 @@ interaction from each other.
 To find the wave functions describing the position of the electrons, the matrix
 described above in REF is set up for some values \(\rho_{\text{min}},
 \rho_{\text{max}}, N\) and \(\omega_{r}\).
-\subsection{Choice of $\omega_r$ to analyze}
+\subsection{Choice of $\omega_r$ to Analyze}
 Several values for $\omega_r$ were used in this project to investigate how the
 potential impacts the relative wave function of the electrons. Specifically,
 analytical eigenvalues for this exact problem (M. Taut, 1993) are compared
 to the algorithm results.
-\subsection{Choosing appropriate boundary values}
+\subsection{Choosing Appropriate Boundary Values}
 The boundary values for this problems are set at $0$ and \(\infty\). In the
 implementation of this problem a numerical value is set for $\rho_\text{max} = \infty$.
 This value was tested for each $\omega_r$, and set at a point large enough
 so that the solution doesnt change noticably on changing $\rho_\text{max}$.
 To avoid division by zero, $\rho_\text{min}$ was set to a small positive value.
-\subsection{Multiple programming languages}
+\subsection{Multiple Programming Languages}
 In this project the Jacobi eigenvalue algorithm was implemented in both Julia and
 C++. The computation speeds of the Jacobi eigenvalue implementations
 and the built in eigenvalue solvers in both languages were compared.
-\subsection{Unit tests}
+\subsection{Unit Tests}
 Unit tests were implemented to verify that the implemented functions behave
 as intended, and that this behaviour is preserved through changes to the programs.
 
@@ -331,7 +331,7 @@ $3 \times 3$ matrix with known eigenvalues.
 \subsection{The Algorithm}
 \label{sec:algorithm}
 
-As the code was written on both Python+C++ and Julia, there were two sets of
+As the code was written in both Python+C++ and Julia, there were two sets of
 results. Since all of the results agree, only one set of results is included.
 The exception to this is the algorithm itself, which although equivalent, behave
 a bit differently.
@@ -402,6 +402,10 @@ The ground state for varying potential strengths $\omega_r$ is shown in figure~\
   the repulsive potential is present.}
 \end{figure}
 
+The eigenvalues for the interacting case with \(l=0\) and different values of
+\(\omega_{r}\) was compared to the analytical values in~\cite{taut}, but there
+was a small discrepancy of \(\approx 20\%\) which origin is unknown.
+
 \section{Discussion}
 
 \subsection{The Algorithm}
@@ -416,7 +420,16 @@ figure~\ref{fig:juliaiterations} , the time needed grows approximately as
 \(2.2\cdot 10^{-3}N^{3}\), at least as \(0\leq N \leq 200\). This renders
 Jacobi's method completely useless at sufficiently large \(N\)s.
 
-\subsection{Impact of Couloumb repulsion}
+\subsection{Solving the Hamiltonian}
+The solution of the Hamiltonian have the behaviour one would expect. As the
+energy increases as the system gets more and more excited, The probability of
+detecting the electron(s) at any one distance decreases. More and more ``nodes''
+appear as the energy increases, and the probability gets ``smeared out'' over a
+larger range of \(\rho\). This is effect is clearer as \(\omega_{r}\) is
+decreases, making the probability smeared across the entire spectrum, while a
+high value of \(\omega_{r}\) concentrates the probability closer and closer to \(0\).
+
+\subsection{Impact of Couloumb Repulsion}
 From figure~\ref{fig:excitation} it is clear that when the Coulomb interaction is added to the
 Hamiltonian, the wavefunction shifts to larger $\rho$.
 It is also evident that for larger $\omega_r$ the harmonic oscillator dominates the repulsion
@@ -441,7 +454,7 @@ boundaries and potential strengths encountered in this quantum mechanical proble
 \bibliography{references}
 \blankpage
 \appendix
-\section{Proof of preservation of orthogonality and dot product for unitary transformations}
+\section{Proof of Preservation of Orthogonality and Dot Product for Unitary Transformations}
 A unitary transformation preserves orthogonality and the dot product. To see
 this, consider an orthogonal basis \(\{\vb{v}_{i}\}\) and an unitary
 transformation \(U\). Defining \(\vb{w}_{i}=U\vb{v}_{i}\), the dot product can
