@@ -6,5 +6,5 @@ CXX_FLAGS = -O3 -Wall -fopenmp -std=c++14 -D_GLIBCXX_PARALLEL -Wfloat-equal -mar
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/erdos/gits/FYS3150/Project2/cpp/src 
+CXX_INCLUDES = -I/home/erdos/gits/FYS3150/Project2/cpp/src -I/home/erdos/gits/FYS3150/Project2/cpp/lib/googletest/include -I/home/erdos/gits/FYS3150/Project2/cpp/lib/googletest 
 

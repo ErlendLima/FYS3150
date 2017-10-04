@@ -40,17 +40,20 @@ arma::mat hamiltonianMat_repulsion(double rho_min, double rho_max, unsigned int 
   return H;
 }
 
-double solve(double rho_min, double rho_max, unsigned int N){
+double solve(double rho_min, double rho_max, unsigned int N, Method& method){
   // Setup matrix for task
   arma::mat H = hamiltonianMat(rho_min, rho_max, N);
-  // Time and run algo
+  // Time and run the algorithm
   auto start    = std::chrono::system_clock::now(); // Wall time
   std::clock_t startCPU = std::clock();                          // CPU clock start
 
   arma::vec eigval;
   arma::mat eigvec;
-  jacobi(eigval, eigvec, H);
-  // arma::eig_sym(eigval, eigvec, H);
+
+  if (method == Method::JACOBI)
+      jacobi(eigval, eigvec, H);
+  else
+      arma::eig_sym(eigval, eigvec, H);
 
   auto end = std::chrono::system_clock::now();
   std::clock_t endCPU = std::clock();

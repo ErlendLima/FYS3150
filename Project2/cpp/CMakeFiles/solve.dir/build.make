@@ -81,28 +81,28 @@ CMakeFiles/solve.dir/src/main.cpp.o.provides: CMakeFiles/solve.dir/src/main.cpp.
 CMakeFiles/solve.dir/src/main.cpp.o.provides.build: CMakeFiles/solve.dir/src/main.cpp.o
 
 
-CMakeFiles/solve.dir/src/given_methods.cpp.o: CMakeFiles/solve.dir/flags.make
-CMakeFiles/solve.dir/src/given_methods.cpp.o: src/given_methods.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/solve.dir/src/given_methods.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/solve.dir/src/given_methods.cpp.o -c /home/erdos/gits/FYS3150/Project2/cpp/src/given_methods.cpp
+CMakeFiles/solve.dir/src/jacobi.cpp.o: CMakeFiles/solve.dir/flags.make
+CMakeFiles/solve.dir/src/jacobi.cpp.o: src/jacobi.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/solve.dir/src/jacobi.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/solve.dir/src/jacobi.cpp.o -c /home/erdos/gits/FYS3150/Project2/cpp/src/jacobi.cpp
 
-CMakeFiles/solve.dir/src/given_methods.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/solve.dir/src/given_methods.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erdos/gits/FYS3150/Project2/cpp/src/given_methods.cpp > CMakeFiles/solve.dir/src/given_methods.cpp.i
+CMakeFiles/solve.dir/src/jacobi.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/solve.dir/src/jacobi.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/erdos/gits/FYS3150/Project2/cpp/src/jacobi.cpp > CMakeFiles/solve.dir/src/jacobi.cpp.i
 
-CMakeFiles/solve.dir/src/given_methods.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/solve.dir/src/given_methods.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erdos/gits/FYS3150/Project2/cpp/src/given_methods.cpp -o CMakeFiles/solve.dir/src/given_methods.cpp.s
+CMakeFiles/solve.dir/src/jacobi.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/solve.dir/src/jacobi.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/erdos/gits/FYS3150/Project2/cpp/src/jacobi.cpp -o CMakeFiles/solve.dir/src/jacobi.cpp.s
 
-CMakeFiles/solve.dir/src/given_methods.cpp.o.requires:
+CMakeFiles/solve.dir/src/jacobi.cpp.o.requires:
 
-.PHONY : CMakeFiles/solve.dir/src/given_methods.cpp.o.requires
+.PHONY : CMakeFiles/solve.dir/src/jacobi.cpp.o.requires
 
-CMakeFiles/solve.dir/src/given_methods.cpp.o.provides: CMakeFiles/solve.dir/src/given_methods.cpp.o.requires
-	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/given_methods.cpp.o.provides.build
-.PHONY : CMakeFiles/solve.dir/src/given_methods.cpp.o.provides
+CMakeFiles/solve.dir/src/jacobi.cpp.o.provides: CMakeFiles/solve.dir/src/jacobi.cpp.o.requires
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/jacobi.cpp.o.provides.build
+.PHONY : CMakeFiles/solve.dir/src/jacobi.cpp.o.provides
 
-CMakeFiles/solve.dir/src/given_methods.cpp.o.provides.build: CMakeFiles/solve.dir/src/given_methods.cpp.o
+CMakeFiles/solve.dir/src/jacobi.cpp.o.provides.build: CMakeFiles/solve.dir/src/jacobi.cpp.o
 
 
 CMakeFiles/solve.dir/src/schrodinger.cpp.o: CMakeFiles/solve.dir/flags.make
@@ -132,14 +132,14 @@ CMakeFiles/solve.dir/src/schrodinger.cpp.o.provides.build: CMakeFiles/solve.dir/
 # Object files for target solve
 solve_OBJECTS = \
 "CMakeFiles/solve.dir/src/main.cpp.o" \
-"CMakeFiles/solve.dir/src/given_methods.cpp.o" \
+"CMakeFiles/solve.dir/src/jacobi.cpp.o" \
 "CMakeFiles/solve.dir/src/schrodinger.cpp.o"
 
 # External object files for target solve
 solve_EXTERNAL_OBJECTS =
 
 solve: CMakeFiles/solve.dir/src/main.cpp.o
-solve: CMakeFiles/solve.dir/src/given_methods.cpp.o
+solve: CMakeFiles/solve.dir/src/jacobi.cpp.o
 solve: CMakeFiles/solve.dir/src/schrodinger.cpp.o
 solve: CMakeFiles/solve.dir/build.make
 solve: libproject_lib.a
@@ -153,7 +153,7 @@ CMakeFiles/solve.dir/build: solve
 .PHONY : CMakeFiles/solve.dir/build
 
 CMakeFiles/solve.dir/requires: CMakeFiles/solve.dir/src/main.cpp.o.requires
-CMakeFiles/solve.dir/requires: CMakeFiles/solve.dir/src/given_methods.cpp.o.requires
+CMakeFiles/solve.dir/requires: CMakeFiles/solve.dir/src/jacobi.cpp.o.requires
 CMakeFiles/solve.dir/requires: CMakeFiles/solve.dir/src/schrodinger.cpp.o.requires
 
 .PHONY : CMakeFiles/solve.dir/requires

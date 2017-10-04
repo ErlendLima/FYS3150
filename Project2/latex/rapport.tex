@@ -267,13 +267,18 @@ a bit differently.
 
 Figure~\ref{fig:juliatiming} compares the time it takes for the handwritten
 Jacobi algorithm to find to eigenvalues of an \(N\times N\)-matrix, versus the
-time it takes for the standard Julia method to do the same.
+time it takes for the standard library methods to do the same. The Jacobi method
+is written in both Julia and C++, while the standard Julia method and Armadillo
+method are used as comparison. Only the memory consumption in Julia is measured
+as C++ provides no easy way to measure this.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/juliatime.eps}
   \caption{\label{fig:juliatiming} Time and amount of memory required to get the eigenvalues of an
-    \(N\times N\)-matrix for the custom Jacobi method versus Julia's standard method.}
+    \(N\times N\)-matrix for the custom Jacobi method versus library methods. In
+  the upper plot, the green dashed line of Julia's eigenvalue solver is hidden
+  by the overlaying Armadillo's purple dashed line.}
 \end{figure}
 
 The number of similarity transforms needed to make all off-diagonal elements
@@ -287,14 +292,12 @@ figure~\ref{fig:juliaiterations}.
     transforms, needed to make all off-diagonal elements less than \(10^{-10}\).}
 \end{figure}
 
-C++ her
-
 \subsection{Solution of the Hamiltonian}
 \label{sec:hamiltonsol}
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\columnwidth]{figures/wavefunctions.eps}
+  \includegraphics[width=\columnwidth]{figures/wavefunctions.png}
   \caption{\label{fig:wavefunctions} A visualization of the potentials and the
     corresponding wave functions for different eigenstates. The graphs have
     arbitrary scales, but have the same values of \(\rho\). The wavefunctions
@@ -305,6 +308,19 @@ C++ her
 
 
 \section{Discussion}
+
+\subsection{The Algorithm}
+Viewing figure~\ref{fig:juliatiming}, it is abundantly clear that the standard
+library methods of both Julia and Armadillo are far superior to the custom
+Jacobi methods, being both quicker and using less memory. More interestingly,
+the Jacobi method written in Julia is quicker than the method written in C++.
+The reason for this is unknown.
+
+The Jacobi method takes considerably longer as the mesh size increases. From
+figure~\ref{fig:juliaiterations} , the time needed grows approximately as
+\(2.2\cdot 10^{-3}N^{3}\), at least as \(0\leq N \leq 200\). This renders
+Jacobi's method completely useless at sufficiently large \(N\)s.
+
 \subsection{Non-interacting case}
 \subsection{Interacting case}
 \label{sec:discussion}

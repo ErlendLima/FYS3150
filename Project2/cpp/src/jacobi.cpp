@@ -15,7 +15,7 @@ void jacobi(arma::vec& eigval, arma::mat& eigvec, arma::mat& A){
   arma::mat A_copy = arma::mat(A);     // Make copy so input matrix is unchanged
   eigvec = arma::eye<arma::mat>(n, n); // Matrix that will hold eigenvalues
 
-  while(fabs(max_offdiag) > epsilon && static_cast<double>(iter) < maxiter){
+  while(fabs(max_offdiag) > epsilon && iter < maxiter){
     find_max_offdiag(A_copy, k, l, n);       // Find max offdiag element
     max_offdiag = A_copy(l,k);               // Fetch for next iteration
     jacobirotate(A_copy, eigvec, k, l, n);   // Perform rotation on largest element

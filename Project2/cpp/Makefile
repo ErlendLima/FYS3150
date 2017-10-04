@@ -78,6 +78,17 @@ rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
+
 # The main all target
 all: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles /home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles/progress.marks
@@ -111,6 +122,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named runUnitTests
+
+# Build rule for target.
+runUnitTests: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 runUnitTests
+.PHONY : runUnitTests
+
+# fast build rule for target.
+runUnitTests/fast:
+	$(MAKE) -f CMakeFiles/runUnitTests.dir/build.make CMakeFiles/runUnitTests.dir/build
+.PHONY : runUnitTests/fast
+
+#=============================================================================
 # Target rules for targets named project_lib
 
 # Build rule for target.
@@ -136,35 +160,61 @@ solve/fast:
 	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/build
 .PHONY : solve/fast
 
-src/given_methods.o: src/given_methods.cpp.o
+#=============================================================================
+# Target rules for targets named gtest
 
-.PHONY : src/given_methods.o
+# Build rule for target.
+gtest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gtest
+.PHONY : gtest
+
+# fast build rule for target.
+gtest/fast:
+	$(MAKE) -f lib/googletest/CMakeFiles/gtest.dir/build.make lib/googletest/CMakeFiles/gtest.dir/build
+.PHONY : gtest/fast
+
+#=============================================================================
+# Target rules for targets named gtest_main
+
+# Build rule for target.
+gtest_main: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 gtest_main
+.PHONY : gtest_main
+
+# fast build rule for target.
+gtest_main/fast:
+	$(MAKE) -f lib/googletest/CMakeFiles/gtest_main.dir/build.make lib/googletest/CMakeFiles/gtest_main.dir/build
+.PHONY : gtest_main/fast
+
+src/jacobi.o: src/jacobi.cpp.o
+
+.PHONY : src/jacobi.o
 
 # target to build an object file
-src/given_methods.cpp.o:
-	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/given_methods.cpp.o
-	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/given_methods.cpp.o
-.PHONY : src/given_methods.cpp.o
+src/jacobi.cpp.o:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/jacobi.cpp.o
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/jacobi.cpp.o
+.PHONY : src/jacobi.cpp.o
 
-src/given_methods.i: src/given_methods.cpp.i
+src/jacobi.i: src/jacobi.cpp.i
 
-.PHONY : src/given_methods.i
+.PHONY : src/jacobi.i
 
 # target to preprocess a source file
-src/given_methods.cpp.i:
-	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/given_methods.cpp.i
-	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/given_methods.cpp.i
-.PHONY : src/given_methods.cpp.i
+src/jacobi.cpp.i:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/jacobi.cpp.i
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/jacobi.cpp.i
+.PHONY : src/jacobi.cpp.i
 
-src/given_methods.s: src/given_methods.cpp.s
+src/jacobi.s: src/jacobi.cpp.s
 
-.PHONY : src/given_methods.s
+.PHONY : src/jacobi.s
 
 # target to generate assembly for a file
-src/given_methods.cpp.s:
-	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/given_methods.cpp.s
-	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/given_methods.cpp.s
-.PHONY : src/given_methods.cpp.s
+src/jacobi.cpp.s:
+	$(MAKE) -f CMakeFiles/project_lib.dir/build.make CMakeFiles/project_lib.dir/src/jacobi.cpp.s
+	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/jacobi.cpp.s
+.PHONY : src/jacobi.cpp.s
 
 src/main.o: src/main.cpp.o
 
@@ -226,6 +276,33 @@ src/schrodinger.cpp.s:
 	$(MAKE) -f CMakeFiles/solve.dir/build.make CMakeFiles/solve.dir/src/schrodinger.cpp.s
 .PHONY : src/schrodinger.cpp.s
 
+test/test_solve.o: test/test_solve.cpp.o
+
+.PHONY : test/test_solve.o
+
+# target to build an object file
+test/test_solve.cpp.o:
+	$(MAKE) -f CMakeFiles/runUnitTests.dir/build.make CMakeFiles/runUnitTests.dir/test/test_solve.cpp.o
+.PHONY : test/test_solve.cpp.o
+
+test/test_solve.i: test/test_solve.cpp.i
+
+.PHONY : test/test_solve.i
+
+# target to preprocess a source file
+test/test_solve.cpp.i:
+	$(MAKE) -f CMakeFiles/runUnitTests.dir/build.make CMakeFiles/runUnitTests.dir/test/test_solve.cpp.i
+.PHONY : test/test_solve.cpp.i
+
+test/test_solve.s: test/test_solve.cpp.s
+
+.PHONY : test/test_solve.s
+
+# target to generate assembly for a file
+test/test_solve.cpp.s:
+	$(MAKE) -f CMakeFiles/runUnitTests.dir/build.make CMakeFiles/runUnitTests.dir/test/test_solve.cpp.s
+.PHONY : test/test_solve.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -233,18 +310,25 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... runUnitTests"
 	@echo "... rebuild_cache"
 	@echo "... project_lib"
+	@echo "... test"
 	@echo "... solve"
-	@echo "... src/given_methods.o"
-	@echo "... src/given_methods.i"
-	@echo "... src/given_methods.s"
+	@echo "... gtest"
+	@echo "... gtest_main"
+	@echo "... src/jacobi.o"
+	@echo "... src/jacobi.i"
+	@echo "... src/jacobi.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
 	@echo "... src/schrodinger.o"
 	@echo "... src/schrodinger.i"
 	@echo "... src/schrodinger.s"
+	@echo "... test/test_solve.o"
+	@echo "... test/test_solve.i"
+	@echo "... test/test_solve.s"
 .PHONY : help
 
 

@@ -1,4 +1,11 @@
 /home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles/edit_cache.dir
+/home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles/runUnitTests.dir
 /home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles/rebuild_cache.dir
 /home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles/project_lib.dir
+/home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles/test.dir
 /home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles/solve.dir
+/home/erdos/gits/FYS3150/Project2/cpp/lib/googletest/CMakeFiles/rebuild_cache.dir
+/home/erdos/gits/FYS3150/Project2/cpp/lib/googletest/CMakeFiles/test.dir
+/home/erdos/gits/FYS3150/Project2/cpp/lib/googletest/CMakeFiles/gtest.dir
+/home/erdos/gits/FYS3150/Project2/cpp/lib/googletest/CMakeFiles/edit_cache.dir
+/home/erdos/gits/FYS3150/Project2/cpp/lib/googletest/CMakeFiles/gtest_main.dir
