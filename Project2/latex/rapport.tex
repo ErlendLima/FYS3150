@@ -213,7 +213,7 @@ equation describing an electron in an harmonic oscillator is
 \end{equation}
 with potential
 \begin{equation*}
-  V(r) = \frac{1}{2}mω^{2}r^{2}
+  V(r) = \frac{1}{2}m\omega^{2}r^{2}
 \end{equation*}
 and energies
 \begin{equation*}
@@ -227,7 +227,7 @@ with \(n=0,1,2,\ldots\) and \(l = 0,1,2,\ldots\)
   \label{eq:scaledschroedinger}
   -\dv[2]{\rho}u(\rho)+\rho^{2}u(\rho) = \lambda u(\rho)
 \end{equation}
-see the description of Project 2 for a more detailed derivation. To solve this equation numerically,
+see \cite{project2} for a more detailed derivation. To solve this equation numerically,
 \(\dv[2]{u}{\rho}\) is computed as
 \begin{equation*}
   \dv[2]{u}{\rho} \simeq \frac{u(\rho+h)-2u(\rho)+u(\rho-h)}{h^{2}} + \mathcal{O}(h^{2})
@@ -367,27 +367,33 @@ figure~\ref{fig:juliaiterations}.
 \subsection{Solution of the Hamiltonian}
 \label{sec:hamiltonsol}
 
+Figure~\ref{fig:wavefunctions} visualizes the two potentials and the lowest
+eigenfunction solutions with the Jacobi method. Notice for larger energy
+eigenstates the increase in the number of nodes and the wider nature of
+the wave functions.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/wavefunctions.png}
   \caption{\label{fig:wavefunctions} A visualization of the potentials and the
     corresponding wave functions for different eigenstates. The graphs have
-    arbitrary scales, but have the same values of \(\rho\). The wavefunctions
+    arbitrary scales, but have the same values of $\rho$. The wavefunctions
     correspond to
     the first four bound eigenstates of the potential \(V=\rho^{2}\).}
 \end{figure}
 
-
+A comparison of the solutions for the ground state and first excited state is
+shown in figure~\ref{fig:excitation}.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/excitation.eps}
   \caption{\label{fig:excitation} Comparison of the probability of finding the
-    electron at certain positions \(rho\) in the ground state (top) and first
-    excited state (bottom) for both the harmonic oscillator potential and
-    Coulomb interaction.}
+    electron at certain positions \(\rho\) in the ground state (top) and first
+    excited state (bottom) for both the Coulomb potential and repulsive potential.}
 \end{figure}
 
+The ground state for varying potential strengths $\omega_r$ is shown in figure~\ref{fig:omegas}.
 
 \begin{figure}[H]
   \centering
@@ -421,11 +427,16 @@ This behaviour is as expected.
 \section{Conclusion}
 The solution to Schrödinger's equation for two electrons in an external
 harmonic oscillator was found using Jacobi's eigenvalue algorithm and built-in
-algorithms in Julia and C++. The results are consistent with analytic eigenvalues
-by M. Taut and intuition about the problem. The Jacobi eigenvalue method was shown
-to be
-numerically stable for the limits $\rho_\text{max}$ and $\rho_\text{min}$ used
-in this project, and a wide array of $\omega_r$.
+algorithms in Julia and C++. The results show that for strong oscillator potentials
+the Coulomb interaction is negligible, while for weaker potential wells the repulsion
+has a large impact on the solution. The quantum mechanical results are consistent with
+intuition about the system, and can be compared with an analytic solution found
+in \cite{taut}.
+
+The Jacobi method, despite being incredibly slow compared to it's built-in
+counterparts in Julia and C++, converged to correct eigenvalues over the domain
+of values examined, and therefore seems numerically stable over the range of
+boundaries and potential strengths encountered in this quantum mechanical problem.
 \label{sec:conclusion}
 \bibliography{references}
 \blankpage
