@@ -120,12 +120,24 @@
 two electrons in an external oscillator potential with C++ and Julia}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
-% \author{Aram Salihi}
+\author{Aram Salihi}
 \affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project2}}
 \date{\today}
 
 \begin{abstract}
-  This is really abstract. So abstract it is spooky :O
+Numerical solutions to the problem with two electrons in a harmonic oscillator
+potential are investigated. Results are presented both with and without
+the Couloumb interaction, and compared for limits of the oscillator strength.
+The problem is written as an eigenvalue problem, which is solved with the
+famous Jacobi rotation algorithm, through separate implementations in C++ and Julia.
+The execution speed of the Jacobi method was compared to the built-in eigenvalue solvers
+in armadillo and julia.
+
+The results show that for strong oscillator potentials the Coulomb interaction is negligible,
+while for weaker potential wells the repulsion has a large impact on the solution. From
+comparing runtimes it is evident that the built-in eigenvalue solvers are far superior
+to the Jacobi method. The Jacobi implementation in Julia was faster by around a factor
+4 compared to the C++ implementation. The reason for this is unknown.
 \end{abstract}
 \maketitle
 \tableofcontents
@@ -136,29 +148,6 @@ two electrons in an external oscillator potential with C++ and Julia}
 
 \newpage
 
-% % Get all of the data from the script into a dictionary
-% \begin{pycode}
-% from subprocess import Popen, PIPE
-% from latextools import untag_all
-% p = Popen(['python', '../analysis/analyze.py', '../cpp'],
-% stdout=PIPE, stderr=PIPE)
-% output, err = p.communicate()
-% data = output.decode('utf8')
-% latex_data = untag_all(data)
-% \end{pycode}
-%
-% \begin{table}[ht]
-%   \centering
-%   \pyc{print(latex_data['error_table'])}
-%   \caption{Summary of the errors}
-%   \label{tab:error}
-% \end{table}
-%
-% \begin{figure}[ht]
-%   \centering
-%   \includegraphics[scale=0.5]{figures/function.eps}
-%   \caption{\label{fig:general} Caption}
-% \end{figure}
 \section{Introduction}
 \label{sec:introduction}
 Eigenvalue problems occur frequently in mathematics and science. Many problems
@@ -200,7 +189,7 @@ around hyperplanes in such a way that the off-diagonal elements are reduced to
 fall beneath some threshhold.
 Since eigenvalues are preserved under similarity
 transformations, the eigenvalues of \(A\) can be read off the diagonal of a
-sufficiently diagonalized matrix. For a more detailed description, see REF.
+sufficiently diagonalized matrix. For a more detailed description, see \cite{mortenjensen}.
 
 There are several ways to iterate through the matrix to eliminate the offdiagonal
 elements, for instance a full systematic iteration over all matrix elements. In this paper,
@@ -238,7 +227,7 @@ with \(n=0,1,2,\ldots\) and \(l = 0,1,2,\ldots\)
   \label{eq:scaledschroedinger}
   -\dv[2]{\rho}u(\rho)+\rho^{2}u(\rho) = \lambda u(\rho)
 \end{equation}
-see REF for a more detailed derivation. To solve this equation numerically,
+see the description of Project 2 for a more detailed derivation. To solve this equation numerically,
 \(\dv[2]{u}{\rho}\) is computed as
 \begin{equation*}
   \dv[2]{u}{\rho} \simeq \frac{u(\rho+h)-2u(\rho)+u(\rho-h)}{h^{2}} + \mathcal{O}(h^{2})
@@ -421,9 +410,9 @@ figure~\ref{fig:juliaiterations} , the time needed grows approximately as
 Jacobi's method completely useless at sufficiently large \(N\)s.
 
 \subsection{Impact of Couloumb repulsion}
-From figure REF it is clear that when the Coulomb interaction is added to the
+From figure~\ref{fig:excitation} it is clear that when the Coulomb interaction is added to the
 Hamiltonian, the wavefunction shifts to larger $\rho$.
-It clear that for larger $\omega_r$ the harmonic oscillator dominates the repulsion
+It is also evident that for larger $\omega_r$ the harmonic oscillator dominates the repulsion
 and the wavefunctions are much closer. For small $\omega_r$ the repulsion
 has a much larger impact and pushes the wavefunction further away from the origin.
 This behaviour is as expected.
@@ -432,9 +421,10 @@ This behaviour is as expected.
 The solution to Schrödinger's equation for two electrons in an external
 harmonic oscillator was found using Jacobi's eigenvalue algorithm and built-in
 algorithms in Julia and C++. The results are consistent with analytic eigenvalues
-by M. Taut and intuition about the problem. The Jacobi eigenvalue method is
-numerically stable for reasonable limits $\rho_\text{max}$ and $\rho_\text{min}$,
-and a wide array of $\omega_r$.
+by M. Taut and intuition about the problem. The Jacobi eigenvalue method was shown
+to be
+numerically stable for the limits $\rho_\text{max}$ and $\rho_\text{min}$ used
+in this project, and a wide array of $\omega_r$.
 \label{sec:conclusion}
 \bibliography{references}
 \blankpage
