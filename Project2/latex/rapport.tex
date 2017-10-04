@@ -170,9 +170,11 @@ For matrices where $n \geq 5$ there is
 no general analytical procedure to obtain the roots of the characteristic polynomial, by the
 Abel-Ruffini theorem. In most situations the eigenvalue problems have much
 larger matrices, on the order \(n\sim 10\), and numerical algorithms are needed to solve the problems. In
-this paper, the direct Jacobi rotation and iterative Lanczos method
-are investigated.The algorithm accuracies are compared to each other and the
-built-in eigenvalue solvers in Armadillo and Julia.
+this paper, the direct Jacobi rotation and built-in methods in Julia and the C++
+library armadillo are used to solve eigenvalue problems. This project was implemented
+in two programming languages for several reasons. First of all, it is very relevant to
+learn several programming languages, and for future projects it is interesting
+to compare execution speeds for the same algorithm.
 
 The methods are used to solve Schrödinger's equation for two electrons in a
 three-dimensional harmonic oscillator potential, which can be reformulated into
@@ -200,8 +202,11 @@ Since eigenvalues are preserved under similarity
 transformations, the eigenvalues of \(A\) can be read off the diagonal of a
 sufficiently diagonalized matrix. For a more detailed description, see REF.
 
-\subsubsection{Jacobi sweep variations}
-Cyclic jacobi (systematically cycle over all elements) and classic Jacobi (the one we are using, find max offdiagonal element)
+There are several ways to iterate through the matrix to eliminate the offdiagonal
+elements, for instance a full systematic iteration over all matrix elements. In this paper,
+the maximum offdiagonal element is found and eliminated in each iteration, which can be shown to be
+the method which provides the fastest convergence to the solution. The disadvantage of this method
+is that finding the largest offdiagonal element is a cumbersome task for large matrices.
 \subsection{The Harmonic Oscillator}
 \label{sec:harmonic}
 In the words of Richard Feynman, ``every potential can be reduced to a
@@ -234,8 +239,6 @@ see REF for a more detailed derivation. To solve this equation numerically,
 \end{equation*}
 where \(h\) is the step size.
 bla bla bla
-\subsection{Lanczos algorithm}
-Dududu
 \section{Method}
 \label{sec:method}
 
@@ -244,16 +247,30 @@ Hamiltonian for two systems
 describing electrons trapped in a harmonic oscillator. In the first case, the
 electron(s) only feel the potential well, and does ther
 \subsection{Choice of $\omega_r$ to analyze}
-\subsection{Choosing an appropriate value for infinity}
-\subsection{Choice of step size}
+Several values for $\omega_r$ were used in this project to investigate how the
+potential impacts the relative wave function of the electrons. Specifically,
+analytical eigenvalues for this exact problem (M. Taut, 1993) are compared
+to the algorithm results.
+\subsection{Choosing appropriate boundary values}
+The boundary values for this problems are set at $0$ and infinity. In the
+implementation of this problem a numerical value is set for $\rho_\text{max} = \infty$.
+This value was tested for each $\omega_r$, and set at a point large enough
+so that the solution doesnt change noticably on changing $\rho_\text{max}$.
+To avoid division by zero, $\rho_\text{min}$ was set to a small positive value.
 \subsection{Multiple programming languages}
-Implementering i Julia og C++. Trening og god måte å verifisere korrekt implementasjon.
+In this project the Jacobi eigenvalue algorithm was implemented in both Julia and
+C++. The computation speeds of the Jacobi eigenvalue implementations
+and the built in eigenvalue solvers in both languages were compared.
 \subsection{Unit tests}
 Unit tests were implemented to verify that the implemented functions behave
 as intended, and that this behaviour is preserved through changes to the programs.
-\subsubsection{Correct maximum offdiagonal element}
-\subsubsection{Jacobi's method on $3 \times 3$ matrix with known eigenvalues}
-\subsubsection{Preservation of dot product and orthogonality?? Skal vi ta denne?}
+
+In one of the tests, the function which finds the maximum offdiagonal element
+is tested with a $50 \times 50$ random matrix with one element modified to a
+much larger value.
+
+The implementation of the full Jacobi eigenvalue algorithm is also tested on a
+$3 \times 3$ matrix with known eigenvalues.
 \section{Results}
 \label{sec:results}
 
@@ -321,10 +338,21 @@ figure~\ref{fig:juliaiterations} , the time needed grows approximately as
 \(2.2\cdot 10^{-3}N^{3}\), at least as \(0\leq N \leq 200\). This renders
 Jacobi's method completely useless at sufficiently large \(N\)s.
 
-\subsection{Non-interacting case}
-\subsection{Interacting case}
+\subsection{Impact of Couloumb repulsion}
+From figure REF it is clear that when the Coulomb interaction is added to the
+Hamiltonian, the wavefunction shifts to larger $\rho$.
+It clear that for larger $\omega_r$ the harmonic oscillator dominates the repulsion
+and the wavefunctions are much closer. For small $\omega_r$ the repulsion
+has a much larger impact and pushes the wavefunction further away from the origin.
+This behaviour is as expected.
 \label{sec:discussion}
 \section{Conclusion}
+The solution to Schrödinger's equation for two electrons in an external
+harmonic oscillator was found using Jacobi's eigenvalue algorithm and built-in
+algorithms in Julia and C++. The results are consistent with analytic eigenvalues
+by M. Taut and intuition about the problem. The Jacobi eigenvalue method is
+numerically stable for reasonable limits $\rho_\text{max}$ and $\rho_\text{min}$,
+and a wide array of $\omega_r$.
 \label{sec:conclusion}
 \bibliography{references}
 \blankpage
