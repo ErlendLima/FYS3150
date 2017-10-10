@@ -82,10 +82,10 @@
 
 \begin{document}
 \sisetup{detect-all}
-\title{Title}
+\title{Simulation of the solar system with numerical methods}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
-\affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project2}}
+\affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project3}}
 \date{\today}
 
 \begin{abstract}
@@ -102,31 +102,84 @@ Abstract abstract.
 
 \section{Introduction}
 \label{sec:introduction}
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Intro dintro mintro pintroduction?
+
+For the simple case of two celestial bodies it is trivial to solve the time
+development of the system anlytically. When more objects are added however, the equations
+have no analytical solution, and numerical methods are required to find
+approximated solutions. This is popularly called a n-body problem. In this project, the classic forward Euler and
+Velocity Verlet algorithms are used to simulate the solar system, and their
+accuracies and runtimes are compared.
 \section{Theory}
 \label{sec:theory}
-For planetary motion
-Initial value problem. Different ways to forward the solutions. Manipulating
-Taylor polynomials yields two famous methods.
+For planetary motion, the only force present is gravity. Newton's law of gravitation
+states that any two objects in the universe attract each other by a force given
+by
+\begin{align}
+  F_G = \frac{G m_1 m_2}{r^2}
+\end{align}
+where $m_1$ and $m_2$ are the masses of the objects, $G$ is the
+gravitational constant and $r$ is the distance between the objects. In the
+case examined in this paper, it is assumed that the solar mass is much larger
+than the planet masses ($M_\odot \gg M_\text{planet}$), and the solar
+movement is therefore ignored. Then, for a planet orbiting the sun, the
+planet position as a function of time is described by Newton's second law:
+\begin{align*}
+  \dv[2]{\mathbf{x}}{t} = \frac{\mathbf{F}_G}{M}
+\end{align*}
+where $M$ is the planet mass. This is equivalent to one ODE (ordinary differential
+equation) for each direction component, i.e. three separate equations in the
+three-dimensional case.
+
+For the numerical methods the above second order ODE is more convenient to
+work with when written as a set of two coupled first order equations. These
+are given by
+\begin{align}
+  \begin{split}
+  \label{eq:coupledequations}
+  \dv{x}{t} &= v(x,t) \\
+  \dv{v}{t} &= \frac{F(x,t)}{M} = a(x,t)
+  \end{split}
+\end{align}
+The algorithms used are both based on Taylor expansions, the forward Euler
+scheme approximates the derivatives to first order, while the Verlet
+method combines a second order approximation with the fact that the acceleration
+is only position dependent.
 \subsection{Forward Euler}
+The Euler method (forward Euler) is the most basic numerical method to solve
+ODEs. This widely known algorithm applied to ~\ref{eq:coupledequations} is given by
+\begin{align*}
+  \begin{split}
+  v_{i+1} = v_{i} + a_{i}\Delta{t} \\
+  x_{i+1} = x_{i} + v_{i}\Delta{t}
+\end{split}
+\end{align*}
+These equations are derived by simply taylor expanding the derivatives and omitting
+the error terms.
 \subsection{Velocity Verlet}
 The velocity Verlet method is based on Taylor-expanding the position and velocity
 to second order, and specialized for cases where the acceleration is only
 dependent on position. The algorithm (see ~\ref{sec:velocityverlet} for details)
-is given by the following equations:
+applied to the problem examined in this paper is given by the following equations:
 \begin{align}
   \begin{split}
-    x_{i+1} &= x_i + v_i + \frac{h^2}{2} a_i \\
-    v_{i+1} &= v_i + \frac{h}{2}(a_{i+1} + a_{i})
+    x_{i+1} &= x_i + v_i + \frac{\Delta{t}^2}{2} a_i \\
+    v_{i+1} &= v_i + \frac{\Delta{t}}{2}(a_{i+1} + a_{i})
   \end{split}
 \end{align}
 Note that this algorithm assumes $a_{i+1}$ is only dependent on position $x_{i+1}$
-and not velocity $v_{i+1}$. This makes the algorithm ideal for solving the
-time development of several physical systems, such as in molecular dynamics
-and the solar system.
+and not velocity $v_{i+1}$. This is because the acceleration in the next step
+is required to calculate the velocity in the next step. Because $a_{i+1} = a(x_{i+1})$,
+the position in the next step is computed prior to the velocity. This algorithm
+therefore seems suited to solve for planetary motion, because gravity is only
+position dependent and the only force that acts within the system.
+
+\subsection{Initial conditions}
+
+\subsection{Errors}
 \section{Method}
 \label{sec:method}
-
+\subsection{Choice of units}
 \section{Results}
 \label{sec:results}
 
@@ -143,35 +196,36 @@ and the solar system.
 \label{sec:velocityverlet}
 The Velocity Verlet method is derived for one dimension ($x$), but is easily
 generalized for three dimensions by simply repeating the procedure with $y$
-or $z$ instead of $x$. The position and time is discretized to $n$ integration
-points so that
+or $z$ instead of $x$. The derivation can also be generalized to three dimensions
+simply by considering $x$ as a vector $\mathbf{x} = (x, y, z)$.
+The position and time is discretized to $n$ integration points so that
 \begin{align*}
   x(t) &\rightarrow x(t_i) &&= x_i \\
-  t &\rightarrow t_i &&= t_0 + ih
+  t &\rightarrow t_i &&= t_0 + i\Delta{t}
 \end{align*}
-where $h = \frac{t_\text{final} - t_0}{n-1}$ the time step size. The velocity
+where $\Delta{t} = \frac{t_\text{final} - t_0}{n-1}$ the time step size. The velocity
 is similarly discretized to each time point so that $v(t) \rightarrow v_i$.
 Taylor expanding the position and velocity yields
 \begin{align*}
-  x_{i+1} &= x_i + h x'_i + \frac{h^2}{2} x''_i + O(h^3) \\
-  v_{i+1} &= v_i + h v'_i + \frac{h^2}{2} v''_i + O(h^3)
+  x_{i+1} &= x_i + \Delta{t} x'_i + \frac{\Delta{t}^2}{2} x''_i + O(\Delta{t}^3) \\
+  v_{i+1} &= v_i + \Delta{t} v'_i + \frac{\Delta{t}^2}{2} v''_i + O(\Delta{t}^3)
 \end{align*}
-The second derivative of the velocity is approximated using Euler's formula, so
+The second derivative of the velocity is approximated using Euler's method, so
 \begin{align*}
-  h v''_i = v'_{i+1} - v'_{i} = a_{i+1} - a_{i}
+  \Delta{t} v''_i = v'_{i+1} - v'_{i} = a_{i+1} - a_{i}
 \end{align*}
 where $a_i$ is the acceleration at $t = t_i$. With this approximation for the
 velocity second derivative, the Taylor expansions are given by
 \begin{align*}
-  v_{i+1} &= v_i + h a_i + \frac{h}{2} (a_{i+1} - a_i) + O(h^3) \\
-          &= v_i + \frac{h}{2} (a_{i+1} + a_{i}) + O(h^3)
+  v_{i+1} &= v_i + \Delta{t} a_i + \frac{\Delta{t}}{2} (a_{i+1} - a_i) + O(\Delta{t}^3) \\
+          &= v_i + \frac{\Delta{t}}{2} (a_{i+1} + a_{i}) + O(\Delta{t}^3)
 \end{align*}
 For the numerical algorithm the error terms are omitted and the resulting
 algorithm is
 \begin{align}
   \begin{split}
-    x_{i+1} &= x_i + v_i + \frac{h^2}{2} a_i \\
-    v_{i+1} &= v_i + \frac{h}{2}(a_{i+1} + a_{i})
+    x_{i+1} &= x_i + v_i + \frac{\Delta{t}^2}{2} a_i \\
+    v_{i+1} &= v_i + \frac{\Delta{t}}{2}(a_{i+1} + a_{i})
   \end{split}
 \end{align}
 \blankpage
