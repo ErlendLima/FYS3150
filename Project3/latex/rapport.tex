@@ -102,10 +102,28 @@ Abstract abstract.
 
 \section{Introduction}
 \label{sec:introduction}
-Intro.
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 \section{Theory}
 \label{sec:theory}
-
+For planetary motion
+Initial value problem. Different ways to forward the solutions. Manipulating
+Taylor polynomials yields two famous methods.
+\subsection{Forward Euler}
+\subsection{Velocity Verlet}
+The velocity Verlet method is based on Taylor-expanding the position and velocity
+to second order, and specialized for cases where the acceleration is only
+dependent on position. The algorithm (see ~\ref{sec:velocityverlet} for details)
+is given by the following equations:
+\begin{align}
+  \begin{split}
+    x_{i+1} &= x_i + v_i + \frac{h^2}{2} a_i \\
+    v_{i+1} &= v_i + \frac{h}{2}(a_{i+1} + a_{i})
+  \end{split}
+\end{align}
+Note that this algorithm assumes $a_{i+1}$ is only dependent on position $x_{i+1}$
+and not velocity $v_{i+1}$. This makes the algorithm ideal for solving the
+time development of several physical systems, such as in molecular dynamics
+and the solar system.
 \section{Method}
 \label{sec:method}
 
@@ -121,8 +139,41 @@ Intro.
 \bibliography{references}
 \blankpage
 \appendix
-\section{Appendix}
-d
+\section{Derivation of velocity Verlet algorithm}
+\label{sec:velocityverlet}
+The Velocity Verlet method is derived for one dimension ($x$), but is easily
+generalized for three dimensions by simply repeating the procedure with $y$
+or $z$ instead of $x$. The position and time is discretized to $n$ integration
+points so that
+\begin{align*}
+  x(t) &\rightarrow x(t_i) &&= x_i \\
+  t &\rightarrow t_i &&= t_0 + ih
+\end{align*}
+where $h = \frac{t_\text{final} - t_0}{n-1}$ the time step size. The velocity
+is similarly discretized to each time point so that $v(t) \rightarrow v_i$.
+Taylor expanding the position and velocity yields
+\begin{align*}
+  x_{i+1} &= x_i + h x'_i + \frac{h^2}{2} x''_i + O(h^3) \\
+  v_{i+1} &= v_i + h v'_i + \frac{h^2}{2} v''_i + O(h^3)
+\end{align*}
+The second derivative of the velocity is approximated using Euler's formula, so
+\begin{align*}
+  h v''_i = v'_{i+1} - v'_{i} = a_{i+1} - a_{i}
+\end{align*}
+where $a_i$ is the acceleration at $t = t_i$. With this approximation for the
+velocity second derivative, the Taylor expansions are given by
+\begin{align*}
+  v_{i+1} &= v_i + h a_i + \frac{h}{2} (a_{i+1} - a_i) + O(h^3) \\
+          &= v_i + \frac{h}{2} (a_{i+1} + a_{i}) + O(h^3)
+\end{align*}
+For the numerical algorithm the error terms are omitted and the resulting
+algorithm is
+\begin{align}
+  \begin{split}
+    x_{i+1} &= x_i + v_i + \frac{h^2}{2} a_i \\
+    v_{i+1} &= v_i + \frac{h}{2}(a_{i+1} + a_{i})
+  \end{split}
+\end{align}
 \blankpage
 \end{document}
 
