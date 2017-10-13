@@ -54,14 +54,14 @@ target_link_libraries(solve project_lib blas lapack -O1 armadillo )
 ################################
 # Testing
 ################################
-if (test)
+if (TESTS)
   if (APPLE)
     add_definitions(-DGTEST_USE_OWN_TR1_TUPLE)
     add_definitions(-D__GLIBCXX__)
   endif (APPLE)
 
   # This adds another subdirectory, which has 'project(googletest)'.
-  add_subdirectory(lib/googletest)
+  add_subdirectory(../../.lib/googletest [binary-dir])
 
   enable_testing()
 

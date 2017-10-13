@@ -170,7 +170,7 @@ gtest: cmake_check_build_system
 
 # fast build rule for target.
 gtest/fast:
-	$(MAKE) -f lib/googletest/CMakeFiles/gtest.dir/build.make lib/googletest/CMakeFiles/gtest.dir/build
+	$(MAKE) -f [binary-dir]/CMakeFiles/gtest.dir/build.make [binary-dir]/CMakeFiles/gtest.dir/build
 .PHONY : gtest/fast
 
 #=============================================================================
@@ -183,7 +183,7 @@ gtest_main: cmake_check_build_system
 
 # fast build rule for target.
 gtest_main/fast:
-	$(MAKE) -f lib/googletest/CMakeFiles/gtest_main.dir/build.make lib/googletest/CMakeFiles/gtest_main.dir/build
+	$(MAKE) -f [binary-dir]/CMakeFiles/gtest_main.dir/build.make [binary-dir]/CMakeFiles/gtest_main.dir/build
 .PHONY : gtest_main/fast
 
 src/jacobi.o: src/jacobi.cpp.o

@@ -63,9 +63,9 @@ CMAKE_BINARY_DIR = /home/erdos/gits/FYS3150/Project2/cpp
 # Target rules for target CMakeFiles/runUnitTests.dir
 
 # All Build rule for target.
+CMakeFiles/runUnitTests.dir/all: [binary-dir]/CMakeFiles/gtest.dir/all
+CMakeFiles/runUnitTests.dir/all: [binary-dir]/CMakeFiles/gtest_main.dir/all
 CMakeFiles/runUnitTests.dir/all: CMakeFiles/project_lib.dir/all
-CMakeFiles/runUnitTests.dir/all: lib/googletest/CMakeFiles/gtest_main.dir/all
-CMakeFiles/runUnitTests.dir/all: lib/googletest/CMakeFiles/gtest.dir/all
 	$(MAKE) -f CMakeFiles/runUnitTests.dir/build.make CMakeFiles/runUnitTests.dir/depend
 	$(MAKE) -f CMakeFiles/runUnitTests.dir/build.make CMakeFiles/runUnitTests.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles --progress-num=9,10 "Built target runUnitTests"
@@ -173,96 +173,96 @@ clean: CMakeFiles/solve.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Directory level rules for directory lib/googletest
+# Directory level rules for directory [binary-dir]
 
 # Convenience name for "all" pass in the directory.
-lib/googletest/all: lib/googletest/CMakeFiles/gtest.dir/all
-lib/googletest/all: lib/googletest/CMakeFiles/gtest_main.dir/all
+[binary-dir]/all: [binary-dir]/CMakeFiles/gtest.dir/all
+[binary-dir]/all: [binary-dir]/CMakeFiles/gtest_main.dir/all
 
-.PHONY : lib/googletest/all
+.PHONY : [binary-dir]/all
 
 # Convenience name for "clean" pass in the directory.
-lib/googletest/clean: lib/googletest/CMakeFiles/gtest.dir/clean
-lib/googletest/clean: lib/googletest/CMakeFiles/gtest_main.dir/clean
+[binary-dir]/clean: [binary-dir]/CMakeFiles/gtest.dir/clean
+[binary-dir]/clean: [binary-dir]/CMakeFiles/gtest_main.dir/clean
 
-.PHONY : lib/googletest/clean
+.PHONY : [binary-dir]/clean
 
 # Convenience name for "preinstall" pass in the directory.
-lib/googletest/preinstall:
+[binary-dir]/preinstall:
 
-.PHONY : lib/googletest/preinstall
+.PHONY : [binary-dir]/preinstall
 
 #=============================================================================
-# Target rules for target lib/googletest/CMakeFiles/gtest.dir
+# Target rules for target [binary-dir]/CMakeFiles/gtest.dir
 
 # All Build rule for target.
-lib/googletest/CMakeFiles/gtest.dir/all:
-	$(MAKE) -f lib/googletest/CMakeFiles/gtest.dir/build.make lib/googletest/CMakeFiles/gtest.dir/depend
-	$(MAKE) -f lib/googletest/CMakeFiles/gtest.dir/build.make lib/googletest/CMakeFiles/gtest.dir/build
+[binary-dir]/CMakeFiles/gtest.dir/all:
+	$(MAKE) -f [binary-dir]/CMakeFiles/gtest.dir/build.make [binary-dir]/CMakeFiles/gtest.dir/depend
+	$(MAKE) -f [binary-dir]/CMakeFiles/gtest.dir/build.make [binary-dir]/CMakeFiles/gtest.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles --progress-num=1,2 "Built target gtest"
-.PHONY : lib/googletest/CMakeFiles/gtest.dir/all
+.PHONY : [binary-dir]/CMakeFiles/gtest.dir/all
 
 # Include target in all.
-all: lib/googletest/CMakeFiles/gtest.dir/all
+all: [binary-dir]/CMakeFiles/gtest.dir/all
 
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-lib/googletest/CMakeFiles/gtest.dir/rule: cmake_check_build_system
+[binary-dir]/CMakeFiles/gtest.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 lib/googletest/CMakeFiles/gtest.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 [binary-dir]/CMakeFiles/gtest.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles 0
-.PHONY : lib/googletest/CMakeFiles/gtest.dir/rule
+.PHONY : [binary-dir]/CMakeFiles/gtest.dir/rule
 
 # Convenience name for target.
-gtest: lib/googletest/CMakeFiles/gtest.dir/rule
+gtest: [binary-dir]/CMakeFiles/gtest.dir/rule
 
 .PHONY : gtest
 
 # clean rule for target.
-lib/googletest/CMakeFiles/gtest.dir/clean:
-	$(MAKE) -f lib/googletest/CMakeFiles/gtest.dir/build.make lib/googletest/CMakeFiles/gtest.dir/clean
-.PHONY : lib/googletest/CMakeFiles/gtest.dir/clean
+[binary-dir]/CMakeFiles/gtest.dir/clean:
+	$(MAKE) -f [binary-dir]/CMakeFiles/gtest.dir/build.make [binary-dir]/CMakeFiles/gtest.dir/clean
+.PHONY : [binary-dir]/CMakeFiles/gtest.dir/clean
 
 # clean rule for target.
-clean: lib/googletest/CMakeFiles/gtest.dir/clean
+clean: [binary-dir]/CMakeFiles/gtest.dir/clean
 
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target lib/googletest/CMakeFiles/gtest_main.dir
+# Target rules for target [binary-dir]/CMakeFiles/gtest_main.dir
 
 # All Build rule for target.
-lib/googletest/CMakeFiles/gtest_main.dir/all: lib/googletest/CMakeFiles/gtest.dir/all
-	$(MAKE) -f lib/googletest/CMakeFiles/gtest_main.dir/build.make lib/googletest/CMakeFiles/gtest_main.dir/depend
-	$(MAKE) -f lib/googletest/CMakeFiles/gtest_main.dir/build.make lib/googletest/CMakeFiles/gtest_main.dir/build
+[binary-dir]/CMakeFiles/gtest_main.dir/all: [binary-dir]/CMakeFiles/gtest.dir/all
+	$(MAKE) -f [binary-dir]/CMakeFiles/gtest_main.dir/build.make [binary-dir]/CMakeFiles/gtest_main.dir/depend
+	$(MAKE) -f [binary-dir]/CMakeFiles/gtest_main.dir/build.make [binary-dir]/CMakeFiles/gtest_main.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles --progress-num=3,4 "Built target gtest_main"
-.PHONY : lib/googletest/CMakeFiles/gtest_main.dir/all
+.PHONY : [binary-dir]/CMakeFiles/gtest_main.dir/all
 
 # Include target in all.
-all: lib/googletest/CMakeFiles/gtest_main.dir/all
+all: [binary-dir]/CMakeFiles/gtest_main.dir/all
 
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-lib/googletest/CMakeFiles/gtest_main.dir/rule: cmake_check_build_system
+[binary-dir]/CMakeFiles/gtest_main.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles 4
-	$(MAKE) -f CMakeFiles/Makefile2 lib/googletest/CMakeFiles/gtest_main.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 [binary-dir]/CMakeFiles/gtest_main.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/erdos/gits/FYS3150/Project2/cpp/CMakeFiles 0
-.PHONY : lib/googletest/CMakeFiles/gtest_main.dir/rule
+.PHONY : [binary-dir]/CMakeFiles/gtest_main.dir/rule
 
 # Convenience name for target.
-gtest_main: lib/googletest/CMakeFiles/gtest_main.dir/rule
+gtest_main: [binary-dir]/CMakeFiles/gtest_main.dir/rule
 
 .PHONY : gtest_main
 
 # clean rule for target.
-lib/googletest/CMakeFiles/gtest_main.dir/clean:
-	$(MAKE) -f lib/googletest/CMakeFiles/gtest_main.dir/build.make lib/googletest/CMakeFiles/gtest_main.dir/clean
-.PHONY : lib/googletest/CMakeFiles/gtest_main.dir/clean
+[binary-dir]/CMakeFiles/gtest_main.dir/clean:
+	$(MAKE) -f [binary-dir]/CMakeFiles/gtest_main.dir/build.make [binary-dir]/CMakeFiles/gtest_main.dir/clean
+.PHONY : [binary-dir]/CMakeFiles/gtest_main.dir/clean
 
 # clean rule for target.
-clean: lib/googletest/CMakeFiles/gtest_main.dir/clean
+clean: [binary-dir]/CMakeFiles/gtest_main.dir/clean
 
 .PHONY : clean
 

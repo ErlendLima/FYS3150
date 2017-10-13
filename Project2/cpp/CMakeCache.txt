@@ -202,14 +202,17 @@ Project2_SOURCE_DIR:STATIC=/home/erdos/gits/FYS3150/Project2/cpp
 //Build all tests.
 TEST:BOOL=OFF
 
+//No help, variable specified on the command line.
+TESTS:UNINITIALIZED=TRUE
+
 //Value Computed by CMake
-gtest_BINARY_DIR:STATIC=/home/erdos/gits/FYS3150/Project2/cpp/lib/googletest
+gtest_BINARY_DIR:STATIC=/home/erdos/gits/FYS3150/Project2/cpp/[binary-dir]
 
 //Dependencies for the target
 gtest_LIB_DEPENDS:STATIC=general;-pthread;
 
 //Value Computed by CMake
-gtest_SOURCE_DIR:STATIC=/home/erdos/gits/FYS3150/Project2/cpp/lib/googletest
+gtest_SOURCE_DIR:STATIC=/home/erdos/gits/FYS3150/.lib/googletest
 
 //Build gtest's sample programs.
 gtest_build_samples:BOOL=OFF
@@ -257,7 +260,7 @@ CMAKE_CACHE_MAJOR_VERSION:INTERNAL=3
 //Minor version of cmake used to create the current loaded cache
 CMAKE_CACHE_MINOR_VERSION:INTERNAL=9
 //Patch version of cmake used to create the current loaded cache
-CMAKE_CACHE_PATCH_VERSION:INTERNAL=3
+CMAKE_CACHE_PATCH_VERSION:INTERNAL=4
 //ADVANCED property for variable: CMAKE_COLOR_MAKEFILE
 CMAKE_COLOR_MAKEFILE-ADVANCED:INTERNAL=1
 //Path to CMake executable.
