@@ -1,4 +1,7 @@
-# Project Three
+# Project Three 
+
+![Travis CI](https://travis-ci.org/Caronthir/FYS3150.svg?branch=master)
+
 <p align="center">
 <b><a href="#usage">Usage</a></b>
 |
@@ -9,6 +12,9 @@
 <b><a href="#license">License</a></b>
 </p>
 <br>
+
+
+<img height="700px" align="center" src="latex/figures/solarsys.png?raw=true">
 
 ## Usage (C++)
 The project is divided into source code and the written rapport. The source code
@@ -41,19 +47,10 @@ to compile the tests, type `cmake -Dtest=ON`. For actually running the tests, ru
 Better support for debugging and stricter compiler flags can be turned on using `cmake -DCMAKE_BUILD_TYPE=DEBUG`.
 
 ## Usage (Julia)
-The version of Julia required is 0.6.0, along with the packages PyPlot, LaTeXStrings and PyCall. If
-these are not available on your system, install them by running for example `Pkg.add("PyPlot")` in
-Julia's REPL.
+The version of Julia required is at least 0.6.0
 
-The most important files are `schroedinger.jl` and `jacobi.jl`. These are modules which implement Jacobi's
-algorithm and methods from solving the Hamiltonian with several potentials. These can be tested by running
-`julia test.jl`. The other scripts are only for
-plotting the results. `interactions.jl` plots two plots comparing the ground state and first excited state of
-one/two electrons which do and do not interact through the Coulomb force, `timejacobi.jl` runs
-the Jacobi algorithm several times, recording the time and memory taken and plots the result together
-with equivalent measurements from the C++ program, `wave.jl` creates a rather elegant visualization
-of the potentials and their solutions, and `omegas.jl` compares the eigenvalues for different
-oscillator frequencies with those given in the article of M. Taut.
+These can be tested by running
+`julia test.jl`.
 
 ## Credits
 The contributors of this project are Erlend Lima and Frederik Johan Mellbye.

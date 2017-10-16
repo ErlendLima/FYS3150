@@ -37,6 +37,8 @@ class Analyzer:
         plt.show()
         fig.savefig('../latex/figures/{}.eps'.format(savename),
                     dpi=1200)
+        fig.savefig('../latex/figures/{}.png'.format(savename),
+                    dpi=1200)
 
 
 
