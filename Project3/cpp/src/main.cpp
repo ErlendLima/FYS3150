@@ -5,9 +5,10 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include "solver.h"
+#include "planet.h"
+#include "solarSys.h"
 
 int main(int argc, char *argv[]) {
-  Solver solver;
   return 0;
 }
 

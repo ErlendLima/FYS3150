@@ -18,7 +18,7 @@ public:
   double kineticEnergy();
   double potentialEnergy(Planet &otherPlanet, double G, double eps);
 
-  // Properties
+private:
   double mass;
   double pos[3];
   double vel[3];

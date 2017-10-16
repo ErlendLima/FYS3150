@@ -3,32 +3,24 @@
 #include <chrono>
 #include <cmath>
 #include "solver.h"
+#include "solarSys.h"
+#include "planet.h"
+
+#define pi 3.141592653589793238462643383279502884197169
 
 using namespace std::placeholders;
 
-// Constructor
-Solver::Solver(){
-  saveFlag = false;  // Default to no save
-  tot_planets = 0;
-  radius      = 100;
-  tot_mass    = 0;
-  G = 4*M_PI*M_PI
-  std::cout << "Constructed Solver instance" << std::endl;
-}
-
-// Destructor
-Solver::~Solver(){};
-
-int Solver::solve(Method method, double time, ){
+int Solver::solve(Method method, unsigned int N, double dt){
   char identifier;
   switch (method){
     case Method::EULER:
       std::cout << "=== Simulating system with Euler's method ===" << std::endl;
-      // Call Euler method function
+      identifier = 'E';
+      solveEuler(N, dt);
     case Method::VERLET:
-      std::cout <<< "=== Simulating system with Velocity Verlet method ===" << std::endl;
-      // Call Verlet method function
+      std::cout << "=== Simulating system with Velocity Verlet method ===" << std::endl;
       identifier = 'V';
+      // Call Verlet method function
       break;
     default:
       std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
@@ -39,7 +31,13 @@ int Solver::solve(Method method, double time, ){
 }
 
 void Solver::solveEuler(unsigned int n, double dt){
-  std::cout << "NOT IMPLEMENTED :(" << std::endl;
+  // Loop over each planet, for each planet loop over other planets, find forces, sum em and forward equations
+
+}
+void Solver::initSystem(){
+  SolarSys sys;
+  sys.add(5.972e24 , 1., 0., 0., 0., 1., 0.); // Add planet 1
+  sys.add(1.9891e30, 0., 0., 0., 0., 0., 0.); // Add sun in center
 }
 
 void Solver::startTiming(){

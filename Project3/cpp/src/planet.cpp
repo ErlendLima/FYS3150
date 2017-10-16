@@ -31,9 +31,9 @@ double Planet::distance(Planet otherPlanet){
   y1 = pos[1];
   z1 = pos[2];
 
-  x2 = otherPlanet.position[0];
-  y2 = otherPlanet.position[1];
-  z2 = otherPlanet.position[2];
+  x2 = otherPlanet.pos[0];
+  y2 = otherPlanet.pos[1];
+  z2 = otherPlanet.pos[2];
 
   xx = x1-x2;
   yy = y1-y2;
@@ -50,5 +50,5 @@ double Planet::gravitationalForce(Planet otherPlanet, double G){
 
 double Planet::acceleration(Planet otherPlanet, double G){
   double r = distance(otherPlanet);
-  if(r!=0) return gravitationalForce(otherPlanet,G)/(mass*r) //TODO: IS THIS RIGHT?
+  if(r!=0) return gravitationalForce(otherPlanet,G)/(mass*r); //TODO: IS THIS RIGHT?
 }
