@@ -1,2 +1,0 @@
-language: julia
-script: julia julia/test.jl
