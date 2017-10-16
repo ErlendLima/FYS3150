@@ -7,9 +7,8 @@ mutable struct Vec3{T <: Real}
     y::T
     z::T
 end
-Vec3(x) = Vec3(x, x, x)
+Vec3(x::T) where {T<:Real} = Vec3(x, x, x)
 Vec3(a::Array{T, 2}) where {T} = Vec3(a[1], a[2], a[3])
-Vec3(v::Vec3) = v
 
 # Implemented basic arithmetic
 -(v1::Vec3, v2::Vec3) = Vec3(v1.x - v2.x,

@@ -4,16 +4,18 @@ include("celestial.jl")
 using ODESolver
 importall Vector3D
 importall Celestial
-pprint(x) = show(IOContext(STDOUT, limit=true), "text/plain", x)
+pprint(x) = show(IOContext(STDOUT, limit=false), "text/plain", x)
 
-N = 10
+N = 5000
 h = 1e-3
 earth = CelestialBody(N+1)
 sun = CelestialBody(N+1)
+jupiter = CelestialBody(N+1)
 init(earth, Vec3(1.1, 2.0, 3.0), Vec3(2.0), 1.0)
 init(sun, Vec3(0.0), Vec3(0.0), 1000.0)
+init(jupiter, [70.0 1.0 1.0], Vec3(0.5), 3.0)
 
-bodies = [sun earth]
+bodies = [sun earth jupiter]
 for n in 1:N
     for body in bodies
         for other in bodies
@@ -49,4 +51,7 @@ end
 #     x[i+1, :] = x[i, :] + v[i, :]*h
 # end
 
-writedlm("../data/test.txt", tomatrix(earth))
+
+# Do some black magic to convert the matrix to the correct size
+output = tomatrix.(bodies) |> x->hcat(x...)
+writedlm("../data/julia.txt", output)

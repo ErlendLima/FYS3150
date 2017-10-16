@@ -21,9 +21,16 @@ function init(body::CelestialBody{T}, pos::Vec3{T}, vel::Vec3{T}, mass::T) where
     body.mass = mass
 end
 
-init(body, pos, vel, mass) = init(body, Vec3(pos), Vec3(vel), mass)
+init(body, pos::T,         vel::T, mass)           where {T<:Real} = init(body, Vec3(pos), Vec3(vel), mass)
+init(body, pos::Array{T},  vel::Array{T, 2}, mass) where {T<:Real} = init(body, Vec3(pos), Vec3(vel), mass)
+init(body, pos::Array{T},  vel::Vec3{T}, mass)     where {T<:Real} = init(body, Vec3(pos), vel, mass)
+init(body, pos::T,         vel::Vec3{T}, mass)     where {T<:Real} = init(body, Vec3(pos), vel, mass)
+init(body, pos::Vec3{T},   vel::Array{T, 2}, mass) where {T<:Real} = init(body, pos,       Vec3(vel), mass)
+init(body, pos::Vec3{T},   vel::T, mass)           where {T<:Real} = init(body, pos,       Vec3(vel), mass)
 
-distance(self::CelestialBody, other::CelestialBody, n) = norm(self.pos[n]-other.pos[n])
+function distance(self::CelestialBody, other::CelestialBody, n)
+    norm(self.pos[n]-other.pos[n])
+end
 
 function tomatrix(body::CelestialBody)
     output = zeros(length(body.pos), 3)

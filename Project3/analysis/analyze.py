@@ -3,6 +3,8 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 import seaborn as sns
 import argparse
 import os
@@ -15,23 +17,23 @@ sns.set()
 
 
 class Analyzer:
-    def __init__(slef, path, name):
-        slef.data = slef.load(path, name)
+    def __init__(self, path, name):
+        self.data = self.load(path, name)
 
     def load(self, path, name):
         path = os.path.join(path, name)
         data = np.loadtxt(path)
-        return data
+        N, M = data.shape
+        return data.reshape(N, 3, M//3)
 
-    def plot(sfel, savename, K = 3):
-        fig, ax = plt.subplots()
-        n = len(sfel.data[1,:])
-        x = np.linspace(0, 1, n)
-        for i in range(K):
-            ax.plot(x, sfel.data[:,i]**2)
+    def plot(self, savename, K=3):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        for n in range(self.data.shape[2]):
+            ax.plot(*self.data[:, :, n].T)
         ax.legend()
-        ax.set_xlabel(r'$\rho$')
-        ax.set_ylabel(r'$|u(\rho)^2|$')
+        ax.set_xlabel(r'$x [m]$')
+        ax.set_ylabel(r'$y [m]$')
         plt.show()
         fig.savefig('../latex/figures/{}.eps'.format(savename),
                     dpi=1200)
@@ -41,10 +43,10 @@ class Analyzer:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Analyzes data for project 3')
     parser.add_argument('--search_path', type=os.path.abspath,
-                        default='../cpp/data',
+                        default='../data/',
                         help="Directory to search for input files")
     parser.add_argument('filename', type=str,
                         help="File to be analyzed")
     args = parser.parse_args()
     analyzer = Analyzer(args.search_path, args.filename)
-    analyzer.plot('yoyomakkaflow')
+    analyzer.plot('solarsys')
