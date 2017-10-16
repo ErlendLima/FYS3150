@@ -1,4 +1,4 @@
 language: julia
 env:
-  - TEST-DIR=Project3/julia
-script: cd $TEST-DIR && julia test.jl
+  - TEST_DIR=Project3/julia
+script: cd $TEST_DIR && julia test.jl
