@@ -1,31 +1,52 @@
 include("odesolver.jl")
+include("vector3d.jl")
+include("celestial.jl")
 using ODESolver
-
-
+importall Vector3D
+importall Celestial
 pprint(x) = show(IOContext(STDOUT, limit=true), "text/plain", x)
+
 N = 10
-x = zeros(N+1, 2)
-y = zeros(N+1, 2)
-vx = zeros(x)
-vy = zeros(y)
-# M⊙ = 2e30
-ME = 6e26
-rE = 1.5e11
-# GM⊙ = 4π^2 # [Au³/y²]
-# r(x) = norm(x)
-# a(x) = -4π^2x/r(x)^3
-h = 1.0
+h = 1e-3
+earth = CelestialBody(N+1)
+sun = CelestialBody(N+1)
+init(earth, Vec3(1.1, 2.0, 3.0), Vec3(2.0), 1.0)
+init(sun, Vec3(0.0), Vec3(0.0), 1000.0)
 
-x[1, :] = [0.0 1.0]
-v[1, :] = [0.0 0.5]
-
-for i in 1:N
-    r = norm(x[i, :])
-    a = -4π^2*x[i, :]/r^3
-    v[i+1, :] = v[i, :] + a*h
-    x[i+1, :] = x[i, :] + v[i, :]*h
+bodies = [sun earth]
+for n in 1:N
+    for body in bodies
+        for other in bodies
+            body ≡ other && continue
+            r = distance(body, other, n)
+            a = -4π^2*body.pos[n]/r^3
+            body.vel[n+1] = body.vel[n] + a*h
+            body.pos[n+1] = body.pos[n] + body.vel[n]*h
+        end
+    end
 end
 
-output = open("../data/test", "w")
-write(output, x)
-pprint(x)
+# x = zeros(N+1, n)
+# y = zeros(N+1, n)
+# vx = zeros(x)
+# vy = zeros(y)
+# # M⊙ = 2e30
+# ME = 6e26
+# rE = 1.5e11
+# # GM⊙ = 4π^2 # [Au³/y²]
+# # r(x) = norm(x)
+# # a(x) = -4π^2x/r(x)^3
+# h = 1.0
+
+# x[1, :] = [0.0 1.0]
+# v[1, :] = [0.0 0.5]
+
+# for i in 1:N
+#     for j in 1:n
+#     r = norm(x[i, :])
+#     a = -4π^2*x[i, :]/r^3
+#     v[i+1, :] = v[i, :] + a*h
+#     x[i+1, :] = x[i, :] + v[i, :]*h
+# end
+
+writedlm("../data/test.txt", tomatrix(earth))
