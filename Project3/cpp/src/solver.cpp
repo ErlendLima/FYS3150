@@ -43,10 +43,11 @@ void Solver::solveEuler(unsigned int n, double dt){
   for(unsigned int i = 0; i < n; i++){
     sys.modifyTime(static_cast<double>(i)*dt);
     // Loop over every planet
-    for(iter = sys.planets.begin(); iter != sys.planets.end(); iter++){
-      // Loop over every other planet for each planet
-      for(iter2 = sys.planets.begin(); iter2 != sys.planets.end(); iter2++){
-        if(iter == iter2){continue;}
+    for(auto & planet: sys.planets){
+        // Loop over every other planet for each planet
+        for(auto & other: sys.planets){
+            if(planet == other)
+                continue;
         else{
           std::cout << "hei" << std::endl;
         }
