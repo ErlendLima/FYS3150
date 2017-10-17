@@ -8,8 +8,6 @@
 
 #define pi 3.141592653589793238462643383279502884197169
 
-using namespace std::placeholders;
-
 int Solver::solve(Method method, unsigned int N, double dt){
   char identifier;
   switch (method){

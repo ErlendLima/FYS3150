@@ -10,7 +10,10 @@ public:
   Solver(){saveFlag = false;};
   virtual ~Solver(){};
   // Trenger man destructor her? Objekt blir vel slettet nar prog termineres uansett
-
+  // I vårt tilfelle, nei, vi trenger ikke en destructor, siden vi bare bruker minnetrygg kode.
+  // Hvis vi brukte manuell minneallokering uten en god destructor og objektene "døde"
+  // i programmets levetid, hadde programmet "reservert" mer og mer minne av operativsystemet
+  // sidene kadaverene fra de døde objektene fortsatt lå i minnet. 
   int solve(Method, unsigned int N, double dt);
   void solveEuler(unsigned int N, double dt);
   void solveVerlet(unsigned int N, double dt);

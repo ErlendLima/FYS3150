@@ -17,4 +17,8 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-//KLASSE FOR SOLVER, KLASSE FOR OBJEKTER (Planet, stjerne, osv), KLASSE FOR FELLES I ODE SOLVER
+/* KLASSE FOR SOLVER,
+   KLASSE FOR OBJEKTER (Planet, stjerne, osv),
+   KLASSE FOR FELLES I ODE SOLVER
+*/
+//Nesten et pent lite dikt :)
