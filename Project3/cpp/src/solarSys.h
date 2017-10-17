@@ -21,6 +21,10 @@ public:
   void add(double M, double x0, double y0, double z0,
                     double vx0, double vy0, double vz0);
   std::vector<std::shared_ptr<Planet>> planets; // Pointers to planet instances
+
+  void modifyTime(double newTime){time = newTime;};
+  void incrementTime(double dt){time += dt;};
+  double getTime(){return time;}
 private:
   double time    = 0.0;
   const double G = 4*pi*pi;
