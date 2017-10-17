@@ -33,31 +33,36 @@ int Solver::solve(Method method, unsigned int N, double dt){
 }
 
 void Solver::solveEuler(unsigned int n, double dt){
+  sys.modifyTime(0.0);
+  double Fx;
+  double Fy;
+  double Fz;
+
   std::vector<std::shared_ptr<Planet>>::iterator iter;
   std::vector<std::shared_ptr<Planet>>::iterator iter2;
 
-  int i = 0;
-  // Loop over every planet
-  for(iter = sys.planets.begin(); iter != sys.planets.end(); iter++){
-    std::cout << "Planet: " << i << std::endl;
-    i++;
-    int j = 0;
-    // Loop over every other planet for each planet
-    for(iter2 = sys.planets.begin(); iter2 != sys.planets.end(); iter2++){
-      if(iter == iter2){j++; continue;}
-      else{
-        std::cout << "Other planet is planet: " << j << std::endl;
-        j++;
-        std::cout << "Distance is " << (*iter)->distance(**iter2) << std::endl;
+  // Loop over time
+  for(unsigned int i = 0; i < n; i++){
+    sys.modifyTime(static_cast<double>(i)*dt);
+    // Loop over every planet
+    for(iter = sys.planets.begin(); iter != sys.planets.end(); iter++){
+      // Loop over every other planet for each planet
+      for(iter2 = sys.planets.begin(); iter2 != sys.planets.end(); iter2++){
+        if(iter == iter2){continue;}
+        else{
+          std::cout << "hei" << std::endl;
         }
+      // Forward velocity and position
       }
+    }
+    std::cout << sys.getTime() << std::endl;
   }
 }
 
 void Solver::initSystem(){
-  sys.add(5.972e24 , 1., 0., 0., 0., 1., 0.); // Add planet 1
-  sys.add(1.9891e30, 0., 0., 0., 0., 0., 0.); // Add sun in center
-  sys.add(2.3213e10, 0., 0., 31., 0.0, 0.0, 0.0);
+  sys.add(5.972e24 , 1.0, 0.0, 0.0, 0.0, 1.0, 0.0); // Add planet 1
+  sys.add(1.9891e30, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); // Add sun in center
+  sys.add(2.3213e10, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0);
 }
 
 void Solver::startTiming(){
