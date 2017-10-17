@@ -51,4 +51,5 @@ double Planet::gravitationalForce(Planet otherPlanet, double G){
 double Planet::acceleration(Planet otherPlanet, double G){
   double r = distance(otherPlanet);
   if(r!=0) return gravitationalForce(otherPlanet,G)/(mass*r); //TODO: IS THIS RIGHT?
+  else return 0;
 }

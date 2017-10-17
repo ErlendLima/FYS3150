@@ -20,8 +20,8 @@ public:
   void add(std::shared_ptr<Planet> planet) {planets.push_back(planet);};
   void add(double M, double x0, double y0, double z0,
                     double vx0, double vy0, double vz0);
-private:
   std::vector<std::shared_ptr<Planet>> planets; // Pointers to planet instances
+private:
   double time    = 0.0;
   const double G = 4*pi*pi;
 };

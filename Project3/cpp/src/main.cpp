@@ -9,6 +9,11 @@
 #include "solarSys.h"
 
 int main(int argc, char *argv[]) {
+  Solver solver;
+  Method method = Method::EULER;
+  unsigned int N = 10;
+  double dt = 0.1;
+  solver.solve(method, N, dt);
   return 0;
 }
 

@@ -15,7 +15,7 @@ public:
   double distance(Planet otherPlanet);
   double gravitationalForce(Planet otherPlanet, double G);
   double acceleration(Planet otherPlanet, double G);
-  double kineticEnergy();
+  double kineticEnergy(){return kinetic;};
   double potentialEnergy(Planet &otherPlanet, double G, double eps);
 
 private:

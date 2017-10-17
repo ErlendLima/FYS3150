@@ -25,6 +25,8 @@ private:
   std::chrono::high_resolution_clock::time_point startWallTime;
   clock_t startCPUTime;
 
+  SolarSys sys;
+
   void startTiming();
   void endTiming();
 };

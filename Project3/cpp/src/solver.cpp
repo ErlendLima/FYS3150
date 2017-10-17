@@ -16,7 +16,9 @@ int Solver::solve(Method method, unsigned int N, double dt){
     case Method::EULER:
       std::cout << "=== Simulating system with Euler's method ===" << std::endl;
       identifier = 'E';
+      initSystem();
       solveEuler(N, dt);
+      break;
     case Method::VERLET:
       std::cout << "=== Simulating system with Velocity Verlet method ===" << std::endl;
       identifier = 'V';
@@ -31,13 +33,31 @@ int Solver::solve(Method method, unsigned int N, double dt){
 }
 
 void Solver::solveEuler(unsigned int n, double dt){
-  // Loop over each planet, for each planet loop over other planets, find forces, sum em and forward equations
+  std::vector<std::shared_ptr<Planet>>::iterator iter;
+  std::vector<std::shared_ptr<Planet>>::iterator iter2;
 
+  int i = 0;
+  // Loop over every planet
+  for(iter = sys.planets.begin(); iter != sys.planets.end(); iter++){
+    std::cout << "Planet: " << i << std::endl;
+    i++;
+    int j = 0;
+    // Loop over every other planet for each planet
+    for(iter2 = sys.planets.begin(); iter2 != sys.planets.end(); iter2++){
+      if(iter == iter2){j++; continue;}
+      else{
+        std::cout << "Other planet is planet: " << j << std::endl;
+        j++;
+        std::cout << "Distance is " << (*iter)->distance(**iter2) << std::endl;
+        }
+      }
+  }
 }
+
 void Solver::initSystem(){
-  SolarSys sys;
   sys.add(5.972e24 , 1., 0., 0., 0., 1., 0.); // Add planet 1
   sys.add(1.9891e30, 0., 0., 0., 0., 0., 0.); // Add sun in center
+  sys.add(2.3213e10, 0., 0., 31., 0.0, 0.0, 0.0);
 }
 
 void Solver::startTiming(){
