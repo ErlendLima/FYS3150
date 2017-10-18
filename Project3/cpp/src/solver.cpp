@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <ctime>
 #include <chrono>
 #include <cmath>
@@ -38,7 +39,8 @@ void Solver::solveEuler(unsigned int n, double dt){
 
   // Setup array to save positions
   double positions[3][sys.n_planets][n] = {0.0};
-
+  // std::array<std::array<vec3,sys.n_planets>, n/10> positions;
+  startTiming();
   // Loop over time
   for(unsigned int i = 0; i < n; i++){
     t = (static_cast<double>(i)*dt);
@@ -56,17 +58,41 @@ void Solver::solveEuler(unsigned int n, double dt){
             }
         }
     }
-    // Forward positions after calculating accelerations
+    // Forward planet position after calculating accelerations
+    unsigned int j = 0;
     for(auto & planet: sys.planets){
       planet->vel += planet->acc*dt;
       planet->pos += planet->vel*dt;
+
+      // if(i % saveeach == 0){
+      positions[0][j][i] = planet->pos[0];
+      positions[1][j][i] = planet->pos[1];
+      positions[2][j][i] = planet->pos[2];
+      // }
+      j++;
+    }
+}
+  endTiming();
+
+  std::ofstream myfile;
+  myfile.open("../data/cpp.txt");
+  // Loop over time points
+  for(unsigned int i = 0; i < n; i++){
+    // Loop over planets
+    for(unsigned int j = 0; j < sys.n_planets; j++){
+      myfile << positions[0][j][i] << " ";
+      myfile << positions[1][j][i] << " ";
+      myfile << positions[2][j][i] << " ";
+      if(j == sys.n_planets-1){
+        myfile << "\n";}
     }
   }
+  myfile.close();
 }
 
 void Solver::initSystem(){
-  sys.add(3.0e-6, 1.0, 0.0, 0.0, 0.0, 2*pi, 0.0); // Add planet earth
   sys.add(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); // Add sun in center
+  sys.add(3.0e-6, 1.0, 0.0, 0.0, 0.0, 2*pi, 0.0); // Add planet earth
 }
 
 void Solver::startTiming(){

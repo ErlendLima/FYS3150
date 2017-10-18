@@ -12,8 +12,8 @@
 int main(int argc, char *argv[]) {
   Solver solver;
   Method method = Method::EULER; // Define method
-  unsigned int N = 1000;          // Simulate 365 days
-  double dt = 1.0/1000.0;           // Step size one day
+  unsigned int N = 50;          // Simulate 365 days
+  double dt = 1.0/50.0;           // Step size one day
   solver.solve(method, N, dt);
   return 0;
 }
