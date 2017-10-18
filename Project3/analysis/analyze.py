@@ -4,14 +4,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
 import seaborn as sns
 import argparse
 import os
-from glob import glob
-import re
-from tabulate import tabulate
-import operator
 
 sns.set()
 
@@ -24,13 +19,16 @@ class Analyzer:
         path = os.path.join(path, name)
         data = np.loadtxt(path)
         N, M = data.shape
-        return data.reshape(N, 3, M//3)
+        return data.reshape(N, 3, M//3, order='F')
 
     def plot(self, savename, K=3):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         for n in range(self.data.shape[2]):
-            ax.plot(*self.data[:, :, n].T)
+            ax.plot(*self.data[:, :, n].T, 'o')
+            # ax.plot(xs=self.data[:, 0, n],
+            #         ys=self.data[:, 1, n],
+            #         zs=self.data[:, 2, n])
         ax.legend()
         ax.set_xlabel(r'$x [m]$')
         ax.set_ylabel(r'$y [m]$')

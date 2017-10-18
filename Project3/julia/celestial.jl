@@ -1,12 +1,16 @@
 module Celestial
-export CelestialBody, distance, init, tomatrix
+export CelestialBody, distance, init, tomatrix, show
 include("vector3d.jl")
+import Base: show
 import Vector3D: Vec3, +, -, *, \, norm, tomatrix
 
 mutable struct CelestialBody{T}
     pos::Vector{Vec3{T}}
     vel::Vector{Vec3{T}}
     mass::T
+    # CelestialBody{T}(position::Vector{Vec3{T}},
+    #                  velocity::Vector{Vec3{T}},
+    #                  mass::T) where{T} = new(position, velocity, mass, zero(mass))
 end
 
 function CelestialBody(N::Number)
@@ -29,7 +33,7 @@ init(body, pos::Vec3{T},   vel::Array{T, 2}, mass) where {T<:Real} = init(body, 
 init(body, pos::Vec3{T},   vel::T, mass)           where {T<:Real} = init(body, pos,       Vec3(vel), mass)
 
 function distance(self::CelestialBody, other::CelestialBody, n)
-    norm(self.pos[n]-other.pos[n])
+    norm(other.pos[n] - self.pos[n])
 end
 
 function tomatrix(body::CelestialBody)
@@ -39,5 +43,9 @@ function tomatrix(body::CelestialBody)
     end
     output
 end
+
+
+pprint(x) = show(IOContext(STDOUT, limit=false), "text/plain", x)
+show(body::CelestialBody) = pprint(body.mass)
 
 end
