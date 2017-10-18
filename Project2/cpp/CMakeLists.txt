@@ -61,7 +61,7 @@ if (TESTS)
   endif (APPLE)
 
   # This adds another subdirectory, which has 'project(googletest)'.
-  add_subdirectory(../../.lib/googletest [binary-dir])
+  add_subdirectory(../../googletest [binary-dir])
 
   enable_testing()
 
