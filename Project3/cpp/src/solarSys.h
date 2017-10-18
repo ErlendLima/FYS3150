@@ -6,8 +6,10 @@
 #include <vector>
 #include <cmath>
 #include "planet.h"
+#include "Vec3/vec3.h"
 
-#define pi 3.141592653589793238462643383279502884197169
+#define pi 3.141592653589793238462643
+#define G 39.47841760435743447533796399950460454125479762896316250565
 
 // class Planet;
 
@@ -20,14 +22,8 @@ public:
   void add(std::shared_ptr<Planet> planet) {planets.push_back(planet);};
   void add(double M, double x0, double y0, double z0,
                     double vx0, double vy0, double vz0);
-  std::vector<std::shared_ptr<Planet>> planets; // Pointers to planet instances
-
-  void modifyTime(double newTime){time = newTime;};
-  void incrementTime(double dt){time += dt;};
-  double getTime(){return time;}
-private:
-  double time    = 0.0;
-  const double G = 4*pi*pi;
+  std::vector<std::shared_ptr<Planet>> planets; // Pointers to planet instance
+  unsigned int n_planets = 0;
 };
 
 #endif /* SOLARSYS_H */

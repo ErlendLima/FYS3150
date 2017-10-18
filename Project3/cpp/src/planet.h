@@ -2,6 +2,7 @@
 #define PLANET_H
 #include <cmath>
 #include <vector>
+#include "Vec3/vec3.h"
 using std::vector;
 
 class Planet
@@ -17,11 +18,13 @@ public:
   double acceleration(Planet otherPlanet, double G);
   double kineticEnergy(){return kinetic;};
   double potentialEnergy(Planet &otherPlanet, double G, double eps);
+  void resetAcc();
+  double mass;
+  vec3 pos;
+  vec3 vel;
+  vec3 acc;
 
 private:
-  double mass;
-  double pos[3];
-  double vel[3];
   double potential;
   double kinetic;
 };

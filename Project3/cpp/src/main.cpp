@@ -7,12 +7,13 @@
 #include "solver.h"
 #include "planet.h"
 #include "solarSys.h"
+#include "Vec3/vec3.h"
 
 int main(int argc, char *argv[]) {
   Solver solver;
-  Method method = Method::EULER;
-  unsigned int N = 10;
-  double dt = 0.1;
+  Method method = Method::EULER; // Define method
+  unsigned int N = 1000;          // Simulate 365 days
+  double dt = 1.0/1000.0;           // Step size one day
   solver.solve(method, N, dt);
   return 0;
 }

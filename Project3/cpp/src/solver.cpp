@@ -5,8 +5,10 @@
 #include "solver.h"
 #include "solarSys.h"
 #include "planet.h"
+#include "Vec3/vec3.h"
 
 #define pi 3.141592653589793238462643383279502884197169
+#define G 39.47841760435743447533796399950460454125479762896316250565
 
 int Solver::solve(Method method, unsigned int N, double dt){
   char identifier;
@@ -31,37 +33,40 @@ int Solver::solve(Method method, unsigned int N, double dt){
 }
 
 void Solver::solveEuler(unsigned int n, double dt){
-  sys.modifyTime(0.0);
-  double Fx;
-  double Fy;
-  double Fz;
+  double t = 0.0;
+  vec3 diff;
 
-  std::vector<std::shared_ptr<Planet>>::iterator iter;
-  std::vector<std::shared_ptr<Planet>>::iterator iter2;
+  // Setup array to save positions
+  double positions[3][sys.n_planets][n] = {0.0};
 
   // Loop over time
   for(unsigned int i = 0; i < n; i++){
-    sys.modifyTime(static_cast<double>(i)*dt);
-    // Loop over every planet
+    t = (static_cast<double>(i)*dt);
+    // Loop over every planet to find acceleration of each planet
     for(auto & planet: sys.planets){
-        // Loop over every other planet for each planet
+        planet->resetAcc();
+        // Loop over all the other planets
         for(auto & other: sys.planets){
-            if(planet == other)
-                continue;
-        else{
-          std::cout << "hei" << std::endl;
+            if(planet == other){
+              continue;
+            }
+            else{
+              diff = other->pos - planet->pos;
+              planet->acc += diff*G*(other->mass)/pow(diff.length(),3);
+            }
         }
-      // Forward velocity and position
-      }
     }
-    std::cout << sys.getTime() << std::endl;
+    // Forward positions after calculating accelerations
+    for(auto & planet: sys.planets){
+      planet->vel += planet->acc*dt;
+      planet->pos += planet->vel*dt;
+    }
   }
 }
 
 void Solver::initSystem(){
-  sys.add(5.972e24 , 1.0, 0.0, 0.0, 0.0, 1.0, 0.0); // Add planet 1
-  sys.add(1.9891e30, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); // Add sun in center
-  sys.add(2.3213e10, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0);
+  sys.add(3.0e-6, 1.0, 0.0, 0.0, 0.0, 2*pi, 0.0); // Add planet earth
+  sys.add(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); // Add sun in center
 }
 
 void Solver::startTiming(){
