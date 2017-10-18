@@ -3,4 +3,10 @@ julia:
   - 0.6
 env:
   - TEST_DIR=Project3/julia
+git:
+  submodules: false
+# Use sed to replace the SSH URL with the public URL, then initialize submodules
+before_install:
+    - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+    - git submodule update --init --recursive
 script: cd $TEST_DIR && julia test.jl

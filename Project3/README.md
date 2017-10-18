@@ -39,8 +39,15 @@ The rapport and all supporting material is located in the `latex` directory.
 The document is compatible with PdfLaTeX, LuaTeX and XeLaTeX.
 
 ## Testing (C++)
-The framework [Google Test](https://github.com/google/googletest) is used to write unit tests.
-This is fully integrated into CMake, making it easy to both add and run the tests. In order
+The framework [Google Test](https://github.com/google/googletest) is used to write unit tests. Google test is
+imported as git submodule. To make it work, type
+
+```console
+git submodule init
+git submodule update
+```
+
+Google test is fully integrated into CMake, making it easy to both add and run the tests. In order
 to compile the tests, type `cmake -Dtest=ON`. For actually running the tests, run `./runUnitTests` or
 `make test`.
 
