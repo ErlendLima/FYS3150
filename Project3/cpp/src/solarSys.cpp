@@ -1,9 +1,9 @@
 #include "solarSys.h"
+#include <string>
 
-void SolarSys::add(double M, double x0, double y0, double z0,
-                       double vx0, double vy0, double vz0)
+void SolarSys::add(std::string name, double M, vec3 pos, vec3 vel, unsigned int n)
 {
-  std::shared_ptr<Planet> planet = std::make_shared<Planet>(M, x0, y0, z0, vx0, vy0, vz0);
+  std::shared_ptr<Planet> planet = std::make_shared<Planet>(name, M, pos, vel,n);
   add(planet);
   n_planets++;
 }

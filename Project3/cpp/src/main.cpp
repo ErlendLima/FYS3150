@@ -10,16 +10,13 @@
 #include "Vec3/vec3.h"
 
 int main(int argc, char *argv[]) {
+  Method method = Method::VERLET; // Define method
+  unsigned int N_peryear = 1000;  // Steps per year
+  double years           = 2;     // Number of years to sim
+  unsigned int N         = static_cast<unsigned int>(years*N_peryear);
+  double dt              = 1.0/N_peryear;
   Solver solver;
-  Method method = Method::EULER; // Define method
-  unsigned int N = 50;          // Simulate 365 days
-  double dt = 1.0/50.0;           // Step size one day
+  solver.doSave(true);
   solver.solve(method, N, dt);
   return 0;
 }
-
-/* KLASSE FOR SOLVER,
-   KLASSE FOR OBJEKTER (Planet, stjerne, osv),
-   KLASSE FOR FELLES I ODE SOLVER
-*/
-//Nesten et pent lite dikt :)

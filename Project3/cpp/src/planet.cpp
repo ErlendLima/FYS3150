@@ -1,51 +1,46 @@
 #include "planet.h"
-#include "Vec3/vec3.h"
 
-Planet::Planet(){
-  mass      = 1.;
-  pos[0]    = 1.;
-  pos[1]    = 0.;
-  pos[2]    = 0.;
-  vel[0]    = 0.;
-  vel[1]    = 0.;
-  vel[2]    = 0.;
-  potential = 0.;
-  kinetic   = 0.;
-}
+#define G 39.478417604357434475337963
 
-Planet::Planet(double M, double x0, double y0, double z0, double vx0, double vy0, double vz0){
-  mass = M;
-  pos[0] = x0;
-  pos[1] = y0;
-  pos[2] = z0;
-  vel[0] = vx0;
-  vel[1] = vy0;
-  vel[2] = vz0;
-  potential = 0.;
-  kinetic = 0.;
+Planet::Planet(const std::string& namme, double M, vec3 pos0, vec3 vel0, unsigned int n)
+:name(namme), mass(M), pos(pos0), vel(vel0)
+{
+  pos_array = arma::zeros(3, n);
+  pos_array(0,0) = pos0(0);
+  pos_array(1,0) = pos0(1);
+  pos_array(2,0) = pos0(2);
 }
 
 double Planet::distance(Planet otherPlanet){
   vec3 diff;
   diff = otherPlanet.pos - pos;
-
   return diff.length();
 }
 
-double Planet::gravitationalForce(Planet otherPlanet, double G){
-  double r = distance(otherPlanet);
-  if(r!=0) return G*mass*otherPlanet.mass/(r*r);
-  else return 0;
+void Planet::force(Planet otherPlanet){
+  vec3 diff = otherPlanet.pos - pos;
+  F = diff*G*mass*otherPlanet.mass/(pow(distance(otherPlanet),3));
 }
 
-double Planet::acceleration(Planet otherPlanet, double G){
-  double r = distance(otherPlanet);
-  if(r!=0) return gravitationalForce(otherPlanet,G)/(mass); //TODO: IS THIS RIGHT?
-  else return 0;
+void Planet::calculateAcc(Planet otherPlanet){
+  force(otherPlanet);
+  acc += F/mass;
 }
 
 void Planet::resetAcc(){
   acc[0] = 0.0;
   acc[1] = 0.0;
   acc[2] = 0.0;
+}
+
+void Planet::resetF(){
+  F[0] = 0.0;
+  F[1] = 0.0;
+  F[2] = 0.0;
+}
+
+void Planet::writePosToMat(unsigned int i){
+  pos_array(0,i) = pos[0];
+  pos_array(1,i) = pos[1];
+  pos_array(2,i) = pos[2];
 }
