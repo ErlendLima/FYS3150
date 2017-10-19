@@ -25,7 +25,7 @@ class Analyzer:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         for n in range(self.data.shape[2]):
-            ax.plot(*self.data[:, :, n].T, 'o')
+            ax.plot(*self.data[:, :, n].T)
             # ax.plot(xs=self.data[:, 0, n],
             #         ys=self.data[:, 1, n],
             #         zs=self.data[:, 2, n])
