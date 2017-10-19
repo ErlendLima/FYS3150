@@ -3,96 +3,112 @@
 #include <ctime>
 #include <chrono>
 #include <cmath>
+#include <memory>
+#include <armadillo>
 #include "solver.h"
 #include "solarSys.h"
 #include "planet.h"
 #include "Vec3/vec3.h"
 
-#define pi 3.141592653589793238462643383279502884197169
-#define G 39.47841760435743447533796399950460454125479762896316250565
+#define G 39.478417604357434475337963
 
-int Solver::solve(Method method, unsigned int N, double dt){
+using std::placeholders::_1;
+
+int Solver::solve(Method method, unsigned int N, double timestep){
+  n = N;
+  dt = timestep;
+  initSystem();
+
   char identifier;
+
+  // Holds step function for the chosen method
+  std::function<void(std::shared_ptr<Planet>)> stepper;
   switch (method){
     case Method::EULER:
       std::cout << "=== Simulating system with Euler's method ===" << std::endl;
       identifier = 'E';
-      initSystem();
-      solveEuler(N, dt);
+      stepper = std::bind(&Solver::EulerStep, this, _1);
       break;
     case Method::VERLET:
       std::cout << "=== Simulating system with Velocity Verlet method ===" << std::endl;
       identifier = 'V';
-      // Call Verlet method function
+      stepper = std::bind(&Solver::VerletStep, this, _1);
       break;
     default:
       std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
       return -1;
     }
-    // Save to file?
+    solveSystem(stepper);
+    if(saveFlag) saveToFile();
     return 0;
 }
 
-void Solver::solveEuler(unsigned int n, double dt){
+void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
   double t = 0.0;
-  vec3 diff;
 
-  // Setup array to save positions
-  double positions[3][sys.n_planets][n] = {0.0};
-  // std::array<std::array<vec3,sys.n_planets>, n/10> positions;
   startTiming();
   // Loop over time
-  for(unsigned int i = 0; i < n; i++){
-    t = (static_cast<double>(i)*dt);
+  for(unsigned int i = 1; i <= n; i++){
     // Loop over every planet to find acceleration of each planet
     for(auto & planet: sys.planets){
-        planet->resetAcc();
-        // Loop over all the other planets
-        for(auto & other: sys.planets){
-            if(planet == other){
-              continue;
-            }
-            else{
-              diff = other->pos - planet->pos;
-              planet->acc += diff*G*(other->mass)/pow(diff.length(),3);
-            }
-        }
+      if(planet->name == "Sun") continue;
+      planet->resetAcc();
+      planet->resetF();
+
+      // Loop over all the other planets
+      for(auto & other: sys.planets){
+          if(planet == other)continue;
+          else{
+            planet->accp = planet->acc;
+            planet->calculateAcc(*other);
+          }
+      }
     }
-    // Forward planet position after calculating accelerations
-    unsigned int j = 0;
+    // Forward planet positions in time with method of choice
     for(auto & planet: sys.planets){
-      planet->vel += planet->acc*dt;
-      planet->pos += planet->vel*dt;
-
-      // if(i % saveeach == 0){
-      positions[0][j][i] = planet->pos[0];
-      positions[1][j][i] = planet->pos[1];
-      positions[2][j][i] = planet->pos[2];
-      // }
-      j++;
+      stepper(planet);
+      planet->writePosToMat(i);
     }
-}
-  endTiming();
-
-  std::ofstream myfile;
-  myfile.open("../data/cpp.txt");
-  // Loop over time points
-  for(unsigned int i = 0; i < n; i++){
-    // Loop over planets
-    for(unsigned int j = 0; j < sys.n_planets; j++){
-      myfile << positions[0][j][i] << " ";
-      myfile << positions[1][j][i] << " ";
-      myfile << positions[2][j][i] << " ";
-      if(j == sys.n_planets-1){
-        myfile << "\n";}
-    }
+    t = i*dt;
   }
-  myfile.close();
+  endTiming();
 }
 
 void Solver::initSystem(){
-  sys.add(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0); // Add sun in center
-  sys.add(3.0e-6, 1.0, 0.0, 0.0, 0.0, 2*pi, 0.0); // Add planet earth
+  sys.add("Sun", 1.0, vec3(), vec3(), n); // Add sun in center
+  sys.add("Earth", 3.0e-6, vec3(1.0, 0.0, 0.0), vec3(0.0, 2*pi, 0.0), n); // Add planet earth
+}
+
+void Solver::EulerStep(std::shared_ptr<Planet> planet){
+  planet->vel += planet->acc*dt;
+  planet->pos += planet->vel*dt;
+
+  planet->updateKinetic();
+}
+void Solver::VerletStep(std::shared_ptr<Planet> planet){
+  planet->pos += planet->vel + dt*dt*planet->acc/2;
+  planet->vel += dt*(planet->acc + planet->accp)/2;
+
+  planet->updateKinetic();
+}
+
+void Solver::saveToFile(){
+  std::ofstream myfile;
+  myfile.open(savepath + "/cpp.txt");
+  // Loop over time points
+  for(unsigned int i = 0; i < n; i++){
+    // Loop over planets
+    unsigned int j = 0;
+    for(auto & planet: sys.planets){
+      myfile << planet->pos_array(0,i) << " ";
+      myfile << planet->pos_array(1,i) << " ";
+      myfile << planet->pos_array(2,i) << " ";
+      if(j == sys.n_planets-1){
+        myfile << "\n";}
+      j++;
+    }
+  }
+  myfile.close();
 }
 
 void Solver::startTiming(){

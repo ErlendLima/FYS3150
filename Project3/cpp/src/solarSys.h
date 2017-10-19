@@ -9,7 +9,7 @@
 #include "Vec3/vec3.h"
 
 #define pi 3.141592653589793238462643
-#define G 39.47841760435743447533796399950460454125479762896316250565
+#define G 39.478417604357434475337963
 
 // class Planet;
 
@@ -20,8 +20,7 @@ public:
   virtual ~SolarSys(){};
   // Add planet to solar system. Can take pointer or args.
   void add(std::shared_ptr<Planet> planet) {planets.push_back(planet);};
-  void add(double M, double x0, double y0, double z0,
-                    double vx0, double vy0, double vz0);
+  void add(std::string, double M, vec3 pos, vec3 vel, unsigned int n);
   std::vector<std::shared_ptr<Planet>> planets; // Pointers to planet instance
   unsigned int n_planets = 0;
 };
