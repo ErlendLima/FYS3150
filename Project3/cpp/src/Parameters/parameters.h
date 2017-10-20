@@ -25,8 +25,8 @@ public:
     void checkVersion();
 
 
-private:
-    void constructMap();
+protected:
+    virtual void constructMap();
     std::ifstream m_infileParameters;
     std::map<std::string, std::unique_ptr<Parameter<int>>> m_intparams;
     std::map<std::string, std::unique_ptr<Parameter<std::string>>> m_stringparams;
