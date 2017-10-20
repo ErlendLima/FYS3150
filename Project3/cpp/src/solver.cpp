@@ -36,6 +36,11 @@ int Solver::solve(Method method, unsigned int N, double timestep){
       // stepper = std::bind(&Solver::VerletStep, this, _1);
       solveSystemVV();
       break;
+    case Method::EULERCROMER:
+      std::cout << "=== Simulating system with Euler-Cromer's method ===" << std::endl;
+      identifier = 'C';
+      stepper = std::bind(&Solver::ECStep, this, _1);
+      break;
     default:
       std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
       return -1;
@@ -104,12 +109,18 @@ void Solver::EulerStep(std::shared_ptr<Planet> planet){
   planet->vel    += planet->acc*dt;
   planet->pos    += planet->vel_tmp*dt;
 }
+
 void Solver::VerletStep1(std::shared_ptr<Planet> planet){
   planet->pos += planet->vel*dt + 0.5*dt*dt*planet->acc;
 }
 void Solver::VerletStep2(std::shared_ptr<Planet> planet){
     planet->vel += 0.5*dt*(planet->acc + planet->acc_prev);
+
+void Solver::ECStep(std::shared_ptr<Planet> planet){
+  planet->vel += planet->acc*dt;
+  planet->pos += planet->vel*dt;
 }
+
 
 void Solver::saveToFile(){
   std::ofstream myfile;
