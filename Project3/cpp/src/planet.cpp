@@ -5,10 +5,10 @@
 Planet::Planet(const std::string& namme, double M, vec3 pos0, vec3 vel0, unsigned int n)
 :name(namme), mass(M), pos(pos0), vel(vel0)
 {
-  pos_array = arma::zeros(3, n);
-  pos_array(0,0) = pos0(0);
-  pos_array(1,0) = pos0(1);
-  pos_array(2,0) = pos0(2);
+  pos_array = arma::zeros(3, n+1);
+  pos_array(0,0) = pos(0);
+  pos_array(1,0) = pos(1);
+  pos_array(2,0) = pos(2);
 }
 
 double Planet::distance(Planet otherPlanet){
