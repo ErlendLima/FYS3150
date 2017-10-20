@@ -27,6 +27,10 @@ void Planet::calculateAcc(Planet otherPlanet){
   acc += F/mass;
 }
 
+double Planet::potentialEnergy(Planet otherPlanet){
+  return -G*mass*otherPlanet.mass/distance(otherPlanet);
+}
+
 void Planet::resetAcc(){
   acc[0] = 0.0;
   acc[1] = 0.0;
