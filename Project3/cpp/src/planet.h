@@ -29,8 +29,9 @@ public:
   double mass;
   vec3 pos;
   vec3 vel;
+  vec3 vel_tmp;
   vec3 acc;
-  vec3 accp;
+  vec3 acc_tmp;
   vec3 F;
   arma::mat pos_array;
 

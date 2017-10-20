@@ -52,6 +52,7 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
     // Loop over every planet to find acceleration of each planet
     for(auto & planet: sys.planets){
       if(planet->name == "Sun") continue;
+      // planet->acc_tmp = planet->acc;
       planet->resetAcc();
       planet->resetF();
 
@@ -59,7 +60,6 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
       for(auto & other: sys.planets){
           if(planet == other)continue;
           else{
-            planet->accp = planet->acc;
             planet->calculateAcc(*other);
           }
       }
@@ -67,6 +67,7 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
     // Forward planet positions in time with method of choice
     for(auto & planet: sys.planets){
       stepper(planet);
+      planet->updateKinetic();
       planet->writePosToMat(i);
     }
     t = i*dt;
@@ -80,16 +81,13 @@ void Solver::initSystem(){
 }
 
 void Solver::EulerStep(std::shared_ptr<Planet> planet){
-  planet->vel += planet->acc*dt;
-  planet->pos += planet->vel*dt;
-
-  planet->updateKinetic();
+  planet->vel_tmp = planet->vel;   // Save velocity temporarily for Euler
+  planet->vel    += planet->acc*dt;
+  planet->pos    += planet->vel_tmp*dt;
 }
 void Solver::VerletStep(std::shared_ptr<Planet> planet){
-  planet->pos += planet->vel + dt*dt*planet->acc/2;
-  planet->vel += dt*(planet->acc + planet->accp)/2;
-
-  planet->updateKinetic();
+  planet->pos += planet->vel + 0.5*dt*dt*planet->acc;
+  planet->vel += 0.5*dt*(planet->acc + planet->acc_tmp);
 }
 
 void Solver::saveToFile(){

@@ -142,9 +142,9 @@ are given by
   \end{split}
 \end{align}
 The algorithms used are both based on Taylor expansions, the forward Euler
-scheme approximates the derivatives to first order, while the Verlet
+scheme approximates position and velocity to first order, while the Verlet
 method combines a second order approximation with the fact that the acceleration
-is only position dependent.
+is only position dependent. In the following the algorithims are stated.
 \subsection{Forward Euler}
 The Euler method (forward Euler) is the most basic numerical method to solve
 ODEs. This widely known algorithm applied to ~\ref{eq:coupledequations} is given by
@@ -154,8 +154,8 @@ ODEs. This widely known algorithm applied to ~\ref{eq:coupledequations} is given
   x_{i+1} = x_{i} + v_{i}\Delta{t}
 \end{split}
 \end{align*}
-These equations are derived by simply taylor expanding the derivatives and omitting
-the error terms.
+These equations are derived by simply Taylor expanding the position and velocity
+and omitting the error terms.
 \subsection{Velocity Verlet}
 The velocity Verlet method is based on Taylor-expanding the position and velocity
 to second order, and specialized for cases where the acceleration is only
