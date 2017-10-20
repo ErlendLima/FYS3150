@@ -49,7 +49,7 @@ add_executable(${executable_name} ${include_files})
 # own executable. Separating out main() means you can add this library to be
 # used elsewhere.
 
-target_link_libraries(solve project_lib blas lapack -O1 armadillo )
+target_link_libraries(solve project_lib blas lapack -O1 armadillo -ljsoncpp)
 
 ################################
 # Testing

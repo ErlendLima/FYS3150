@@ -1,5 +1,6 @@
 #include <string>
-// #include "json.h"
+#include "solarSys.h"
+#include <jsoncpp/json/json.h>
 
 void SolarSys::add(std::string name, double M, vec3 pos, vec3 vel, unsigned int n)
 {
@@ -21,7 +22,7 @@ double SolarSys::potentialEnergy(){
   for(auto & planet: planets){
     for(auto & other: planets){
       if(planet == other)continue;
-      potTot += planet->potentialEnergy(*other);
+      potTot += planet->potentialEnergy(*other)/2;
     }
   }
 }
