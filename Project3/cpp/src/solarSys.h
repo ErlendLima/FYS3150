@@ -23,6 +23,13 @@ public:
   void add(std::string, double M, vec3 pos, vec3 vel, unsigned int n);
   std::vector<std::shared_ptr<Planet>> planets; // Pointers to planet instance
   unsigned int n_planets = 0;
+
+  void updateTotalEnergy();
+  double getTotalEnergy(){return totalEnergy;};
+  double potentialEnergy();
+
+private:
+  double totalEnergy;
 };
 
 #endif /* SOLARSYS_H */

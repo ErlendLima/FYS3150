@@ -18,8 +18,8 @@ public:
   double gravitationalForce(Planet otherPlanet);
   void calculateAcc(Planet otherPlanet);
   void force(Planet otherPlanet);
-  void updateKinetic(){kinetic = 0.5*mass*pow(vel.length(),2);};
-  double potentialEnergy(Planet &otherPlanet);
+  double kineticEnergy(){return 0.5*mass*pow(vel.length(),2);};
+  double potentialEnergy(Planet otherPlanet);
   double totalEnergy();
   void resetAcc();
   void resetF();

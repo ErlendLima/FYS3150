@@ -33,7 +33,6 @@ int Solver::solve(Method method, unsigned int N, double timestep){
     case Method::VERLET:
       std::cout << "=== Simulating system with Velocity Verlet method ===" << std::endl;
       identifier = 'V';
-      // stepper = std::bind(&Solver::VerletStep, this, _1);
       solveSystemVV();
       break;
     case Method::EULERCROMER:
@@ -59,9 +58,10 @@ void Solver::solveSystemVV(){
         updateForces();
         for(auto & planet: sys.planets){
             VerletStep2(planet);
-            planet->updateKinetic();
             planet->writePosToMat(i);
         }
+    sys.updateTotalEnergy();
+    std::cout << sys.getTotalEnergy() << std::endl;
     }
     endTiming();
 }
@@ -75,9 +75,10 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
     // Forward planet positions in time with method of choice
     for(auto & planet: sys.planets){
       stepper(planet);
-      planet->updateKinetic();
       planet->writePosToMat(i);
     }
+    sys.updateTotalEnergy();
+    std::cout << sys.getTotalEnergy() << std::endl;
   }
   endTiming();
 }
@@ -113,8 +114,10 @@ void Solver::EulerStep(std::shared_ptr<Planet> planet){
 void Solver::VerletStep1(std::shared_ptr<Planet> planet){
   planet->pos += planet->vel*dt + 0.5*dt*dt*planet->acc;
 }
+
 void Solver::VerletStep2(std::shared_ptr<Planet> planet){
-    planet->vel += 0.5*dt*(planet->acc + planet->acc_prev);
+  planet->vel += 0.5*dt*(planet->acc + planet->acc_prev);
+}
 
 void Solver::ECStep(std::shared_ptr<Planet> planet){
   planet->vel += planet->acc*dt;
@@ -139,6 +142,10 @@ void Solver::saveToFile(){
     }
   }
   myfile.close();
+}
+
+void Solver::saveEnergyToFile(){
+  sys.energy_array.save();
 }
 
 void Solver::startTiming(){
