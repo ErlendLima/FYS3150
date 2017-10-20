@@ -4,7 +4,9 @@
 #include <chrono>
 #include <cmath>
 #include <memory>
+#include <algorithm>
 #include <armadillo>
+#include <json/json.h>
 #include "solver.h"
 #include "solarSys.h"
 #include "planet.h"
@@ -14,30 +16,27 @@
 
 using std::placeholders::_1;
 
-int Solver::solve(Method method, unsigned int N, double timestep){
-  n = N;
-  dt = timestep;
-  initSystem();
+Solver::Solver(const std::string& parameterpath){
+    readParameters(parameterpath);
+}
 
-  char identifier;
+int Solver::solve(){
+  initSystem();
 
   // Holds step function for the chosen method
   std::function<void(std::shared_ptr<Planet>)> stepper;
   switch (method){
     case Method::EULER:
       std::cout << "=== Simulating system with Euler's method ===" << std::endl;
-      identifier = 'E';
       stepper = std::bind(&Solver::EulerStep, this, _1);
       solveSystem(stepper);
       break;
     case Method::VERLET:
       std::cout << "=== Simulating system with Velocity Verlet method ===" << std::endl;
-      identifier = 'V';
       solveSystemVV();
       break;
     case Method::EULERCROMER:
       std::cout << "=== Simulating system with Euler-Cromer's method ===" << std::endl;
-      identifier = 'C';
       stepper = std::bind(&Solver::ECStep, this, _1);
       break;
     default:
@@ -100,9 +99,65 @@ void Solver::updateForces(){
     }
 }
 
+
+void Solver::readParameters(const std::string& filename){
+    // Load the JSON file and read the relevant parameters
+    std::ifstream parameters(filename);
+    parameters >> root;
+    std::string smethod     = root["method"].asString();
+    unsigned int N_per_year = root["steps per year"].asInt();
+    unsigned int num_years  = root["number of years"].asInt();
+    saveFlag                = root["do save results"].asBool();
+    use_all_planets         = root["use all planets"].asBool();
+    planets_to_use          = root["use planets"];
+
+    // Act on the read parameters
+    n = num_years*N_per_year;
+    dt = 1.0/N_per_year;
+
+    std::transform(smethod.begin(), smethod.end(), smethod.begin(), ::tolower);
+    if(smethod == "euler")
+        method = Method::EULER;
+    else if(smethod == "verlet")
+        method = Method::VERLET;
+    else
+        throw std::runtime_error("Unknown method");
+
+}
+
 void Solver::initSystem(){
-  sys.add("Sun", 1.0, vec3(), vec3(), n); // Add sun in center
-  sys.add("Earth", 3.0e-6, vec3(1.0, 0.0, 0.0), vec3(0.0, 2*pi, 0.0), n); // Add planet earth
+    auto planets = root["planets"];
+    for(unsigned int i = 0; i < planets.size(); i ++){
+        if(!usePlanet(planets[i]["name"].asString()))
+            continue;
+
+        sys.add(planets[i]["name"].asString(),
+                planets[i]["mass"].asDouble(),
+                vec3(planets[i]["position"][0].asDouble(),
+                     planets[i]["position"][1].asDouble(),
+                     planets[i]["position"][2].asDouble()),
+                vec3(planets[i]["velocity"][0].asDouble(),
+                     planets[i]["velocity"][1].asDouble(),
+                     planets[i]["velocity"][2].asDouble()),
+                n);
+    }
+    if(sys.planets.size() <= 0)
+        throw std::runtime_error("No planets found during initialization");
+
+    std::string using_planets = "Using planets ";
+    for(auto &planet: sys.planets)
+        using_planets += planet->name + ", ";
+    std::cout << using_planets << std::endl;
+}
+
+bool Solver::usePlanet(const std::string& planet_name){
+    if(use_all_planets)
+        return true;
+    for(unsigned int i = 0; i < planets_to_use.size(); i++){
+        if(planet_name == planets_to_use[i].asString())
+            return true;
+    }
+    return false;
 }
 
 void Solver::EulerStep(std::shared_ptr<Planet> planet){

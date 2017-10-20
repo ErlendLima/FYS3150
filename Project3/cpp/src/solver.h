@@ -1,16 +1,17 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 #include <chrono>
+#include <json/json.h>
 #include "solarSys.h"
 
 enum class Method{EULER, EULERCROMER, VERLET};
 class Solver
 {
 public:
-  Solver(){saveFlag = true;};
+    Solver(const std::string& parameterpath);
   virtual ~Solver(){};
 
-  int solve(Method, unsigned int N, double dt);
+  int solve();
   void solveSystem(std::function<void(std::shared_ptr<Planet>)>&);
   void solveSystemVV();
   void doSave(bool flag){saveFlag = flag;};
@@ -28,9 +29,15 @@ private:
   void VerletStep1(std::shared_ptr<Planet>);
   void VerletStep2(std::shared_ptr<Planet>);
   void ECStep(std::shared_ptr<Planet>);
+    void readParameters(const std::string& filename);
+    bool usePlanet(const std::string& planet);
 
   bool saveFlag = true;
   std::string savepath = "../data";
+    Method method;
+    Json::Value root;
+    Json::Value planets_to_use;
+    bool use_all_planets;
 
   void startTiming();
   void endTiming();

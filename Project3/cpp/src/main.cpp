@@ -10,13 +10,8 @@
 #include "Vec3/vec3.h"
 
 int main(int argc, char *argv[]) {
-  Method method = Method::VERLET; // Define method
-  unsigned int N_peryear = 100;  // Steps per year
-  double years           = 1;     // Number of years to sim
-  unsigned int N         = static_cast<unsigned int>(years*N_peryear);
-  double dt              = 1.0/N_peryear;
-  Solver solver;
-  solver.doSave(true);
-  solver.solve(method, N, dt);
+    std::string parameterpath = "../data/parameters.json";
+  Solver solver(parameterpath);
+  solver.solve();
   return 0;
 }

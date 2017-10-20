@@ -1,6 +1,7 @@
 import telnetlib
 import json
 import re
+import sys
 
 
 class Planet:
@@ -33,8 +34,11 @@ def construct_planets(start: str, end: str, filename: str) -> [Planet]:
 
     # Scale each planet by the units of the sun
     # and distance convert to AU
+    sunmass = planets['Sun'].mass
     for name, planet in planets.items():
-        planet.mass /= planets['Sun'].mass
+        sys.stdout.write(f"Converting the mass of {name} from {planet.mass} to ")
+        planet.mass = planet.mass / sunmass
+        print(planet.mass)
         planet.pos = [x*km_to_AU for x in planet.pos]
         planet.vel = [x*km_to_AU for x in planet.vel]
 
@@ -76,8 +80,7 @@ def get_info(ID: str, startdate: str, enddate: str) -> (str, str,
         X, Y, Z = [float(val) for val in position_pattern.findall(data)][:3]
         VX, VY, VZ = [float(val) for val in velocity_pattern.findall(data)][:3]
     except Exception as error:
-        print("Failed to extract information from ", data)
-        print(ID)
+        print("Failed to extract information from ", ID, data)
         raise(error)
 
     mass = float(mass) * 10**float(exponent)
@@ -85,15 +88,18 @@ def get_info(ID: str, startdate: str, enddate: str) -> (str, str,
 
 
 def dump_planets_to_file(planets: [Planet], filename: str) -> None:
-    data = [p.to_dict() for p in planets]
-    with open(filename, 'w') as output:
-        json.dump(data, output)
-
+    bodies = [p.to_dict() for p in planets]
+    with open(filename, 'r') as rfile:
+        data = json.load(rfile)
+        data['planets'] = bodies
+    with open(filename, 'w') as wfile:
+        json.dump(data, wfile, indent=4)
 
 
 if __name__ == '__main__':
-    # The info is always retrieved from the startdate, the end date is only given for the telnet site to work
+    # The info is always retrieved from the startdate,
+    # the end date is only given for the telnet site to work
     start = "1977-Oct-18"
     end = "1977-Oct-19"
     planets = construct_planets(start, end, filename="targets.txt")
-    dump_planets_to_file(planets, filename="../data/parameters.txt")
+    dump_planets_to_file(planets, filename="../data/parameters.json")

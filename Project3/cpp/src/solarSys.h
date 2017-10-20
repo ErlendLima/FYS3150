@@ -27,6 +27,7 @@ public:
   void updateTotalEnergy();
   double getTotalEnergy(){return totalEnergy;};
   double potentialEnergy();
+  void readParameters(const std::string& filename);
 
 private:
   double totalEnergy;
