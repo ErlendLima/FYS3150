@@ -21,7 +21,7 @@ double SolarSys::potentialEnergy(){
   for(auto & planet: planets){
     for(auto & other: planets){
       if(planet == other)continue;
-      potTot += planet->potentialEnergy(*other);
+      potTot += planet->potentialEnergy(*other)/2;
     }
   }
   return 0.0;
