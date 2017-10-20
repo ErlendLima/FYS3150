@@ -69,9 +69,9 @@ end
     body1 = CelestialBody(2)
     body2 = CelestialBody(2)
     body3 = CelestialBody(2)
-    init(body1, Vec3([1.0 2.0 3.0]), Vec3(4.0, 5.0, 6.0), 7.0)
-    init(body2, [1.0 2.0 3.0], Vec3([4.0 5.0 6.0]), 7.0)
-    init(body3, Vec3(1.0), Vec3(2.0), 1000.0)
+    init!(body1, Vec3([1.0 2.0 3.0]), Vec3(4.0, 5.0, 6.0), 7.0)
+    init!(body2, [1.0 2.0 3.0], Vec3([4.0 5.0 6.0]), 7.0)
+    init!(body3, Vec3(1.0), Vec3(2.0), 1000.0)
     @testset "Init Test" begin
         @test body1.pos == body2.pos
         @test body1.vel == body2.vel
