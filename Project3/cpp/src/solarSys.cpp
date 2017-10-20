@@ -1,5 +1,5 @@
-#include <string>
 #include "solarSys.h"
+#include <string>
 #include <jsoncpp/json/json.h>
 
 void SolarSys::add(std::string name, double M, vec3 pos, vec3 vel, unsigned int n)

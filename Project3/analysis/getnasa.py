@@ -63,7 +63,7 @@ def get_info(ID: str, startdate: str, enddate: str) -> (str, str,
     telnet.open('horizons.jpl.nasa.gov', 6775)
 
     name_pattern = re.compile(r'Target body name: (\w+) ')
-    mass_pattern = re.compile(r'Mass,?\s+\(?\d+\^(\d+) .*?\)?.\s*[=~]\s*(\w\.\w+)[\s\+]')
+    mass_pattern = re.compile(r'Mass,?\s+(?:\w+)?\s*\(?\d+\^(\d+) .*?\)?.\s*[=~]\s*(\w+\.\w+)[\s\+]')
     position_pattern = re.compile(r'(?<!V)[XYZ]\s?=\s?(.+?)[\s\n]')
     velocity_pattern = re.compile(r'(?<=V)[XYZ]\s?=\s?(.+?)[\s\n]')
     data = ''
@@ -77,6 +77,7 @@ def get_info(ID: str, startdate: str, enddate: str) -> (str, str,
         VX, VY, VZ = [float(val) for val in velocity_pattern.findall(data)][:3]
     except Exception as error:
         print("Failed to extract information from ", data)
+        print(ID)
         raise(error)
 
     mass = float(mass) * 10**float(exponent)
