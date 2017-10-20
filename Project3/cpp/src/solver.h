@@ -3,7 +3,7 @@
 #include <chrono>
 #include "solarSys.h"
 
-enum class Method{EULER, VERLET};
+enum class Method{EULER, EULERCROMER, VERLET};
 class Solver
 {
 public:
@@ -24,6 +24,7 @@ private:
   double dt;
   void EulerStep(std::shared_ptr<Planet>);
   void VerletStep(std::shared_ptr<Planet>);
+  void ECStep(std::shared_ptr<Planet>);
 
   bool saveFlag = true;
   std::string savepath = "../data";
