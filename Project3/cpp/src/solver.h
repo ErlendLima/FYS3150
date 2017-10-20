@@ -12,8 +12,10 @@ public:
 
   int solve(Method, unsigned int N, double dt);
   void solveSystem(std::function<void(std::shared_ptr<Planet>)>&);
+  void solveSystemVV();
   void doSave(bool flag){saveFlag = flag;};
   void setSavepath(const std::string& path){savepath = path;}
+  void updateForces();
   void initSystem();
   void saveToFile();
 
@@ -23,7 +25,8 @@ private:
   unsigned int n; // Antall steg
   double dt;
   void EulerStep(std::shared_ptr<Planet>);
-  void VerletStep(std::shared_ptr<Planet>);
+  void VerletStep1(std::shared_ptr<Planet>);
+  void VerletStep2(std::shared_ptr<Planet>);
 
   bool saveFlag = true;
   std::string savepath = "../data";

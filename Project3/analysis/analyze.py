@@ -12,8 +12,9 @@ sns.set()
 
 
 class Analyzer:
-    def __init__(self, path, name):
+    def __init__(self, path, name, plot2d=False):
         self.data = self.load(path, name)
+        self.plot2d = plot2d
 
     def load(self, path, name):
         path = os.path.join(path, name)
@@ -23,13 +24,16 @@ class Analyzer:
 
     def plot(self, savename, K=3):
         fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.scatter(0,0,0, marker='o',c=(1,0.6,0),s=200)
-        for n in range(self.data.shape[2]):
-            ax.plot(*self.data[:, :, n].T)
-            # ax.plot(xs=self.data[:, 0, n],
-            #         ys=self.data[:, 1, n],
-            #         zs=self.data[:, 2, n])
+        if not self.plot2d:
+            ax = fig.add_subplot(111, projection='3d')
+            ax.scatter(0, 0, 0, marker='o', c=(1, 0.6, 0), s=200)
+            for n in range(self.data.shape[2]):
+                ax.plot(*self.data[:, :, n].T)
+        else:
+            ax = fig.add_subplot(111)
+            ax.scatter(0, 0, marker='o', c=(1, 0.6, 0), s=200)
+            for n in range(self.data.shape[2]):
+                ax.plot(*self.data[:, 0:2, n].T)
         ax.legend()
         ax.set_xlabel(r'$x [m]$')
         ax.set_ylabel(r'$y [m]$')
@@ -48,6 +52,8 @@ if __name__ == '__main__':
                         help="Directory to search for input files")
     parser.add_argument('filename', type=str,
                         help="File to be analyzed")
+    parser.add_argument('--plot2d', help="Plot as 2D",
+                        action="store_true")
     args = parser.parse_args()
-    analyzer = Analyzer(args.search_path, args.filename)
+    analyzer = Analyzer(args.search_path, args.filename, plot2d=args.plot2d)
     analyzer.plot('solarsys')
