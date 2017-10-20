@@ -144,10 +144,6 @@ void Solver::saveToFile(){
   myfile.close();
 }
 
-void Solver::saveEnergyToFile(){
-  sys.energy_array.save();
-}
-
 void Solver::startTiming(){
   startWallTime = std::chrono::high_resolution_clock::now();
   startCPUTime  = std::clock();
