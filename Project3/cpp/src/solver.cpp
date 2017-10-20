@@ -44,8 +44,6 @@ int Solver::solve(Method method, unsigned int N, double timestep){
 }
 
 void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
-  double t = 0.0;
-
   startTiming();
   // Loop over time
   for(unsigned int i = 1; i <= n; i++){
@@ -69,7 +67,6 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
       stepper(planet);
       planet->writePosToMat(i);
     }
-    t = i*dt;
   }
   endTiming();
 }

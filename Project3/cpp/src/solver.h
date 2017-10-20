@@ -20,7 +20,7 @@ public:
 private:
   SolarSys sys;
 
-  unsigned int n;
+  unsigned int n; // Antall steg
   double dt;
   void EulerStep(std::shared_ptr<Planet>);
   void VerletStep(std::shared_ptr<Planet>);
