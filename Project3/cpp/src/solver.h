@@ -1,7 +1,7 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 #include <chrono>
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 #include "solarSys.h"
 
 enum class Method{EULER, EULERCROMER, VERLET};

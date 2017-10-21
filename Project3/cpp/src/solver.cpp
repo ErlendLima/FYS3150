@@ -6,7 +6,7 @@
 #include <memory>
 #include <algorithm>
 #include <armadillo>
-#include <json/json.h>
+#include <jsoncpp/json/json.h>
 #include "solver.h"
 #include "solarSys.h"
 #include "planet.h"

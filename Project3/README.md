@@ -22,7 +22,11 @@ is located across three different directories: analysis, cpp and julia. The
 resulting data produced by the C++ program is read by the analysis code located
 in analysis, while julia does both its own computations and its own plotting.
 
-Compilation of the C++ program requires C++14, Armadillo version 6.7 and CMake version 3.1. If the
+Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1 and JSONcpp. On Ubuntu these can be installed with
+```console
+sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev libjsoncpp-1 libjsoncpp-dev
+```
+ If the
 requirements are satisfied, the makefile can be created and run with
 
 ```console
