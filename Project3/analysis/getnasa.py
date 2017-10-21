@@ -39,8 +39,7 @@ def construct_planets(start: str, end: str, filename: str) -> [Planet]:
         sys.stdout.write(f"Converting the mass of {name} from {planet.mass} to ")
         planet.mass = planet.mass / sunmass
         print(planet.mass)
-        planet.pos = [x*km_to_AU for x in planet.pos]
-        planet.vel = [x*km_to_AU for x in planet.vel]
+        planet.vel = [x*365.242199 for x in planet.vel]
 
     return [planet for _, planet in planets.items()]
 
@@ -48,18 +47,18 @@ def construct_planets(start: str, end: str, filename: str) -> [Planet]:
 def get_info(ID: str, startdate: str, enddate: str) -> (str, str,
                                                         str, str, str,
                                                         str, str, str):
-    interactions = ((r'Horizons>', str(ID) + ''),
-                    (r'Select.*E.phemeris.*:', 'E'),
-                    (r'Observe.*:', 'v'),
-                    (r'Coordinate center.*:', '500@0'),
-                    (r'Confirm selected station.*>', 'y'),
-                    (r'Reference plane.*:', 'eclip'),
-                    (r'Starting .* :', str(startdate)),
-                    (r'Ending .* :', str(enddate)),
-                    (r'Output interval.*:', '1d'),
-                    (r'Accept default output.* :', 'y'),
-                    (r'Scroll . Page: .*%', ' '),
-                    (r'Select\.\.\. .A.gain.* :', 'x'))
+    interactions = (('Horizons>', str(ID) + ''),
+                    ('Select', 'E'),
+                    ('Observe', 'v'),
+                    ('Coordinate center', '500@0'),
+                    ('Confirm selected station.*>', 'y'),
+                    ('Reference plane.', 'eclip'),
+                    ('Starting', str(startdate)),
+                    ('Ending', str(enddate)),
+                    ('Output interval', '1d'),
+                    ('Accept default output:', 'y'),
+                    ('Scroll', ' '),
+                    ('Select', 'x'))
     interactions = [(p.encode('ascii'), r.encode('ascii'))
                     for p, r in interactions]
 
@@ -72,7 +71,7 @@ def get_info(ID: str, startdate: str, enddate: str) -> (str, str,
     velocity_pattern = re.compile(r'(?<=V)[XYZ]\s?=\s?(.+?)[\s\n]')
     data = ''
     for prompt, response in interactions:
-        data += telnet.read_until(prompt, 3).decode('ascii')
+        data += telnet.read_until(prompt, 5).decode('ascii')
         telnet.write(response + b"\r\r\n")
     try:
         name = name_pattern.search(data)[1]

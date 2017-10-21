@@ -3,6 +3,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import argparse
@@ -35,13 +36,46 @@ class Analyzer:
             for n in range(self.data.shape[2]):
                 ax.plot(*self.data[:, 0:2, n].T)
         ax.legend()
-        ax.set_xlabel(r'$x [m]$')
-        ax.set_ylabel(r'$y [m]$')
+        ax.set_xlabel('X [AU]')
+        ax.set_ylabel('Y [AU]')
+        if not self.plot2d:
+            ax.set_zlabel('Z [AU]')
         plt.show()
         fig.savefig('../latex/figures/{}.eps'.format(savename),
                     dpi=1200)
         fig.savefig('../latex/figures/{}.png'.format(savename),
                     dpi=1200)
+
+    def update_lines(self, num, lines):
+        for index, line in enumerate(lines):
+            line[0].set_data(self.data[0:num+1, 0:2, index][0])
+            print(self.data[0:num+1, 2, index][0])
+            line[0].set_3d_properties(self.data[0:num+1, 2, index][0])
+        return lines
+
+    def animate(self):
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        xmin = np.min(self.data[:, 0, :])
+        ymin = np.min(self.data[:, 1, :])
+        zmin = np.min(self.data[:, 2, :])
+        xmax = np.max(self.data[:, 0, :])
+        ymax = np.max(self.data[:, 1, :])
+        zmax = np.max(self.data[:, 2, :])
+        ax.set_xlim3d([xmin, xmax])
+        ax.set_xlabel('X [AU]')
+        ax.set_ylim3d([ymin, ymax])
+        ax.set_ylabel('Y [AU]')
+        ax.set_zlim3d([zmin, zmax])
+        ax.set_zlabel('Z [AU]')
+
+        lines = [ax.plot(*self.data[:1, :, n].T)
+                 for n in range(self.data.shape[2])]
+
+        system_animation = animation.FuncAnimation(fig, self.update_lines, 25, fargs=(lines,),
+                                                   interval=50, blit=False)
+
+        plt.show()
 
 
 
@@ -54,6 +88,12 @@ if __name__ == '__main__':
                         help="File to be analyzed")
     parser.add_argument('--plot2d', help="Plot as 2D",
                         action="store_true")
+    parser.add_argument('--animate', help="Animate the orbits",
+                        action="store_true")
     args = parser.parse_args()
-    analyzer = Analyzer(args.search_path, args.filename, plot2d=args.plot2d)
-    analyzer.plot('solarsys')
+    analyzer = Analyzer(args.search_path, args.filename,
+                        plot2d=args.plot2d)
+    if args.animate:
+        analyzer.animate()
+    else:
+        analyzer.plot('solarsys')

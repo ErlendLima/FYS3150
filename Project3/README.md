@@ -26,7 +26,10 @@ Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake vers
 ```console
 sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev libjsoncpp-1 libjsoncpp-dev
 ```
- If the
+Note that the path to jsoncpp is not standardized. This program assumes it lies in `<include path>/jsoncpp/json/json.h`. 
+If you get a compilation error, create a symlink from the path to your `json.h` to `jsoncpp/json/json.h`.
+
+If the
 requirements are satisfied, the makefile can be created and run with
 
 ```console
