@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cmath>
 #include <memory>
+#include <omp.h>
 #include <algorithm>
 #include <armadillo>
 #include <jsoncpp/json/json.h>
@@ -50,17 +51,25 @@ int Solver::solve(){
 void Solver::solveSystemVV(){
     startTiming();
     updateForces();
+    double progress = 0.1;
     for(unsigned int i = 1; i <= n; i++){
-        for(auto & planet: sys.planets)
-            VerletStep1(planet);
+
+// #pragma omp parallel for
+        for(unsigned int j = 0; j < sys.planets.size(); j++)
+            VerletStep1(sys.planets[j]);
 
         updateForces();
-        for(auto & planet: sys.planets){
-            VerletStep2(planet);
-            planet->writePosToMat(i);
+// #pragma omp parallel for
+        for(unsigned int j = 0; j < sys.planets.size(); j++){
+            VerletStep2(sys.planets[j]);
+            sys.planets[j]->writePosToMat(i);
+        }
+        if(i/static_cast<double>(n) >= progress){
+            std::cout << 100*progress << "% completed" << std::endl;
+            progress += 0.1;
         }
     sys.updateTotalEnergy();
-    std::cout << sys.getTotalEnergy() << std::endl;
+    // std::cout << sys.getTotalEnergy() << std::endl;
     }
     endTiming();
 }
@@ -77,23 +86,23 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
       planet->writePosToMat(i);
     }
     sys.updateTotalEnergy();
-    std::cout << sys.getTotalEnergy() << std::endl;
+    // std::cout << sys.getTotalEnergy() << std::endl;
   }
   endTiming();
 }
 
 void Solver::updateForces(){
-    for(auto & planet: sys.planets){
-        if(planet->name == "Sun") continue;
-        planet->acc_prev = planet->acc;
-        planet->resetAcc();
-        planet->resetF();
+    for(unsigned int i = 0; i < sys.planets.size(); i++){
+        if(sys.planets[i]->name == "Sun") continue;
+        sys.planets[i]->acc_prev = sys.planets[i]->acc;
+        sys.planets[i]->resetAcc();
+        sys.planets[i]->resetF();
 
         // Loop over all the other planets
         for(auto & other: sys.planets){
-            if(planet == other)continue;
+            if(sys.planets[i] == other)continue;
             else{
-                planet->calculateAcc(*other);
+                sys.planets[i]->calculateAcc(*other);
             }
         }
     }

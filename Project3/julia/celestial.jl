@@ -22,12 +22,12 @@ function init!(body::CelestialBody{T}, pos::Vec3{T}, vel::Vec3{T}, mass::T) wher
     body.mass = mass
 end
 
-init(body, pos::T,         vel::T, mass)           where {T<:Real} = init(body, Vec3(pos), Vec3(vel), mass)
-init(body, pos::Array{T},  vel::Array{T, 2}, mass) where {T<:Real} = init(body, Vec3(pos), Vec3(vel), mass)
-init(body, pos::Array{T},  vel::Vec3{T}, mass)     where {T<:Real} = init(body, Vec3(pos), vel, mass)
-init(body, pos::T,         vel::Vec3{T}, mass)     where {T<:Real} = init(body, Vec3(pos), vel, mass)
-init(body, pos::Vec3{T},   vel::Array{T, 2}, mass) where {T<:Real} = init(body, pos,       Vec3(vel), mass)
-init(body, pos::Vec3{T},   vel::T, mass)           where {T<:Real} = init(body, pos,       Vec3(vel), mass)
+init!(body, pos::T,         vel::T, mass)           where {T<:Real} = init!(body, Vec3(pos), Vec3(vel), mass)
+init!(body, pos::Array{T},  vel::Array{T, 2}, mass) where {T<:Real} = init!(body, Vec3(pos), Vec3(vel), mass)
+init!(body, pos::Array{T},  vel::Vec3{T}, mass)     where {T<:Real} = init!(body, Vec3(pos), vel, mass)
+init!(body, pos::T,         vel::Vec3{T}, mass)     where {T<:Real} = init!(body, Vec3(pos), vel, mass)
+init!(body, pos::Vec3{T},   vel::Array{T, 2}, mass) where {T<:Real} = init!(body, pos,       Vec3(vel), mass)
+init!(body, pos::Vec3{T},   vel::T, mass)           where {T<:Real} = init!(body, pos,       Vec3(vel), mass)
 
 function distance(self::CelestialBody, other::CelestialBody, n)
     norm(other.pos[n] - self.pos[n])
