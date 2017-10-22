@@ -89,7 +89,12 @@
 \date{\today}
 
 \begin{abstract}
-Abstract abstract.
+Two numerical algorithms are used to solve systems of coupled ODE's by simulating a n-body problem, our solar system.
+The algorithms used are the Forward Euler and Velocity-Verlet algorithms. With only X extra floating point operations per 
+iteration of the algorithm, the Verlet method is shown to completely outperform the Euler scheme in terms of numerical accuracy and stability,
+with a small cost in execution speed. By investigating the solutions for different step sizes, $10^5$ time steps per year resulted in
+solutions with an acceptable compromise between numerical precision and speed. The perihelion precession of Mercury (which
+was predicted by general relativity) was also reproduced by the numerical implementation. 
 \end{abstract}
 \maketitle
 \tableofcontents
@@ -102,14 +107,22 @@ Abstract abstract.
 
 \section{Introduction}
 \label{sec:introduction}
-Intro dintro mintro pintroduction?
+The n-body problem consists of predicting the individual motions of a group of objects
+interacting with each other gravitationally. The motivation for finding solutions
+to this problem comes from the desire to understand the relative motion of the 
+objects in the solar system. The methods used to solve these types of problems are also applicable in 
+similar problems in statistical and molecular dynamics.   
 
 For the simple case of two celestial bodies it is trivial to solve the time
-development of the system anlytically. When more objects are added however, the equations
-have no analytical solution, and numerical methods are required to find
-approximated solutions. This is popularly called a n-body problem. In this project, the classic forward Euler and
-Velocity Verlet algorithms are used to simulate the solar system, and their
-accuracies and runtimes are compared.
+development of the system analytically. When more objects are added however,
+analytical solutions are hard to come by, and numerical methods are required to find
+approximated solutions.
+
+In this paper, the equations of motion are written as a coupled set of first-order linear equations, and
+the classic forward Euler and Velocity Verlet algorithms are employed to simulate the solar system, 
+and their accuracies, conservation properties and computation times are compared. The theoretical
+model for the forces in our solar system (Newtonian gravity) is derived, and the numerical implementations
+are used to solve the time development of the planets in the solar system. Several analytical results are reproduced by the program, such as conservation of energy and angular momentum, escape velocities and the perihelion precession of Mercury.
 \section{Theory}
 \label{sec:theory}
 For planetary motion, the only force present is gravity. Newton's law of gravitation
@@ -131,7 +144,7 @@ where $M$ is the planet mass. This is equivalent to one ODE (ordinary differenti
 equation) for each direction component, i.e. three separate equations in the
 three-dimensional case.
 
-For the numerical methods the above second order ODE is more convenient to
+For the numerical methods the above second order vector ODE is more convenient to
 work with when written as a set of two coupled first order equations. These
 are given by
 \begin{align}
@@ -141,10 +154,15 @@ are given by
   \dv{v}{t} &= \frac{F(x,t)}{M} = a(x,t)
   \end{split}
 \end{align}
+These equations are solved for three dimensions. Note that the gravitational force,
+and hence the acceleration, depends on the distance between the celestial bodies. 
+This results in six coupled, first-order, linear differential equations.
+
 The algorithms used are both based on Taylor expansions, the forward Euler
 scheme approximates position and velocity to first order, while the Verlet
 method combines a second order approximation with the fact that the acceleration
 is only position dependent. In the following the algorithims are stated.
+
 \subsection{Forward Euler}
 The Euler method (forward Euler) is the most basic numerical method to solve
 ODEs. This widely known algorithm applied to ~\ref{eq:coupledequations} is given by
@@ -171,11 +189,36 @@ Note that this algorithm assumes $a_{i+1}$ is only dependent on position $x_{i+1
 and not velocity $v_{i+1}$. This is because the acceleration in the next step
 is required to calculate the velocity in the next step. Because $a_{i+1} = a(x_{i+1})$,
 the position in the next step is computed prior to the velocity. This algorithm
-therefore seems suited to solve for planetary motion, because gravity is only
+therefore is suited to solve for planetary motion, because gravity is only
 position dependent and the only force that acts within the system.
 
-\subsection{Energy conservation}
+\subsection{Initial conditions}
+To find a unique solution to the set of coupled equations a set of initial conditions needs
+to be specified. For the set of three coupled second order equations solved in this project, 
+initial positions and velocities are required for each spatial dimension. That is,
+\begin{align*}
+ \mathbf{x_0}(t = 0) \text{ and } \mathbf{v_0}(t = 0)   
+\end{align*} 
+are required for the sun and all planets and moons that are included in the simulation.
 
+\subsection{Conservation laws for the system}
+Because no external forces act on the system, total energy and angular momentum should
+be conserved over time. Expressions for these quantities are shown separately
+\subsubsection{Energy}
+The total energy of the system should be conserved. The kinetic energy of an object with
+mass $m$ and velocity $v$ is given by
+\begin{align*}
+ E_k = \frac{1}{2}m v^2
+\end{align*}
+The expression for the gravitational potential energy of a massive object can be found by 
+integrating the gravitational force from the distance between the objects to some reference
+distance, which is set to $r = \infty$ (i.e. using the definition of potential energy and the law
+of gravitation). This yields
+\begin{align*}
+ E_p = -\int_\infty^r F_G \text{d} r = -\frac{GmM}{r}
+\end{align*}
+\subsubsection{Angular momentum}
+Yolo
 \subsection{Escape velocity}
 The escape velocity is the minimum speed needed for an object to escape from the
 gravitational influence of an object with mass. One way to derive this velocity
@@ -196,8 +239,21 @@ which yields the size of the escape velocity
 From the equations it is clear that the direction of the escape velocity is
 arbitrary, because only energies need to be considered to arrive at the above
 expression.
-\subsection{Errors}
 
+\subsection{Perihelion precession of Mercury}
+In Newtonian physics, any object that orbits a massive star or planet will have a constant elliptical orbit with
+the spherical mass approximately at focus. In the solar system, the closest point to the Sun of an orbit is called
+the perihelion. Multiple effects in the solar system cause the elliptical orbits to rotate, in the sense that the perihelia
+precesses around the sun. The most significant effect comes from the gravitational forces from the other bodies in 
+the solar system. For Mercury, the Newtonian based-explanations were insufficient in predicting the precession, and 
+this error was corrected when Einstein showed that results from general relativity closely agrees with the observed
+perihelion precession. To correct for general relativity spacetime shift, the gravitational force can be modified to
+\begin{align}
+\label{eq:mercuryprecession}
+\mathbf{F_G} = \frac{G M_\odot M_\text{Mercury}}{r^3}\left[1 + \frac{3l^2}{r^2c^2} \right] \hat{\mathbf{r}}
+\end{align}
+where $l = |\mathbf{l}|$ is the norm of the angular momentum per mass of Mercury, $c$ is the speed of light and 
+$\mathbf{r}$ is the relative position of Mercury with respect to the Sun.
 \section{Method}
 \label{sec:method}
 \subsection{Choice of units}
@@ -220,13 +276,21 @@ constant is given by
   G = 4\pi^2 \text{AU}^3 \text{yr}^{-2} M_\odot^{-1}
 \end{align}
 \subsection{Initial values}
-The initial values of the solar system bodies are fetched from NASA
-(see \cite{NASA}). Mer her perhaps?
-\subsection{Earth-Sun system - Comparison of Forward Euler and Velocity-Verlet}
-\subsection{Three-body problem}
-\subsection{Full Solar System simulation}
-\subsection{The perihelion precession of Mercury}
-
+The initial values of the solar system bodies are fetched from NASA (see \cite{NASA}). Mer her perhaps?
+\subsection{Models}
+In this project, four separate situations are tested. This makes it possible to test the versatility of the
+algorithms in different circumstances, and to investigate multiple special situations.
+\subsubsection{Earth-Sun system - Comparison of Forward Euler and Velocity-Verlet}
+\label{seq:earthsunmethod}
+For the simple case of the Earth-Sun system, the positions of the Sun and Earth over time are
+found with both the Forward Euler and the Velocity Verlet algorithms. This is an excellent case
+to compare the methods to each other, and to expected analytical behavior. 
+\subsubsection{Three-body problem}
+The Earth-Sun system is expanded to include the most massive planet in the Solar System, Jupiter.
+\subsubsection{Full Solar System simulation}
+The simulation is here fully extended to include every planet (also Pluto, although Pluto is not considered a planet any more :( ).
+\subsubsection{The perihelion precession of Mercury}
+Badummmm tsss
 \section{Results}
 \label{sec:results}
 \subsection{Comparison of Forward Euler and Velocity Verlet for Earth-Sun system}
