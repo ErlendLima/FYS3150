@@ -174,14 +174,65 @@ the position in the next step is computed prior to the velocity. This algorithm
 therefore seems suited to solve for planetary motion, because gravity is only
 position dependent and the only force that acts within the system.
 
-\subsection{Initial conditions}
+\subsection{Energy conservation}
 
+\subsection{Escape velocity}
+The escape velocity is the minimum speed needed for an object to escape from the
+gravitational influence of an object with mass. One way to derive this velocity
+is by energy conservation. The case with the Earth-Sun system
+is examined, where at the initial state, Earth (with mass $M_E$) is at a
+distance $r$ from the Sun (mass $M_\odot$). The
+initial speed of the planet is the escape velocity $\mathbf{v_e}$, and at the
+final state it will have moved infinitely far away ($r = \infty$) and the speed
+will tend to zero. By conservation of energy
+\begin{align*}
+  (K + U)_0 &= (K + U)_1 \\
+  \frac{1}{2} M_E \mathbf{v_e}^2 &= \frac{GM_E M_\odot}{r}
+\end{align*}
+which yields the size of the escape velocity
+\begin{align}
+  v_e = |\mathbf{v_e}| = \sqrt{\frac{2GM_\odot}{r}}
+\end{align}
+From the equations it is clear that the direction of the escape velocity is
+arbitrary, because only energies need to be considered to arrive at the above
+expression.
 \subsection{Errors}
+
 \section{Method}
 \label{sec:method}
 \subsection{Choice of units}
+For the Solar System it is convenient to use units that scale lengths, time and
+masses to orders of magnitude that are easier to work with. The distances are
+therefore in astronomical units (AU), which is defined to roughly the mean
+distance between the Earth and the Sun. By the same token, time is measured in
+years (yr) and masses are in solar masses $M_\odot$.
+
+Examining Newton's law for Earth in the Earth-Sun system under the assumption
+that the orbit is circular shows that
+\begin{align*}
+  \frac{GmM_\odot}{r^2} = m \frac{v^2}{r}
+\end{align*}
+where $m$ is Earth's mass and $r$ is the distance between the objects. In the
+units chosen, $r = 1$ AU and the orbital velocity is given by the orbital distance
+travelled per year $v = 2\pi \text{AU}/1 \text{yr}$. Then the gravitational
+constant is given by
+\begin{align}
+  G = 4\pi^2 \text{AU}^3 \text{yr}^{-2} M_\odot^{-1}
+\end{align}
+\subsection{Initial values}
+The initial values of the solar system bodies are fetched from NASA
+(see \cite{NASA}). Mer her perhaps?
+\subsection{Earth-Sun system - Comparison of Forward Euler and Velocity-Verlet}
+\subsection{Three-body problem}
+\subsection{Full Solar System simulation}
+\subsection{The perihelion precession of Mercury}
+
 \section{Results}
 \label{sec:results}
+\subsection{Comparison of Forward Euler and Velocity Verlet for Earth-Sun system}
+\subsection{Three-body problem}
+\subsection{Full solar system simulation}
+\subsection{The perihelion precession of Mercury}
 
 \section{Discussion}
 \label{sec:discussion}
