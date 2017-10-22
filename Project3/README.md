@@ -14,7 +14,8 @@
 <br>
 
 
-<img height="700px" align="center" src="latex/figures/solarsys.png?raw=true">
+<!-- <img height="700px" align="center" src="latex/figures/solarsys.png?raw=true"> -->
+[![Animation of the solar system](https://github.com/Caronthir/FYS3150/blob/master/Project3/latex/figures/animation.gif)]
 
 ## Usage (C++)
 The project is divided into source code and the written rapport. The source code

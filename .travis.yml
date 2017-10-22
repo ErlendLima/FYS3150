@@ -9,4 +9,8 @@ git:
 before_install:
     - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
     - git submodule update --init --recursive
-script: cd $TEST_DIR && julia test.jl
+script: cd $TEST_DIR && julia --code-coverage test.jl
+# Coverage.jl
+after_success:
+    - julia -e 'println(pwd()); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
+
