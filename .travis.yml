@@ -12,5 +12,5 @@ before_install:
 script: cd $TEST_DIR && julia --code-coverage test.jl
 # Coverage.jl
 after_success:
-    - julia -e 'cd("Project3/julia"); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
+    - julia -e 'pwd(); cd("./Project3/julia"); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
 
