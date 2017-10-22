@@ -46,14 +46,15 @@ class Analyzer:
         fig.savefig('../latex/figures/{}.png'.format(savename),
                     dpi=1200)
 
-    def update_lines(self, num, lines):
-        for index, line in enumerate(lines):
-            line[0].set_data(self.data[0:num+1, 0:2, index][0])
-            print(self.data[0:num+1, 2, index][0])
-            line[0].set_3d_properties(self.data[0:num+1, 2, index][0])
+    def update_lines(self, num, lines, scatter):
+        for index, (line, scatt) in enumerate(zip(lines, scatter)):
+            line[0].set_data(*self.data[0:num+1, 0:2, index].T)
+            line[0].set_3d_properties(self.data[0:num+1, 2, index])
+            scatt[0].set_data(*self.data[num:num+1, 0:2, index].T)
+            scatt[0].set_3d_properties(self.data[num:num+1, 2, index])
         return lines
 
-    def animate(self):
+    def animate(self, save=False):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
         xmin = np.min(self.data[:, 0, :])
@@ -68,14 +69,21 @@ class Analyzer:
         ax.set_ylabel('Y [AU]')
         ax.set_zlim3d([zmin, zmax])
         ax.set_zlabel('Z [AU]')
+        ax.grid(False)
 
-        lines = [ax.plot(*self.data[:1, :, n].T)
+        lines = [ax.plot(*self.data[:1, :, n].T, alpha=0.5)
                  for n in range(self.data.shape[2])]
+        scatter = [ax.plot(*self.data[:1, :, n].T, linestyle='', marker='o')
+                   for n in range(self.data.shape[2])]
 
-        system_animation = animation.FuncAnimation(fig, self.update_lines, 25, fargs=(lines,),
-                                                   interval=50, blit=False)
-
-        plt.show()
+        system_animation = animation.FuncAnimation(fig, self.update_lines,
+                                                   frames=range(0, self.data.shape[0], 10),
+                                                   fargs=(lines, scatter,),
+                                                   interval=10, blit=False)
+        if save:
+            system_animation.save('../latex/figures/animation.gif', writer='imagemagick', fps=30)
+        else:
+            plt.show()
 
 
 
@@ -90,10 +98,12 @@ if __name__ == '__main__':
                         action="store_true")
     parser.add_argument('--animate', help="Animate the orbits",
                         action="store_true")
+    parser.add_argument('--save', help="Save the (animation) plots",
+                        action="store_true")
     args = parser.parse_args()
     analyzer = Analyzer(args.search_path, args.filename,
                         plot2d=args.plot2d)
     if args.animate:
-        analyzer.animate()
+        analyzer.animate(args.save)
     else:
         analyzer.plot('solarsys')
