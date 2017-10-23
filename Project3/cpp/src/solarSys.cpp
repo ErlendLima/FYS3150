@@ -9,21 +9,26 @@ void SolarSys::add(std::string name, double M, vec3 pos, vec3 vel, unsigned int 
 }
 
 void SolarSys::updateTotalEnergy(){
-  totalEnergy = 0.0;
-  for(auto & planet: planets){
-    totalEnergy += planet->kineticEnergy();
-  }
-  totalEnergy += potentialEnergy();
+    totalEnergy = kineticEnergy();
+    totalEnergy += potentialEnergy();
 }
 
-double SolarSys::potentialEnergy(){
-  double potTot = 0.0;
+double SolarSys::kineticEnergy() const{
+    double energy = 0.0;
+    for(auto & planet: planets){
+        energy += planet->kineticEnergy();
+    }
+    return energy;
+}
+
+double SolarSys::potentialEnergy() const{
+  double energy = 0.0;
   for(auto & planet: planets){
     for(auto & other: planets){
       if(planet == other)continue;
-      potTot += planet->potentialEnergy(*other)/2;
+      energy += planet->potentialEnergy(*other)/2;
     }
   }
-  return 0.0;
+  return energy;
 }
 

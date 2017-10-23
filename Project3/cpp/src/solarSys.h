@@ -11,26 +11,26 @@
 #define pi 3.141592653589793238462643
 #define G 39.478417604357434475337963
 
-// class Planet;
-
 class SolarSys
 {
 public:
-  SolarSys(){};
-  virtual ~SolarSys(){};
-  // Add planet to solar system. Can take pointer or args.
-  void add(std::shared_ptr<Planet> planet) {planets.push_back(planet);};
-  void add(std::string, double M, vec3 pos, vec3 vel, unsigned int n);
-  std::vector<std::shared_ptr<Planet>> planets; // Pointers to planet instance
-  unsigned int n_planets = 0;
+    SolarSys(){};
+    virtual ~SolarSys(){};
+    // Add planet to solar system. Can take pointer or arguments
+    void add(std::shared_ptr<Planet> planet) {planets.push_back(planet);};
+    void add(std::string, double M, vec3 pos, vec3 vel, unsigned int n);
 
-  void updateTotalEnergy();
-  double getTotalEnergy(){return totalEnergy;};
-  double potentialEnergy();
-  void readParameters(const std::string& filename);
+    std::vector<std::shared_ptr<Planet>> planets; // Pointers to planet instance
+    unsigned int n_planets = 0;
+
+    void updateTotalEnergy();
+    double getTotalEnergy(){return totalEnergy;};
+    double potentialEnergy() const;
+    double kineticEnergy() const;
+    void readParameters(const std::string& filename);
 
 private:
-  double totalEnergy;
+    double totalEnergy = 0.0;
 };
 
 #endif /* SOLARSYS_H */

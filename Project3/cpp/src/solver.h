@@ -9,40 +9,43 @@ class Solver
 {
 public:
     Solver(const std::string& parameterpath);
-  virtual ~Solver(){};
+    virtual ~Solver(){};
 
-  int solve();
-  void solveSystem(std::function<void(std::shared_ptr<Planet>)>&);
-  void solveSystemVV();
-  void doSave(bool flag){saveFlag = flag;};
-  void setSavepath(const std::string& path){savepath = path;}
-  void updateForces();
-  void initSystem();
-  void saveToFile();
+    int solve();
+    void solveSystem(std::function<void(std::shared_ptr<Planet>)>&);
+    void solveSystemVV();
+    void doSave(bool flag){saveFlag = flag;};
+    void setSavepath(const std::string& path){savepath = path;}
+    void updateForces();
+    void initSystem();
+    void saveToFile();
 
 private:
-  SolarSys sys;
+    SolarSys sys;
 
-  unsigned int n; // Antall steg
-  double dt;
-  void EulerStep(std::shared_ptr<Planet>);
-  void VerletStep1(std::shared_ptr<Planet>);
-  void VerletStep2(std::shared_ptr<Planet>);
-  void ECStep(std::shared_ptr<Planet>);
+    unsigned int n; // Number of steps
+    double dt;
+    void EulerStep(std::shared_ptr<Planet>);
+    void VerletStep1(std::shared_ptr<Planet>);
+    void VerletStep2(std::shared_ptr<Planet>);
+    void ECStep(std::shared_ptr<Planet>);
     void readParameters(const std::string& filename);
-    bool usePlanet(const std::string& planet);
+    bool usePlanet(const std::string& planet) const;
+    void startTiming();
+    void endTiming();
+    void updateEnergy(unsigned int n);
 
-  bool saveFlag = true;
-  std::string savepath = "../data";
+    bool saveFlag = true;
+    std::string savepath = "../data";
     Method method;
     Json::Value root;
     Json::Value planets_to_use;
     bool use_all_planets;
 
-  void startTiming();
-  void endTiming();
-  std::chrono::high_resolution_clock::time_point startWallTime;
-  clock_t startCPUTime;
+
+    arma::mat energyArray;
+    std::chrono::high_resolution_clock::time_point startWallTime;
+    clock_t startCPUTime;
 };
 
 #endif /* SOLVER_H */
