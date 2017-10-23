@@ -10,6 +10,7 @@ Planet::Planet(const std::string& namme, double M, vec3 pos0, vec3 vel0, unsigne
   pos_array(0, 0) = pos(0);
   pos_array(1, 0) = pos(1);
   pos_array(2, 0) = pos(2);
+  writePosToMat(0);               // Save initial position
 }
 
 double Planet::distance(Planet otherPlanet){
