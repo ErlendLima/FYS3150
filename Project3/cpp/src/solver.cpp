@@ -52,7 +52,7 @@ void Solver::solveSystemVV(){
     startTiming();
     updateForces();
     double progress = 0.1;
-    for(unsigned int i = 1; i <= n; i++){
+    for(unsigned int i = 0; i < n; i++){
 
 // #pragma omp parallel for
         for(unsigned int j = 0; j < sys.planets.size(); j++)
@@ -64,12 +64,13 @@ void Solver::solveSystemVV(){
             VerletStep2(sys.planets[j]);
             sys.planets[j]->writePosToMat(i);
         }
+
+        // Write out the progress for each 10% increment
         if(i/static_cast<double>(n) >= progress){
             std::cout << 100*progress << "% completed" << std::endl;
             progress += 0.1;
         }
-    sys.updateTotalEnergy();
-    // std::cout << sys.getTotalEnergy() << std::endl;
+        updateEnergy(i);
     }
     endTiming();
 }
@@ -85,8 +86,7 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
       stepper(planet);
       planet->writePosToMat(i);
     }
-    sys.updateTotalEnergy();
-    // std::cout << sys.getTotalEnergy() << std::endl;
+    updateEnergy(i);
   }
   endTiming();
 }
@@ -156,10 +156,14 @@ void Solver::initSystem(){
     std::string using_planets = "Using planets ";
     for(auto &planet: sys.planets)
         using_planets += planet->name + ", ";
-    std::cout << using_planets << std::endl;
+    std::cout << using_planets + "\r\r." << std::endl;
+
+    // Set up the energy array with the format
+    // time - kinetic energy - potential energy
+    energyArray = arma::zeros(3, n+1);
 }
 
-bool Solver::usePlanet(const std::string& planet_name){
+bool Solver::usePlanet(const std::string& planet_name) const{
     if(use_all_planets)
         return true;
     for(unsigned int i = 0; i < planets_to_use.size(); i++){
@@ -188,24 +192,33 @@ void Solver::ECStep(std::shared_ptr<Planet> planet){
   planet->pos += planet->vel*dt;
 }
 
+void Solver::updateEnergy(unsigned int step){
+    energyArray(0, step) = step*dt;
+    energyArray(1, step) = sys.kineticEnergy();
+    energyArray(2, step) = sys.potentialEnergy();
+}
 
 void Solver::saveToFile(){
-  std::ofstream myfile;
-  myfile.open(savepath + "/cpp.txt");
-  // Loop over time points
-  for(unsigned int i = 0; i < n; i++){
-    // Loop over planets
-    unsigned int j = 0;
-    for(auto & planet: sys.planets){
-      myfile << planet->pos_array(0,i) << " ";
-      myfile << planet->pos_array(1,i) << " ";
-      myfile << planet->pos_array(2,i) << " ";
-      if(j == sys.n_planets-1){
-        myfile << "\n";}
-      j++;
+    // Save the position
+    std::ofstream positionstream;
+    positionstream.open(savepath + "/position.txt");
+    // Loop over time points
+    for(unsigned int i = 0; i < n; i++){
+        // Loop over planets
+        unsigned int j = 0;
+        for(auto & planet: sys.planets){
+            positionstream << planet->pos_array(0,i) << " ";
+            positionstream << planet->pos_array(1,i) << " ";
+            positionstream << planet->pos_array(2,i) << " ";
+            if(j == sys.n_planets-1){
+                positionstream << "\n";}
+            j++;
+        }
     }
-  }
-  myfile.close();
+    positionstream.close();
+
+    // Save the energy
+    energyArray.save(savepath + "/energy.txt", arma::raw_ascii);
 }
 
 void Solver::startTiming(){
