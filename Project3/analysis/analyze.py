@@ -74,9 +74,10 @@ class Analyzer:
         fig_energy.savefig('../latex/figures/energy.eps', dpi=1200)
 
     def update_lines(self, num, lines, scatter):
+        start = 0 if num < 100 else num-100
         for index, (line, scatt) in enumerate(zip(lines, scatter)):
-            line[0].set_data(*self.position[0:num+1, 0:2, index].T)
-            line[0].set_3d_properties(self.position[0:num+1, 2, index])
+            line[0].set_data(*self.position[start:num+1, 0:2, index].T)
+            line[0].set_3d_properties(self.position[start:num+1, 2, index])
             scatt[0].set_data(*self.position[num:num+1, 0:2, index].T)
             scatt[0].set_3d_properties(self.position[num:num+1, 2, index])
         return lines
@@ -84,17 +85,20 @@ class Analyzer:
     def animate(self, save=False):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
+        # Set the limits of the axis to the greatest of all x-, y- and z-axes.
         xmin = np.min(self.position[:, 0, :])
         ymin = np.min(self.position[:, 1, :])
         zmin = np.min(self.position[:, 2, :])
         xmax = np.max(self.position[:, 0, :])
         ymax = np.max(self.position[:, 1, :])
         zmax = np.max(self.position[:, 2, :])
-        ax.set_xlim3d([xmin, xmax])
+        axmax = max([xmax, ymax, zmax])
+        axmin = min([xmin, ymin, zmin])
+        for axlim in [ax.set_xlim3d, ax.set_ylim3d, ax.set_zlim3d]:
+            axlim([axmin, axmax])
+
         ax.set_xlabel('X [AU]')
-        ax.set_ylim3d([ymin, ymax])
         ax.set_ylabel('Y [AU]')
-        ax.set_zlim3d([zmin, zmax])
         ax.set_zlabel('Z [AU]')
         ax.grid(False)
 

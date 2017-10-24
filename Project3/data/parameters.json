@@ -211,17 +211,13 @@
             ]
         }
     ],
-    "method": "verlet",
-    "steps per year": 1000,
-    "number of years": 5,
+    "method": "euler",
+    "steps per year": 40830,
+    "number of years": 1,
     "do save results": true,
     "use all planets": false,
     "use planets": [
         "Sun",
-        "Earth",
-        "Venus",
-        "Mars",
-        "Jupiter",
-        "Mercury"
+        "Earth"
     ]
 }

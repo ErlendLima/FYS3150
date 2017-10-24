@@ -51,6 +51,7 @@ int Solver::solve(){
 void Solver::solveSystemVV(){
     startTiming();
     updateForces();
+    updateEnergy(0);
     double progress = 0.1;
     for(unsigned int i = 1; i <= n; i++){
 
@@ -77,6 +78,7 @@ void Solver::solveSystemVV(){
 
 void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
     startTiming();
+    updateEnergy(0);
     // Loop over time
     for(unsigned int i = 1; i <= n; i++){
         // Loop over every planet to find acceleration of each planet
