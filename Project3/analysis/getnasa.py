@@ -22,7 +22,6 @@ class Planet:
 
 def construct_planets(start: str, end: str, filename: str) -> [Planet]:
     planets = {}
-    km_to_AU = 1/149597900
 
     with open(filename, 'r') as ids:
         for line in ids:
