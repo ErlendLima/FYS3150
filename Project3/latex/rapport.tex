@@ -215,6 +215,7 @@ integrating the gravitational force from the distance between the objects to som
 distance, which is set to $r = \infty$ (i.e. using the definition of potential energy and the law
 of gravitation). This yields
 \begin{align*}
+  \label{eq:potentialenergy}
  E_p = -\int_\infty^r F_G \text{d} r = -\frac{GmM}{r}
 \end{align*}
 as the potential energy of an object (mass $m$) with respect to some object (mass $M$),
@@ -223,27 +224,16 @@ separated by a distance $r$.
 Yolo
 \subsection{Escape velocity}
 The escape velocity is the minimum speed needed for an object to escape from the
-gravitational influence of an object with mass. One way to derive this velocity
-is by energy conservation. The case with the Earth-Sun system
-is examined, where at the initial state, Earth (with mass $M_E$) is at a
-distance $r$ from the Sun (mass $M_\odot$). The
-initial speed of the planet is the escape velocity $\mathbf{v_e}$, and at the
-final state it will have moved infinitely far away ($r = \infty$) and the speed
-will tend to zero. By conservation of energy
-\begin{align*}
-  (K + U)_0 &= (K + U)_1 \\
-  \frac{1}{2} M_E \mathbf{v_e}^2 &= \frac{GM_E M_\odot}{r}
-\end{align*}
-which yields the size of the escape velocity
+gravitational influence of an object with mass. The expression for the escape
+velocity of an object in the gravitational field of some other object with mass
+$M_\odot$ at a distance $r$ is given by
 \begin{align}
   v_e = |\mathbf{v_e}| = \sqrt{\frac{2GM_\odot}{r}}
 \end{align}
-From the equations it is clear that the direction of the escape velocity is
-arbitrary, because only energies need to be considered to arrive at the above
-expression.
+See ~\ref{sec:escapevelocityderivation} for a complete derivation of this expression.
 
 \subsection{Perihelion precession of Mercury}
-In Newtonian physics, any object that orbits a massive star or planet will have a constant elliptical orbit with
+In Newtonian physics, any object that orbits a massive star or planet will have an elliptical orbit with
 the spherical mass approximately at focus. In the solar system, the closest point to the Sun of an orbit is called
 the perihelion. Multiple effects in the solar system cause the elliptical orbits to rotate, in the sense that the perihelia
 precesses around the sun. The most significant effect comes from the gravitational forces from the other bodies in
@@ -280,6 +270,41 @@ constant is given by
 \subsection{Initial values}
 The initial values of the solar system bodies are fetched from the NASA HORIZONS
 Web-Interface, see \cite{nasa}.
+\subsection{Calculation of conserved properties}
+\subsubsection{Total energy}
+The total energy and it's distribution among total potential and kinetic energy
+is monitored for each simulation. The total energy of the solar system at a given time step is
+calculated by summing the total energy of each planet at each time step.
+At a given time step $t_i$, the kinetic energy of a given planet with mass $m$
+and discretized velocity $v_i$ is simply given by
+\begin{align}
+  K_i = \frac{1}{2} m v_i^2
+\end{align}
+The potential energy of a planet is given by equation ~\ref{eq:potentialenergy}.
+This needs to be summed for each distance $r$ between the respective planets. To
+avoid double-counting the potential energies, the potential energy is calculated
+as
+\begin{align}
+  U_{i, \text{tot}} = \sum_j \sum_{i > j} - \frac{G M_j M_i}{|\mathbf{x}_i - \mathbf{x}_j|}
+\end{align}
+where $M_i$ is the mass and $\mathbf{x}_i$ the position of planet number $i$
+(the planets are indexed). The total energy is then
+\begin{align}
+  E_{i,\text{tot}} = K_i + U_i
+\end{align}
+\subsubsection{Angular momentum}
+\subsubsection{Relative quantities}
+In the analysis, because of the unusual units used, it is more intuitive to
+consider the relative energy (the energy divided by the initial energy). At time step $i$
+this is given by
+\begin{align}
+  E_i = \frac{E_{i,\text{tot}}}{E_{0,\text{tot}}}
+\end{align}
+The relative energy is referred to as the energy $E$ in the results and
+discussion. The total angular momentum is scaled similarly.
+
+\subsection{Bisection method to find escape velocities numerically}
+
 \subsection{Models}
 In this project, four separate situations are tested. This makes it possible to test the versatility of the
 algorithms in different circumstances, and to investigate multiple special situations.
@@ -291,10 +316,19 @@ no initial velocity, and for simplicity Earth is given an initial position 1 AU
 away from the Sun in the x-direction. It is given an initial velocity $v = 2\pi$ AU/yr
 in the y-direction, which analytically should lead to a perfect circular motion
 if the Sun is kept stationary. The simulation is done with $N = 1000$ time steps.
+The total energy in the system over time is shown in a plot, and used for
+comparing the algorithms.
 \subsubsection{Three-body problem}
 The Earth-Sun system is expanded to include the most massive planet in the Solar System, Jupiter.
+An ideal number of time steps per year is found by trial and error. In this and the remaining models, the Velocity
+Verlet algorithm is used because of the far superior accurary compared to the
+Euler scheme. The impact of the inclusion of Jupiter on the Earth orbit is investigated
+for different variations of the mass of Jupiter, first the actual mass $M_\text{jupiter}$,
+and then $10 M_\text{jupiter}$ and $1000 M_\text{jupiter}$.
 \subsubsection{Full Solar System simulation}
-The simulation is here fully extended to include every planet (also Pluto, although Pluto is not considered a planet any more :( ).
+The simulation is here fully extended to include every planet (Pluto is also included,
+for historical reasons). The initial
+conditions from NASA are now used.
 \subsubsection{The perihelion precession of Mercury}
 The gravitational force is modified to include general relativistic effects, and
 the system is simulated with only the Sun and Mercury. The other planets are removed,
@@ -304,12 +338,33 @@ was done.
 \section{Results}
 \label{sec:results}
 \subsection{Earth-Sun system - Comparison of Euler and Verlet methods}
+\label{sec:earthsunresults}
+See figure ~\ref{fig:earthsunorbits} for a comparison of the Forward Euler and
+Velocity Verlet algorithms for a one-year simulation of the Sun-Earth system with
+$N = 1000$ time steps.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/eulerverlet.eps}
   \caption{Position of the Earth forwarded for a year with the Euler and Verlet
-  schemes. The initial position is marked with a red cross.}
+  schemes. The initial position is marked with a red cross, and the initial
+  velocity is in the positive y-direction.}
   \label{fig:earthsunorbits}
+\end{figure}
+Notice that the Verlet method computes what appears a complete orbit, as expected
+for the Earth with the given initial conditions. With the Euler method, the Earth
+visibly spirals outwards with time. The energies over time for both algorithms
+are shown in figures ~\ref{fig:eulerenergy} and ~\ref{fig:verletenergy}.
+
+\begin{figure}[H]
+  \includegraphics[width=\columnwidth]{figures/energy_euler.eps}
+  \caption{Euler energy - Earth-Sun}
+  \label{fig:eulerenergy}
+\end{figure}
+
+\begin{figure}[H]
+  \includegraphics[width=\columnwidth]{figures/energy_verlet.eps}
+  \caption{Verlet energy Earth-Sun}
+  \label{fig:verletenergy}
 \end{figure}
 \subsection{Three-body problem}
 \subsection{Full solar system simulation}
@@ -324,7 +379,7 @@ Concluding it all with a conclusion.
 \bibliography{references}
 \blankpage
 \appendix
-\section{Derivation of velocity Verlet algorithm}
+\section{Derivation of Velocity Verlet algorithm}
 \label{sec:velocityverlet}
 The Velocity Verlet method is derived for one dimension ($x$), but is easily
 generalized for three dimensions by simply repeating the procedure with $y$
@@ -360,6 +415,25 @@ algorithm is
     v_{i+1} &= v_i + \frac{\Delta{t}}{2}(a_{i+1} + a_{i})
   \end{split}
 \end{align}
+\section{Escape velocity derivation}
+\label{sec:escapevelocityderivation}
+One way to derive the escape velocity is by energy conservation. The case with the Earth-Sun system
+is examined, where at the initial state, Earth (with mass $M_E$) is at a
+distance $r$ from the Sun (mass $M_\odot$). The
+initial speed of the planet is the escape velocity $\mathbf{v_e}$, and at the
+final state it will have moved infinitely far away ($r = \infty$) and the speed
+will tend to zero. By conservation of energy
+\begin{align*}
+  (K + U)_0 &= (K + U)_1 \\
+  \frac{1}{2} M_E \mathbf{v_e}^2 &= \frac{GM_E M_\odot}{r}
+\end{align*}
+which yields the size of the escape velocity
+\begin{align}
+  v_e = |\mathbf{v_e}| = \sqrt{\frac{2GM_\odot}{r}}
+\end{align}
+From the equations it is clear that the direction of the escape velocity is
+arbitrary, because only energies need to be considered to arrive at the above
+expression.
 \blankpage
 \end{document}
 
