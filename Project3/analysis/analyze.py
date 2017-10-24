@@ -15,17 +15,22 @@ sns.set()
 class Analyzer:
     def __init__(self, path, position, energy, plot2d=False):
         self.position = self.load(path, position)
+        N, M = self.position.shape
+        self.position = self.position.reshape(N, 3, M//3, order='F')
+
         self.energy = self.load(path, energy)
         self.plot2d = plot2d
 
     def load(self, path, name):
         path = os.path.join(path, name)
         data = np.loadtxt(path)
-        N, M = data.shape
-        return data.reshape(N, 3, M//3, order='F')
+        return data
 
-    def plot(self, K=3):
-        # Position
+    def plot(self):
+        self.plot_position()
+        self.plot_energy()
+
+    def plot_position(self):
         fig = plt.figure()
         if not self.plot2d:
             ax = fig.add_subplot(111, projection='3d')
@@ -44,16 +49,26 @@ class Analyzer:
             ax.set_zlabel('Z [AU]')
 
         fig.savefig('../latex/figures/position.eps', dpi=1200)
-        # Energy
+
+    def plot_energy(self):
         fig_energy, (kinetic, potential, total) = plt.subplots(3, sharex=True)
-        kinetic.plot(*self.energy[0:2, :].T,
-                     label="Kinetic")
-        potential.plot(self.energy[0, :], self.energy[2, :],
-                       label="Potential")
-        total.plot(self.energy[0, :],
-                   np.sum(self.energy[[1, 2], :], axis=0),
-                   label="Toal energy")
+        self.energy = self.energy[:, :-2]
+        # Time
+        time = self.energy[0, :]
+        # Kinetic Energy
+        Ek = self.energy[1, :]/self.energy[1, 0]
+        kinetic.plot(time, Ek)
+        # Potential Energy
+        Ep = self.energy[2, :]/self.energy[2, 0]
+        potential.plot(time, Ep)
+        # Total Energy
+        Et = np.sum(self.energy[[1, 2], :], axis=0)/np.sum(self.energy[[1, 2], 0], axis=0)
+        total.plot(time, Et)
         total.set_xlabel("Time [years]")
+        kinetic.set_title("Kinetic Energy")
+        potential.set_title("Potential Energy")
+        total.set_title("Total Energy")
+        fig_energy.legend()
         plt.show()
         fig_energy.savefig('../latex/figures/energy.eps', dpi=1200)
 
@@ -92,10 +107,10 @@ class Analyzer:
                                                    fargs=(lines, scatter,),
                                                    interval=10, blit=False)
         if save:
-            system_animation.save('../latex/figures/animation.gif', writer='imagemagick', fps=30)
+            system_animation.save('../latex/figures/animation.gif',
+                                  writer='imagemagick', fps=30)
         else:
             plt.show()
-
 
 
 if __name__ == '__main__':
@@ -120,4 +135,4 @@ if __name__ == '__main__':
     if args.animate:
         analyzer.animate(args.save)
     else:
-        analyzer.plot('solarsys')
+        analyzer.plot()

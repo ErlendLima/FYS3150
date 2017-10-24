@@ -76,19 +76,19 @@ void Solver::solveSystemVV(){
 }
 
 void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
-  startTiming();
-  // Loop over time
-  for(unsigned int i = 1; i <= n; i++){
-    // Loop over every planet to find acceleration of each planet
-      updateForces();
-    // Forward planet positions in time with method of choice
-    for(auto & planet: sys.planets){
-      stepper(planet);
-      planet->writePosToMat(i);
+    startTiming();
+    // Loop over time
+    for(unsigned int i = 1; i <= n; i++){
+        // Loop over every planet to find acceleration of each planet
+        updateForces();
+        // Forward planet positions in time with method of choice
+        for(auto & planet: sys.planets){
+            stepper(planet);
+            planet->writePosToMat(i);
+        }
+        updateEnergy(i);
     }
-    updateEnergy(i);
-  }
-  endTiming();
+    endTiming();
 }
 
 void Solver::updateForces(){
@@ -207,9 +207,9 @@ void Solver::saveToFile(){
         // Loop over planets
         unsigned int j = 0;
         for(auto & planet: sys.planets){
-            positionstream << planet->pos_array(0,i) << " ";
-            positionstream << planet->pos_array(1,i) << " ";
-            positionstream << planet->pos_array(2,i) << " ";
+            positionstream << planet->pos_array(0, i) << " ";
+            positionstream << planet->pos_array(1, i) << " ";
+            positionstream << planet->pos_array(2, i) << " ";
             if(j == sys.n_planets-1){
                 positionstream << "\n";}
             j++;
