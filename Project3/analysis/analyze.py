@@ -9,7 +9,7 @@ import seaborn as sns
 import argparse
 import os
 
-sns.set()
+sns.set(context="poster")
 
 
 class Analyzer:
@@ -31,7 +31,7 @@ class Analyzer:
         self.plot_energy()
 
     def plot_position(self):
-        fig = plt.figure()
+        fig = plt.figure(figsize = (9,7))
         if not self.plot2d:
             ax = fig.add_subplot(111, projection='3d')
             ax.scatter(0, 0, 0, marker='o', c=(1, 0.6, 0), s=200)
@@ -42,17 +42,19 @@ class Analyzer:
             ax.scatter(0, 0, marker='o', c=(1, 0.6, 0), s=200)
             for n in range(self.position.shape[2]):
                 ax.plot(*self.position[:, 0:2, n].T)
-        ax.legend()
+        # ax.legend()
         ax.set_xlabel('X [AU]')
         ax.set_ylabel('Y [AU]')
         if not self.plot2d:
             ax.set_zlabel('Z [AU]')
+        else:
+            ax.axis('equal')
 
         fig.savefig('../latex/figures/position.eps', dpi=1200)
 
     def plot_energy(self):
-        fig_energy, (kinetic, potential, total) = plt.subplots(3, sharex=True)
-        self.energy = self.energy[:, :-2]
+        fig_energy, (kinetic, potential, total) = plt.subplots(3, sharex=True, figsize=(11,8))
+        self.energy = self.energy[:, 1:-2]
         # Time
         time = self.energy[0, :]
         # Kinetic Energy
@@ -68,7 +70,6 @@ class Analyzer:
         kinetic.set_title("Kinetic Energy")
         potential.set_title("Potential Energy")
         total.set_title("Total Energy")
-        fig_energy.legend()
         plt.show()
         fig_energy.savefig('../latex/figures/energy.eps', dpi=1200)
 
