@@ -1,8 +1,6 @@
 #!/bin/python3
 # -*- coding: utf-8 -*-
 
-import subprocess
-import json
 import numpy as np
 import pandas as pd
 import re
@@ -21,26 +19,19 @@ class BatchRunner(Runner):
         self['use all planets'] = False
         self['use planets'] = ['Sun', 'Earth']
         self['steps per year'] = min
+        self['freeze sun'] = True
+        self['use two body approximation'] = False
 
     def get_relative_total_energy(self):
         """ Calculates the relative total energy at the final step """
-        energies = np.loadtxt(self.energy_path)
+        energies = self.get_energy()
         start = energies[[1, 2], 0].sum()
         end = energies[[1, 2], -1].sum()
         total_relative = end/start
         return total_relative
 
-    def get_simulation_time(self):
-        out = self.run_simulation()
-        time = float(out.split()[-1][:-1])  # Ugly ass code. Regex doesn't work
-        return time
-
-    def update_json(self, step, method):
-        self.increase_timestep(step)
-        self.set_method(method)
-
     def run(self, steps=[10, 20, 30, 50, 100, 200, 500,
-                         1000, 1500, 2000, 5000]):
+                         1000, 1500, 2000, 3000]):
         self.setup_parameters(min=min(steps))
         num_steps = len(steps)
         self.data = pd.DataFrame({'verlet': np.zeros(num_steps),
@@ -51,11 +42,12 @@ class BatchRunner(Runner):
         counter = 0
         for step in steps:
             step = int(step)
+            self['steps per year'] += step
             print(f"{counter}: {step}")
             for method in ['verlet', 'euler']:
                 self['method'] = method
-                self['steps per year'] += step
-                self.data[method + ' time'][counter] = self.get_simulation_time()
+                out, _ = self.get_simulation_time()
+                self.data[method + ' time'][counter] = self.extract_time(out)
                 self.data[method][counter] = self.get_relative_total_energy()
             self.data['step'][counter] = step
             counter += 1

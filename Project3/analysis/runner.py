@@ -16,8 +16,7 @@ class Runner:
         self.exe_path = '../cpp/solve'
         self.energy_path = '../data/energy.txt'
         self.position_path = '../data/position.txt'
-        self.analysis_path = 'analyzer.py'
-        self.parameters = {}
+        self.analysis_path = 'analyze.py'
         self.original_params = self.load_parameters()
         self.parameters = self.load_parameters()
 
@@ -27,20 +26,30 @@ class Runner:
     def __getitem__(self, *args):
         return self.parameters.__getitem__(*args)
 
+    def get_planet(self, name):
+        for planet in self['planets']:
+            if name == planet['name']:
+                return planet
+        raise IndexError(f"{planet} does not exist")
+
     def run_simulation(self) -> str:
         self.save_parameters(self.parameters)
         process = subprocess.Popen(self.exe_path, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE, shell=True)
-        out, _ = process.communicate()
-        out = out.decode('ascii')
-        return out
+        out, err = process.communicate()
+        return out.decode('ascii'), err.decode('ascii')
+
+    @staticmethod
+    def extract_time(out: str) -> str:
+        time = float(out.split()[-1][:-1])  # Ugly ass code. Regex doesn't work
+        return time
 
     def run_analysis(self, arguments: str) -> None:
-        args = shlex.split(arguments)
-        process = subprocess.Popen(self.analysis_path, args=args,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE, shell=True)
-        out, _ = process.communicate()
+        args = f"python {self.analysis_path} {self.position_path} {self.energy_path} {arguments}"
+        args = shlex.split(args)
+        print(args)
+        process = subprocess.run(args)
+        print(process)
 
     def get_energy(self) -> str:
         return np.loadtxt(self.energy_path)

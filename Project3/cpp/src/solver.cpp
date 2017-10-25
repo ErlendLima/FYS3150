@@ -55,15 +55,13 @@ void Solver::solveSystemVV(){
     double progress = 0.1;
     for(unsigned int i = 1; i <= n; i++){
 
-// #pragma omp parallel for
-        for(unsigned int j = 0; j < sys.planets.size(); j++)
-            VerletStep1(sys.planets[j]);
+        for(auto & planet: sys.planets)
+            VerletStep1(planet);
 
         updateForces();
-// #pragma omp parallel for
-        for(unsigned int j = 0; j < sys.planets.size(); j++){
-            VerletStep2(sys.planets[j]);
-            sys.planets[j]->writePosToMat(i);
+        for(auto & planet: sys.planets){
+            VerletStep2(planet);
+            planet->writePosToMat(i);
         }
 
         // Write out the progress for each 10% increment
@@ -95,7 +93,7 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
 
 void Solver::updateForces(){
     for(unsigned int i = 0; i < sys.planets.size(); i++){
-        if(sys.planets[i]->name == "Sun") continue;
+        if(freezeSun && sys.planets[i]->name == "Sun") continue;
         sys.planets[i]->acc_prev = sys.planets[i]->acc;
         sys.planets[i]->resetAcc();
         sys.planets[i]->resetF();
@@ -120,6 +118,8 @@ void Solver::readParameters(const std::string& filename){
     unsigned int num_years  = root["number of years"].asInt();
     saveFlag                = root["do save results"].asBool();
     use_all_planets         = root["use all planets"].asBool();
+    freezeSun               = root["freeze sun"].asBool();
+    twoBodyApproximation    = root["use two body approximation"].asBool();
     planets_to_use          = root["use planets"];
 
     // Act on the read parameters

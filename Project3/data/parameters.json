@@ -72,7 +72,7 @@
         },
         {
             "name": "Jupiter",
-            "mass": 0.0009545325625181036,
+            "mass": 0.09545325625181036,
             "position": [
                 0.3835086244341776,
                 5.093273470298185,
@@ -212,12 +212,15 @@
         }
     ],
     "method": "euler",
-    "steps per year": 6830,
-    "number of years": 1,
+    "steps per year": 1000.0,
+    "number of years": 12,
     "do save results": true,
     "use all planets": false,
+    "freeze sun": true,
+    "use two body approximation": true,
     "use planets": [
         "Sun",
-        "Earth"
+        "Earth",
+        "Jupiter"
     ]
 }

@@ -40,7 +40,9 @@ private:
     Method method;
     Json::Value root;
     Json::Value planets_to_use;
-    bool use_all_planets;
+    bool use_all_planets = true;
+    bool freezeSun = false;
+    bool twoBodyApproximation = false;
 
 
     arma::mat energyArray;
