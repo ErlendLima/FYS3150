@@ -8,35 +8,19 @@ import pandas as pd
 import re
 import matplotlib.pyplot as plt
 import seaborn as sns
+from runner import Runner
 sns.set(context='poster')
 
 
-class Runner:
+class BatchRunner(Runner):
     time_pattern = re.compile('CPU time:\s*(.*?)s.*')
 
-    def __init__(self, exe_path, param_path, energy_path):
-        self.exe_path = exe_path
-        self.param_path = param_path
-        self.energy_path = energy_path
-
     def setup_parameters(self, min):
-        with open(self.param_path, 'r') as param_file:
-            param_json = json.load(param_file)
-        param_json['number of years'] = 1
-        param_json['do save results'] = True
-        param_json['use all planets'] = False
-        param_json['use planets'] = ['Sun', 'Earth']
-        param_json['steps per year'] = min
-        with open(self.param_path, 'w') as param_file:
-            json.dump(param_json, param_file, indent=4)
-
-    def increase_timestep(self, step=100):
-        """ Increase the parameter 'steps per year' by step """
-        self.param_json["steps per year"] = int(self.param_json["steps per year"]) + step
-
-    def set_method(self, method):
-        """ Sets the integration method to either Euler or Verlet """
-        self.param_json["method"] = method
+        self['number of years'] = 1
+        self['do save results'] = True
+        self['use all planets'] = False
+        self['use planets'] = ['Sun', 'Earth']
+        self['steps per year'] = min
 
     def get_relative_total_energy(self):
         """ Calculates the relative total energy at the final step """
@@ -46,25 +30,17 @@ class Runner:
         total_relative = end/start
         return total_relative
 
-    def run_simulation(self):
-        process = subprocess.Popen(self.exe_path, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE, shell=True)
-        out, _ = process.communicate()
-        out = out.decode('ascii')
+    def get_simulation_time(self):
+        out = self.run_simulation()
         time = float(out.split()[-1][:-1])  # Ugly ass code. Regex doesn't work
         return time
 
     def update_json(self, step, method):
-        """ Update the parameters of the json file """
-        with open(self.param_path, 'r') as param_file:
-            self.param_json = json.load(param_file)
         self.increase_timestep(step)
         self.set_method(method)
-        with open(self.param_path, 'w') as param_file:
-            json.dump(self.param_json, param_file, indent=4)
 
     def run(self, steps=[10, 20, 30, 50, 100, 200, 500,
-                         1000, 1500, 2000, 5000, 10_000, 100_000]):
+                         1000, 1500, 2000, 5000]):
         self.setup_parameters(min=min(steps))
         num_steps = len(steps)
         self.data = pd.DataFrame({'verlet': np.zeros(num_steps),
@@ -77,14 +53,15 @@ class Runner:
             step = int(step)
             print(f"{counter}: {step}")
             for method in ['verlet', 'euler']:
-                self.update_json(step, method)
-                self.data[method + ' time'][counter] = self.run_simulation()
+                self['method'] = method
+                self['steps per year'] += step
+                self.data[method + ' time'][counter] = self.get_simulation_time()
                 self.data[method][counter] = self.get_relative_total_energy()
             self.data['step'][counter] = step
             counter += 1
 
         self.data.to_csv('runnerdata.csv')
-        self.plot()
+        self.revert_parameters()
 
     def load(self, path):
         self.data = pd.DataFrame.from_csv(path)
@@ -97,15 +74,17 @@ class Runner:
         error.loglog(self.data['step'], self.data['euler'], label='Euler')
         error.loglog(self.data['step'], self.data['verlet'], label='Verlet')
         error.set_xlabel("Stepsize")
-        error.set_ylabel("Relative error after 1 orbit")
+        error.set_ylabel("Relative energy after one orbit")
         time.plot(self.data['step'], self.data['euler time'], label='Euler')
         time.plot(self.data['step'], self.data['verlet time'], label='Verlet')
         error.set_xlabel("Stepsize")
         time.set_ylabel("Time [s]")
         fig.legend()
+        fig.savefig('../latex/figures/timing.eps')
         plt.show()
 
 
 if __name__ == '__main__':
-    runner = Runner('../cpp/solve', '../data/parameters.json', '../data/energy.txt')
+    runner = BatchRunner()
     runner.run()
+    runner.plot()

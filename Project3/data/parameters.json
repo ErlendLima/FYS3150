@@ -212,7 +212,7 @@
         }
     ],
     "method": "euler",
-    "steps per year": 40830,
+    "steps per year": 6830,
     "number of years": 1,
     "do save results": true,
     "use all planets": false,

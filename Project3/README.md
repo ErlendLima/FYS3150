@@ -5,6 +5,7 @@
 
 <p align="center">
 <b><a href="#overview">Overview</a></b>
+|
 <b><a href="#usage-c">Usage (C++)</a></b>
 |
 <b><a href="#testing-c">Testing (C++)</a></b>
