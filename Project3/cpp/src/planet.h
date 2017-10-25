@@ -14,14 +14,14 @@ public:
   Planet(const std::string&, double M, vec3 pos0, vec3 vel0, unsigned int n);
 
   // Methods
-  double distance(Planet otherPlanet);
-  double gravitationalForce(Planet otherPlanet);
-  void calculateAcc(Planet otherPlanet);
-  void calculateAccRelativistic(Planet otherPlanet);
-  void force(Planet otherPlanet);
-  void relativisticForce(Planet otherPlanet);
-  double kineticEnergy(){return 0.5*mass*pow(vel.length(),2);};
-  double potentialEnergy(Planet otherPlanet);
+  double distance(const Planet& other) const;
+  double gravitationalForce(const Planet& other) const;
+  void calculateAcc(const Planet& other);
+  void calculateAccRelativistic(const Planet& other);
+  void force(const Planet& other);
+  void relativisticForce(const Planet& other);
+  double kineticEnergy() const {return 0.5*mass*pow(vel.length(),2);};
+  double potentialEnergy(const Planet& other) const;
   double totalEnergy();
   void resetAcc();
   void resetF();

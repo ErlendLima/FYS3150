@@ -12,6 +12,7 @@ class JupiterRunner(Runner):
         self['steps per year'] = 1e3
         self['freeze sun'] = False
         self['use two body approximation'] = False
+        self['method'] = 'verlet'
 
     def run(self):
         self.setup()

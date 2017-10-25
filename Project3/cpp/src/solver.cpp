@@ -77,6 +77,7 @@ void Solver::solveSystemVV(){
 void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
     startTiming();
     updateEnergy(0);
+    double progress = 0.1;
     // Loop over time
     for(unsigned int i = 1; i <= n; i++){
         // Loop over every planet to find acceleration of each planet
@@ -85,6 +86,11 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
         for(auto & planet: sys.planets){
             stepper(planet);
             planet->writePosToMat(i);
+        }
+        // Write out the progress for each 10% increment
+        if(i/static_cast<double>(n) >= progress){
+            std::cout << 100*progress << "% completed" << std::endl;
+            progress += 0.1;
         }
         updateEnergy(i);
     }
@@ -126,6 +132,8 @@ void Solver::readParameters(const std::string& filename){
     n = num_years*N_per_year;
     dt = 1.0/N_per_year;
 
+    std::cout << "Simulating " << num_years << " year(s) with "
+              << N_per_year << " steps per year.\n";
     std::transform(smethod.begin(), smethod.end(), smethod.begin(), ::tolower);
     if(smethod == "euler")
         method = Method::EULER;
@@ -158,7 +166,7 @@ void Solver::initSystem(){
     std::string using_planets = "Using planets ";
     for(auto &planet: sys.planets)
         using_planets += planet->name + ", ";
-    std::cout << using_planets + "\r\r." << std::endl;
+    std::cout << using_planets << std::endl;
 
     // Set up the energy array with the format
     // time - kinetic energy - potential energy

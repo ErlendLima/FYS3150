@@ -211,9 +211,9 @@
             ]
         }
     ],
-    "method": "euler",
-    "steps per year": 1000.0,
-    "number of years": 12,
+    "method": "verlet",
+    "steps per year": 10000,
+    "number of years": 1,
     "do save results": true,
     "use all planets": false,
     "freeze sun": true,
@@ -221,6 +221,9 @@
     "use planets": [
         "Sun",
         "Earth",
-        "Jupiter"
+        "Jupiter",
+        "Venus",
+        "Mercury",
+        "Uranus"
     ]
 }
