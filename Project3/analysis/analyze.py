@@ -108,7 +108,7 @@ class Analyzer:
                    for n in range(self.position.shape[2])]
 
         system_animation = animation.FuncAnimation(fig, self.update_lines,
-                                                   frames=range(0, self.position.shape[0], 10),
+                                                   frames=range(0, self.position.shape[0], 100),
                                                    fargs=(lines, scatter,),
                                                    interval=10, blit=False)
         if save:

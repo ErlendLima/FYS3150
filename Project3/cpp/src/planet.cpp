@@ -13,37 +13,37 @@ Planet::Planet(const std::string& namme, double M, vec3 pos0, vec3 vel0, unsigne
   writePosToMat(0);               // Save initial position
 }
 
-double Planet::distance(Planet otherPlanet){
+double Planet::distance(const Planet& other) const{
   vec3 diff;
-  diff = otherPlanet.pos - pos;
+  diff = other.pos - pos;
   return diff.length();
 }
 
-void Planet::force(Planet otherPlanet){
-  vec3 diff = otherPlanet.pos - pos;
-  F = diff*G*mass*otherPlanet.mass/(pow(distance(otherPlanet),3));
+void Planet::force(const Planet& other){
+  vec3 diff = other.pos - pos;
+  F = diff*G*mass*other.mass/(pow(distance(other),3));
 }
 
-void Planet::relativisticForce(Planet otherPlanet){
-  vec3 diff = otherPlanet.pos - pos;
+void Planet::relativisticForce(const Planet& other){
+  vec3 diff = other.pos - pos;
   double r_squared  = diff.lengthSquared();
-  double ang_mom_norm = diff.cross2d(otherPlanet.pos);
-  force(otherPlanet); // SHOULD I ALSO DIVIDE BY THE MASS HERE?
+  double ang_mom_norm = diff.cross2d(other.pos);
+  force(other); // SHOULD I ALSO DIVIDE BY THE MASS HERE?
   F *= (1 + 3*ang_mom_norm*ang_mom_norm/(r_squared*c*c));
 }
 
-void Planet::calculateAcc(Planet otherPlanet){
-  force(otherPlanet);
+void Planet::calculateAcc(const Planet& other){
+  force(other);
   acc += F/mass;
 }
 
-void Planet::calculateAccRelativistic(Planet otherPlanet){
-  relativisticForce(otherPlanet);
+void Planet::calculateAccRelativistic(const Planet& other){
+  relativisticForce(other);
   acc += F/mass;
 }
 
-double Planet::potentialEnergy(Planet otherPlanet){
-  return -G*mass*otherPlanet.mass/distance(otherPlanet);
+double Planet::potentialEnergy(const Planet& other) const{
+  return -G*mass*other.mass/distance(other);
 }
 
 void Planet::resetAcc(){

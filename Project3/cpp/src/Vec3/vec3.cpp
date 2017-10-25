@@ -19,9 +19,9 @@ vec3::vec3(double a, double b, double c)
 
 vec3 &vec3::operator-=(const vec3 &rhs)
 {
-    this->components[0] -= rhs.components[0];
-    this->components[1] -= rhs.components[1];
-    this->components[2] -= rhs.components[2];
+    components[0] -= rhs.components[0];
+    components[1] -= rhs.components[1];
+    components[2] -= rhs.components[2];
     return *this;
 }
 
