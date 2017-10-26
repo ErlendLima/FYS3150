@@ -22,7 +22,7 @@ public:
   void relativisticForce(const Planet& other);
   double kineticEnergy() const {return 0.5*mass*pow(vel.length(),2);};
   double potentialEnergy(const Planet& other) const;
-  double totalEnergy();
+  double angularMomentum(const vec3& COM) const;
   void resetAcc();
   void resetF();
   void writePosToMat(unsigned int);
@@ -36,10 +36,6 @@ public:
   vec3 acc_prev;
   vec3 F;
   arma::mat pos_array;
-
-private:
-  double potential = 0;
-  double kinetic   = 0;
 };
 
 #endif // PLANET_H

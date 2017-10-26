@@ -22,6 +22,7 @@ Solver::Solver(const std::string& parameterpath){
 }
 
 int Solver::solve(){
+  // Wrapper for initializing, solving and saving the solution of the system.
   initSystem();
 
   std::function<void(std::shared_ptr<Planet>)> stepOne;
@@ -56,9 +57,15 @@ int Solver::solve(){
 
 void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepOne,
                          std::function<void(std::shared_ptr<Planet>)>& stepTwo){
+    // Solves the time development of the system. To generalize the code for
+    // both algorithms, the forwarding functions are passed as args. The first
+    // step is only used for the Verlet method because the acceleration is
+    // updated mid-step.
     startTiming();
+    sys.updateCOM();
     updateForces();
     updateEnergy(0);
+    angMomArray(0) = sys.angularMomentum();
     double progress = 0.1;
     // Loop over time
     for(unsigned int i = 1; i <= n; i++){
@@ -85,17 +92,21 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepOne,
             progress += 0.1;
         }
         updateEnergy(i);
+        sys.updateCOM();
+        angMomArray(i) = sys.angularMomentum();
     }
     endTiming();
 }
 
 void Solver::updateForces(){
+    // Update the acceleration for each planet
     for(auto& planet: sys.planets){
+        // Save previous acceleration for Verlet solver, reset temp variables
         planet->acc_prev = planet->acc;
         planet->resetAcc();
         planet->resetF();
 
-        // Loop over all the other planets
+        // Loop over all the other planets and add acceleration contribution
         for(auto & other: sys.planets){
             if(planet == other)continue;
             else{
@@ -161,6 +172,8 @@ void Solver::readParameters(const std::string& filename){
 }
 
 void Solver::initSystem(){
+    // Add relevant objects to solar system instance, which holds all objects
+    // in the system
     auto planets = root["planets"];
     for(unsigned int i = 0; i < planets.size(); i ++){
         if(!usePlanet(planets[i]["name"].asString()))
@@ -187,10 +200,12 @@ void Solver::initSystem(){
     // Set up the energy array with the format
     // time - kinetic energy - potential energy
     energyArray = arma::zeros(3, n+1);
+    angMomArray = arma::zeros(n+1);
     sys.sort();
 }
 
 bool Solver::usePlanet(const std::string& planet_name) const{
+    // Checks in input if a planet is to be used in the simulation by name
     if(use_all_planets)
         return true;
     for(unsigned int i = 0; i < planets_to_use.size(); i++){
@@ -221,14 +236,17 @@ void Solver::saveToFile(){
 
     // Save the energy
     energyArray.save(savepath + "/energy.txt", arma::raw_ascii);
+    angMomArray.save(savepath + "/angmom.txt", arma::raw_ascii);
 }
 
 void Solver::startTiming(){
+  // Start timing the algorithm (both wall time and cpu time)
   startWallTime = std::chrono::high_resolution_clock::now();
   startCPUTime  = std::clock();
 }
 
 void Solver::endTiming(){
+  // Print wall time and cpu time when called
   auto CPUTime = (std::clock() - startCPUTime)/static_cast<double>(CLOCKS_PER_SEC);
   std::chrono::duration<double> wallTime = (std::chrono::high_resolution_clock::now() - startWallTime);
   std::cout << "Wall time: " << wallTime.count() << "s\n"

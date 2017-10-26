@@ -36,6 +36,7 @@ private:
     void startTiming();
     void endTiming();
     void updateEnergy(unsigned int n);
+    void updateAngMom(unsigned int n);
     void nop(const std::shared_ptr<Planet>) const{};
 
     bool saveFlag = true;
@@ -47,7 +48,7 @@ private:
     bool freezeSun = false;
     bool twoBodyApproximation = false;
 
-
+    arma::mat angMomArray;
     arma::mat energyArray;
     std::chrono::high_resolution_clock::time_point startWallTime;
     clock_t startCPUTime;

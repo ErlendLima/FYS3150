@@ -27,6 +27,25 @@ double SolarSys::potentialEnergy() const{
   return energy;
 }
 
+double SolarSys::angularMomentum() const{
+  // Returns total angular momentum in the system
+  double angmom = 0.0;
+  for(auto & planet: planets){
+    angmom += planet->angularMomentum(COM);
+  }
+  return angmom;
+}
+
+void SolarSys::updateCOM(){
+  COM = 0.0; // Reset first
+  double totalMass = 0.0;
+  for(auto & planet: planets){
+    COM += planet->pos * planet->mass;
+    totalMass += planet->mass;
+  }
+  COM /= totalMass;
+}
+
 void SolarSys::sort(){
     // Place the sun in the initial position of the array
     auto temp = planets;
