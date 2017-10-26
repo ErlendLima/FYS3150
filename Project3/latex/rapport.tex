@@ -339,7 +339,7 @@ where $j$ indicates the planet index, $i$ is the time step index and $r$ is the
 position relative to the center of mass. The center of mass of the system
 is calculated with
 \begin{align}
-  \mathbf{R}_\text{COM} = \frac{1}{M_\text{tot}} \sum_j M_j r_j
+  \mathbf{R}_\text{COM} = \frac{1}{M_\text{tot}} \sum_j M_j \mathbf{r}_j
 \end{align}
 \subsubsection{Relative quantities}
 In the analysis, because of the unusual units used, it is more intuitive to
@@ -353,8 +353,19 @@ discussion. The total angular momentum is scaled similarly.
 
 \subsection{Bisection method to find escape velocities numerically}
 For the Earth-Sun system, the Earth requires an initial velocity of
-$v = 2 \pi \sqrt{2}$ to escape the solar system, by equation ~\ref{eq:escapevelocity}.
+$v = 2 \pi \sqrt{2}$ AU/yr to escape the solar system by equation ~\ref{eq:escapevelocity}.
 
+A bisection inspired method was developed to find this value numerically. For the
+full algorithm see \texttt{findescapevelocity.py} in the Git repository.
+
+\subsection{Modifications to gravity}
+The force of gravity was modified by changing the exponent for the radius
+in the force expression, i.e. a modification of the type
+\begin{align*}
+  \tilde{F}_G = \frac{G m_1 m_2}{r^\beta}
+\end{align*}
+where $\beta \in [2,3]$ are tested. Notice that $\beta = 2$ results in the correct
+Newtonian expression.
 
 \subsection{Models}
 In this project, four separate situations are tested. This makes it possible to test the versatility of the
@@ -366,7 +377,7 @@ forwarded for a year with both algorithms. The Sun is placed at the origin with
 no initial velocity, and for simplicity Earth is given an initial position 1 AU
 away from the Sun in the x-direction. It is given an initial velocity $v = 2\pi$ AU/yr
 in the y-direction, which analytically should lead to a perfect circular motion
-if the Sun is kept stationary. The primary simulation is done with $N = 1000$ time steps.
+if the Sun is kept stationary. The simulation is done with $N = 1000$ time steps.
 The total energy in the system over time is shown in a plot, and used for
 comparing the algorithms.
 
@@ -422,6 +433,7 @@ are shown in figures ~\ref{fig:eulerenergy} and ~\ref{fig:verletenergy}.
   with the Velocity Verlet solver.}
   \label{fig:verletenergy}
 \end{figure}
+\subsection{Escape velocity}
 
 \subsection{Three-body problem}
 \subsection{Full solar system simulation}
@@ -449,9 +461,12 @@ is likely caused by the fact that the method systematically makes an error away
 from the Sun, because of the linearization of the accelerations and velocity.
 
 Energy error vs. execution time and number of steps.
+
+\subsection{Escape velocity}
 \subsection{Three-body system}
 
 \subsection{Full solar system simulation}
+
 
 \subsection{Perihelion precession of Mercury}
 
