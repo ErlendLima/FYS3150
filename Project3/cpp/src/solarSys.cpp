@@ -53,9 +53,10 @@ void SolarSys::sort(){
     for (auto& planet: planets){
         if (planet->name == "Sun")
             temp[0] = planet;
-        else
+        else{
             temp[i] = planet;
-        i++;
+            i++;
+        }
     }
     planets = temp;
 }

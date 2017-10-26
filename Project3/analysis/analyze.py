@@ -13,12 +13,13 @@ sns.set(context="poster")
 
 
 class Analyzer:
-    def __init__(self, path, position, energy, plot2d=False):
+    def __init__(self, path, position, energy, angular_momentum, plot2d=False):
         self.position = self.load(path, position)
         N, M = self.position.shape
         self.position = self.position.reshape(N, 3, M//3, order='F')
 
         self.energy = self.load(path, energy)
+        self.angular_momentum = self.load(path, angular_momentum)
         self.plot2d = plot2d
 
     def load(self, path, name):
@@ -28,10 +29,11 @@ class Analyzer:
 
     def plot(self):
         self.plot_position()
+        self.plot_angular_momentum()
         self.plot_energy()
 
     def plot_position(self):
-        fig = plt.figure(figsize=(9,7))
+        fig = plt.figure(figsize=(9, 7))
         if not self.plot2d:
             ax = fig.add_subplot(111, projection='3d')
             ax.scatter(*self.position[0, :, 0], marker='o',
@@ -53,6 +55,14 @@ class Analyzer:
             ax.axis('equal')
 
         fig.savefig('../latex/figures/position.eps', dpi=1200)
+
+    def plot_angular_momentum(self):
+        fig = plt.figure(figsize=(9, 7))
+        time = self.energy[0, :]
+        plt.plot(time, self.angular_momentum)
+        plt.xlabel(r"Time [yr]")
+        plt.ylabel(r"Total Angular Momentum [AU$^2$/yr]")
+        plt.show()
 
     def plot_energy(self):
         fig_energy, (kinetic, potential, total) = plt.subplots(3, sharex=True,
@@ -126,10 +136,12 @@ if __name__ == '__main__':
     parser.add_argument('--search_path', type=os.path.abspath,
                         default='../data/',
                         help="Directory to search for input files")
-    parser.add_argument('position_filename', type=str,
+    parser.add_argument('--position', type=str, default="position.txt",
                         help="The file containing the positions")
-    parser.add_argument('energy_filename', type=str,
+    parser.add_argument('--energy', type=str, default="energy.txt",
                         help="The file containing the energies")
+    parser.add_argument('--angular', type=str, default="angmom.txt",
+                        help="The file containing the angular momenta")
     parser.add_argument('--plot2d', help="Plot as 2D",
                         action="store_true")
     parser.add_argument('--animate', help="Animate the orbits",
@@ -137,8 +149,8 @@ if __name__ == '__main__':
     parser.add_argument('--save', help="Save the (animation) plots",
                         action="store_true")
     args = parser.parse_args()
-    analyzer = Analyzer(args.search_path, args.position_filename,
-                        args.energy_filename,
+    analyzer = Analyzer(args.search_path, args.position,
+                        args.energy, args.angular,
                         plot2d=args.plot2d)
     if args.animate:
         analyzer.animate(args.save)
