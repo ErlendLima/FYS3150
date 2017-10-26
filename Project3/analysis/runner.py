@@ -20,6 +20,13 @@ class Runner:
         self.original_params = self.load_parameters()
         self.parameters = self.load_parameters()
 
+    def __enter__(self):
+        self.setup()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.revert_parameters()
+
     def __setitem__(self, *args):
         return self.parameters.__setitem__(*args)
 
@@ -54,7 +61,7 @@ class Runner:
 
     def get_position(self) -> str:
         position = np.loadtxt(self.position_path)
-        M, N = position.shape
+        N, M = position.shape
         return position.reshape(N, 3, M//3, order='F')
 
     def revert_parameters(self) -> None:

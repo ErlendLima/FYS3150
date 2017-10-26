@@ -36,6 +36,7 @@ public:
   vec3 acc_prev;
   vec3 F;
   arma::mat pos_array;
+  double beta = 2;
 };
 
 #endif // PLANET_H

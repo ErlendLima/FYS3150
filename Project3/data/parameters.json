@@ -218,6 +218,7 @@
     "use all planets": false,
     "freeze sun": true,
     "use two body approximation": false,
+    "gravitational exponent": 2,
     "use planets": [
         "Sun",
         "Earth"

@@ -23,7 +23,7 @@ double Planet::distance(const Planet& other) const{
 void Planet::force(const Planet& other){
   // Calculate force vector on this object from some other object
   vec3 diff = other.pos - pos;
-  F = diff*G*mass*other.mass/(pow(distance(other),3));
+  F = diff*G*mass*other.mass/(pow(distance(other), 1+beta));
 }
 
 void Planet::relativisticForce(const Planet& other){

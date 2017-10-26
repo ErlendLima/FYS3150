@@ -47,6 +47,7 @@ private:
     bool use_all_planets = true;
     bool freezeSun = false;
     bool twoBodyApproximation = false;
+    double gravitationalExponent = 2;
 
     arma::mat angMomArray;
     arma::mat energyArray;
