@@ -24,13 +24,12 @@ public:
     unsigned int n_planets = 0;
 
     void updateTotalEnergy();
-    double getTotalEnergy(){return totalEnergy;};
     double potentialEnergy() const;
     double kineticEnergy() const;
     void readParameters(const std::string& filename);
+    void sort();
 
 private:
-    double totalEnergy = 0.0;
 };
 
 #endif /* SOLARSYS_H */

@@ -31,15 +31,17 @@ class Analyzer:
         self.plot_energy()
 
     def plot_position(self):
-        fig = plt.figure(figsize = (9,7))
+        fig = plt.figure(figsize=(9,7))
         if not self.plot2d:
             ax = fig.add_subplot(111, projection='3d')
-            ax.scatter(0, 0, 0, marker='o', c=(1, 0.6, 0), s=200)
+            ax.scatter(*self.position[0, :, 0], marker='o',
+                       c=(1, 0.6, 0), s=200)
             for n in range(self.position.shape[2]):
                 ax.plot(*self.position[:, :, n].T)
         else:
             ax = fig.add_subplot(111)
-            ax.scatter(0, 0, marker='o', c=(1, 0.6, 0), s=200)
+            ax.scatter(*self.position[0, 0:2, 0], marker='o',
+                       c=(1, 0.6, 0), s=200)
             for n in range(self.position.shape[2]):
                 ax.plot(*self.position[:, 0:2, n].T)
         # ax.legend()
@@ -53,7 +55,8 @@ class Analyzer:
         fig.savefig('../latex/figures/position.eps', dpi=1200)
 
     def plot_energy(self):
-        fig_energy, (kinetic, potential, total) = plt.subplots(3, sharex=True, figsize=(11,8))
+        fig_energy, (kinetic, potential, total) = plt.subplots(3, sharex=True,
+                                                               figsize=(11, 8))
         self.energy = self.energy[:, 1:-2]
         # Time
         time = self.energy[0, :]
@@ -74,7 +77,7 @@ class Analyzer:
         fig_energy.savefig('../latex/figures/energy.eps', dpi=1200)
 
     def update_lines(self, num, lines, scatter):
-        start = 0 if num < 100 else num-100
+        start = 0 if num < 1000 else num-1000
         for index, (line, scatt) in enumerate(zip(lines, scatter)):
             line[0].set_data(*self.position[start:num+1, 0:2, index].T)
             line[0].set_3d_properties(self.position[start:num+1, 2, index])
@@ -108,7 +111,7 @@ class Analyzer:
                    for n in range(self.position.shape[2])]
 
         system_animation = animation.FuncAnimation(fig, self.update_lines,
-                                                   frames=range(0, self.position.shape[0], 100),
+                                                   frames=range(0, self.position.shape[0], 500),
                                                    fargs=(lines, scatter,),
                                                    interval=10, blit=False)
         if save:

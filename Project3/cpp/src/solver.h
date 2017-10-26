@@ -12,8 +12,10 @@ public:
     virtual ~Solver(){};
 
     int solve();
-    void solveSystem(std::function<void(std::shared_ptr<Planet>)>&);
-    void solveSystemVV();
+    void solveVerlet();
+    // void solveEuler();
+    void solveSystem(std::function<void(std::shared_ptr<Planet>)>&,
+                     std::function<void(std::shared_ptr<Planet>)>&);
     void doSave(bool flag){saveFlag = flag;};
     void setSavepath(const std::string& path){savepath = path;}
     void updateForces();
@@ -34,6 +36,7 @@ private:
     void startTiming();
     void endTiming();
     void updateEnergy(unsigned int n);
+    void nop(const std::shared_ptr<Planet>) const{};
 
     bool saveFlag = true;
     std::string savepath = "../data";

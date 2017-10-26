@@ -72,7 +72,7 @@
         },
         {
             "name": "Jupiter",
-            "mass": 0.09545325625181036,
+            "mass": 0.0009545325625181036,
             "position": [
                 0.3835086244341776,
                 5.093273470298185,
@@ -212,18 +212,14 @@
         }
     ],
     "method": "verlet",
-    "steps per year": 10000,
+    "steps per year": 100000,
     "number of years": 1,
     "do save results": true,
     "use all planets": false,
     "freeze sun": true,
-    "use two body approximation": true,
+    "use two body approximation": false,
     "use planets": [
         "Sun",
-        "Earth",
-        "Jupiter",
-        "Venus",
-        "Mercury",
-        "Uranus"
+        "Earth"
     ]
 }

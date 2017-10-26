@@ -31,7 +31,8 @@ class BatchRunner(Runner):
         return total_relative
 
     def run(self, steps=[10, 20, 30, 50, 100, 200, 500,
-                         1000, 1500, 2000, 3000]):
+                         1000, 1500, 2000, 3000, 5000,
+                         8000, 10_000, 50_000, 100_000, 1_000_000]):
         self.setup_parameters(min=min(steps))
         num_steps = len(steps)
         self.data = pd.DataFrame({'verlet': np.zeros(num_steps),
@@ -46,7 +47,7 @@ class BatchRunner(Runner):
             print(f"{counter}: {step}")
             for method in ['verlet', 'euler']:
                 self['method'] = method
-                out, _ = self.get_simulation_time()
+                out, _ = self.run_simulation()
                 self.data[method + ' time'][counter] = self.extract_time(out)
                 self.data[method][counter] = self.get_relative_total_energy()
             self.data['step'][counter] = step
