@@ -8,11 +8,6 @@ void SolarSys::add(std::string name, double M, vec3 pos, vec3 vel, unsigned int 
   n_planets++;
 }
 
-void SolarSys::updateTotalEnergy(){
-    totalEnergy = kineticEnergy();
-    totalEnergy += potentialEnergy();
-}
-
 double SolarSys::kineticEnergy() const{
     double energy = 0.0;
     for(auto & planet: planets){
@@ -32,3 +27,16 @@ double SolarSys::potentialEnergy() const{
   return energy;
 }
 
+void SolarSys::sort(){
+    // Place the sun in the initial position of the array
+    auto temp = planets;
+    unsigned int i = 1;
+    for (auto& planet: planets){
+        if (planet->name == "Sun")
+            temp[0] = planet;
+        else
+            temp[i] = planet;
+        i++;
+    }
+    planets = temp;
+}

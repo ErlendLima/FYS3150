@@ -24,21 +24,27 @@ Solver::Solver(const std::string& parameterpath){
 int Solver::solve(){
   initSystem();
 
-  // Holds step function for the chosen method
-  std::function<void(std::shared_ptr<Planet>)> stepper;
+  std::function<void(std::shared_ptr<Planet>)> stepOne;
+  std::function<void(std::shared_ptr<Planet>)> stepTwo;
+
   switch (method){
     case Method::EULER:
       std::cout << "=== Simulating system with Euler's method ===" << std::endl;
-      stepper = std::bind(&Solver::EulerStep, this, _1);
-      solveSystem(stepper);
+      stepOne = std::bind(&Solver::nop, this, _1);
+      stepTwo = std::bind(&Solver::EulerStep, this, _1);
+      solveSystem(stepOne, stepTwo);
       break;
     case Method::VERLET:
       std::cout << "=== Simulating system with Velocity Verlet method ===" << std::endl;
-      solveSystemVV();
+      stepOne = std::bind(&Solver::VerletStep1, this, _1);
+      stepTwo = std::bind(&Solver::VerletStep2, this, _1);
+      solveSystem(stepOne, stepTwo);
       break;
     case Method::EULERCROMER:
       std::cout << "=== Simulating system with Euler-Cromer's method ===" << std::endl;
-      stepper = std::bind(&Solver::ECStep, this, _1);
+      stepOne = std::bind(&Solver::nop, this, _1);
+      stepTwo = std::bind(&Solver::ECStep, this, _1);
+      solveSystem(stepOne, stepTwo);
       break;
     default:
       std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
@@ -48,44 +54,30 @@ int Solver::solve(){
     return 0;
 }
 
-void Solver::solveSystemVV(){
+void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepOne,
+                         std::function<void(std::shared_ptr<Planet>)>& stepTwo){
     startTiming();
     updateForces();
     updateEnergy(0);
     double progress = 0.1;
-    for(unsigned int i = 1; i <= n; i++){
-
-        for(auto & planet: sys.planets)
-            VerletStep1(planet);
-
-        updateForces();
-        for(auto & planet: sys.planets){
-            VerletStep2(planet);
-            planet->writePosToMat(i);
-        }
-
-        // Write out the progress for each 10% increment
-        if(i/static_cast<double>(n) >= progress){
-            std::cout << 100*progress << "% completed" << std::endl;
-            progress += 0.1;
-        }
-        updateEnergy(i);
-    }
-    endTiming();
-}
-
-void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
-    startTiming();
-    updateEnergy(0);
-    double progress = 0.1;
     // Loop over time
     for(unsigned int i = 1; i <= n; i++){
+        for(unsigned int j = 0; j < sys.planets.size(); j++){
+            if(freezeSun && j == 0) continue;
+            stepOne(sys.planets[j]);
+        }
+
         // Loop over every planet to find acceleration of each planet
         updateForces();
         // Forward planet positions in time with method of choice
-        for(auto & planet: sys.planets){
-            stepper(planet);
-            planet->writePosToMat(i);
+        // The first 'planet' is the sun, and receives special treatment
+        for(unsigned int j = 0; j < sys.planets.size(); j++){
+            if(freezeSun && j == 0){
+                sys.planets[j]->writePosToMat(i);
+                continue;
+            }
+            stepTwo(sys.planets[j]);
+            sys.planets[j]->writePosToMat(i);
         }
         // Write out the progress for each 10% increment
         if(i/static_cast<double>(n) >= progress){
@@ -98,22 +90,45 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepper){
 }
 
 void Solver::updateForces(){
-    for(unsigned int i = 0; i < sys.planets.size(); i++){
-        if(freezeSun && sys.planets[i]->name == "Sun") continue;
-        sys.planets[i]->acc_prev = sys.planets[i]->acc;
-        sys.planets[i]->resetAcc();
-        sys.planets[i]->resetF();
+    for(auto& planet: sys.planets){
+        planet->acc_prev = planet->acc;
+        planet->resetAcc();
+        planet->resetF();
 
         // Loop over all the other planets
         for(auto & other: sys.planets){
-            if(sys.planets[i] == other)continue;
+            if(planet == other)continue;
             else{
-                sys.planets[i]->calculateAcc(*other);
+                planet->calculateAcc(*other);
             }
         }
     }
 }
 
+void Solver::EulerStep(std::shared_ptr<Planet> planet){
+    planet->vel_tmp = planet->vel;   // Save velocity temporarily for Euler
+    planet->vel    += planet->acc*dt;
+    planet->pos    += planet->vel_tmp*dt;
+}
+
+void Solver::VerletStep1(std::shared_ptr<Planet> planet){
+    planet->pos += planet->vel*dt + 0.5*dt*dt*planet->acc;
+}
+
+void Solver::VerletStep2(std::shared_ptr<Planet> planet){
+    planet->vel += 0.5*dt*(planet->acc + planet->acc_prev);
+}
+
+void Solver::ECStep(std::shared_ptr<Planet> planet){
+    planet->vel += planet->acc*dt;
+    planet->pos += planet->vel*dt;
+}
+
+void Solver::updateEnergy(unsigned int step){
+    energyArray(0, step) = step*dt;
+    energyArray(1, step) = sys.kineticEnergy();
+    energyArray(2, step) = sys.potentialEnergy();
+}
 
 void Solver::readParameters(const std::string& filename){
     // Load the JSON file and read the relevant parameters
@@ -128,6 +143,7 @@ void Solver::readParameters(const std::string& filename){
     twoBodyApproximation    = root["use two body approximation"].asBool();
     planets_to_use          = root["use planets"];
 
+    std::cout << freezeSun << std::endl;
     // Act on the read parameters
     n = num_years*N_per_year;
     dt = 1.0/N_per_year;
@@ -171,6 +187,7 @@ void Solver::initSystem(){
     // Set up the energy array with the format
     // time - kinetic energy - potential energy
     energyArray = arma::zeros(3, n+1);
+    sys.sort();
 }
 
 bool Solver::usePlanet(const std::string& planet_name) const{
@@ -181,31 +198,6 @@ bool Solver::usePlanet(const std::string& planet_name) const{
             return true;
     }
     return false;
-}
-
-void Solver::EulerStep(std::shared_ptr<Planet> planet){
-  planet->vel_tmp = planet->vel;   // Save velocity temporarily for Euler
-  planet->vel    += planet->acc*dt;
-  planet->pos    += planet->vel_tmp*dt;
-}
-
-void Solver::VerletStep1(std::shared_ptr<Planet> planet){
-  planet->pos += planet->vel*dt + 0.5*dt*dt*planet->acc;
-}
-
-void Solver::VerletStep2(std::shared_ptr<Planet> planet){
-  planet->vel += 0.5*dt*(planet->acc + planet->acc_prev);
-}
-
-void Solver::ECStep(std::shared_ptr<Planet> planet){
-  planet->vel += planet->acc*dt;
-  planet->pos += planet->vel*dt;
-}
-
-void Solver::updateEnergy(unsigned int step){
-    energyArray(0, step) = step*dt;
-    energyArray(1, step) = sys.kineticEnergy();
-    energyArray(2, step) = sys.potentialEnergy();
 }
 
 void Solver::saveToFile(){

@@ -47,9 +47,7 @@ class Runner:
     def run_analysis(self, arguments: str) -> None:
         args = f"python {self.analysis_path} {self.position_path} {self.energy_path} {arguments}"
         args = shlex.split(args)
-        print(args)
         process = subprocess.run(args)
-        print(process)
 
     def get_energy(self) -> str:
         return np.loadtxt(self.energy_path)

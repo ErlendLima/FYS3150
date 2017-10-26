@@ -20,7 +20,7 @@ class JupiterRunner(Runner):
             self.get_planet('Jupiter')['mass'] *= mass_multiplier
             out, _ = self.run_simulation()
             print(f"Simulation ran in {self.extract_time(out)} s")
-            self.run_analysis('--animate')
+            self.run_analysis('--plot2d')
 
         self.revert_parameters()
 
