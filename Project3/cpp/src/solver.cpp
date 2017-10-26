@@ -155,7 +155,6 @@ void Solver::readParameters(const std::string& filename){
     gravitationalExponent   = root["gravitational exponent"].asDouble();
     planets_to_use          = root["use planets"];
 
-    std::cout << freezeSun << std::endl;
     // Act on the read parameters
     n = num_years*N_per_year;
     dt = 1.0/N_per_year;
