@@ -14,17 +14,20 @@ Planet::Planet(const std::string& namme, double M, vec3 pos0, vec3 vel0, unsigne
 }
 
 double Planet::distance(const Planet& other) const{
+  // Calculate distance from this object to some other object
   vec3 diff;
   diff = other.pos - pos;
   return diff.length();
 }
 
 void Planet::force(const Planet& other){
+  // Calculate force vector on this object from some other object
   vec3 diff = other.pos - pos;
   F = diff*G*mass*other.mass/(pow(distance(other), 1+beta));
 }
 
 void Planet::relativisticForce(const Planet& other){
+  // Modified force with relativistic effects on spacetime
   vec3 diff = other.pos - pos;
   double r_squared  = diff.lengthSquared();
   double ang_mom_norm = diff.cross2d(other.pos);
@@ -43,7 +46,13 @@ void Planet::calculateAccRelativistic(const Planet& other){
 }
 
 double Planet::potentialEnergy(const Planet& other) const{
+  // Returns gravitational potential energy of this object in the grav field
+  // of another object
   return -G*mass*other.mass/distance(other);
+}
+
+double Planet::angularMomentum(const vec3& COM) const{
+  return (pos - COM).cross2d(mass * vel);
 }
 
 void Planet::resetAcc(){

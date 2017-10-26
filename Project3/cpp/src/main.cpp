@@ -10,7 +10,9 @@
 #include "Vec3/vec3.h"
 
 int main(int argc, char *argv[]) {
-    std::string parameterpath = "../data/parameters.json";
+  // Initialize solver and run simulation. The initial values and other parameters
+  // are provided in a .json file. See git repo for detailed description.
+  std::string parameterpath = "../data/parameters.json";
   Solver solver(parameterpath);
   solver.solve();
   return 0;

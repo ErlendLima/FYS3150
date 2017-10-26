@@ -90,7 +90,7 @@
 
 \begin{abstract}
 Two numerical algorithms are used to solve systems of coupled ODE's by simulating a n-body problem, our solar system.
-The algorithms used are the Forward Euler and Velocity-Verlet algorithms. With only X extra floating point operations per
+The algorithms used are the Forward Euler and Velocity-Verlet algorithms. With only two additional floating point operations per
 iteration of the algorithm, the Verlet method is shown to completely outperform the Euler scheme in terms of numerical accuracy and stability,
 with a small cost in execution speed. By investigating the solutions for different step sizes, $10^5$ time steps per year resulted in
 solutions with an acceptable compromise between numerical precision and speed. The perihelion precession of Mercury (which
@@ -121,8 +121,10 @@ approximated solutions.
 In this paper, the equations of motion are written as a coupled set of first-order linear equations, and
 the classic forward Euler and Velocity Verlet algorithms are employed to simulate the solar system,
 and their accuracies, conservation properties and computation times are compared. The theoretical
-model for the forces in our solar system (Newtonian gravity) is derived, and the numerical implementations
-are used to solve the time development of the planets in the solar system. Several analytical results are reproduced by the program, such as conservation of energy and angular momentum, escape velocities and the perihelion precession of Mercury.
+model for the forces in our solar system (Newtonian gravity) is shown, and the numerical implementations
+are used to solve the time development of the planets in the solar system. Several analytical results
+are reproduced by the program, such as conservation of energy and angular momentum, escape velocities
+and the perihelion precession of Mercury.
 \section{Theory}
 \label{sec:theory}
 \subsection{Newtonian gravity}
@@ -136,13 +138,14 @@ where $m_1$ and $m_2$ are the masses of the objects, $G$ is the
 gravitational constant and $r$ is the distance between the objects. In the
 case examined in this paper, it is assumed that the solar mass is much larger
 than the planet masses ($M_\odot \gg M_\text{planet}$), and the solar
-movement is therefore ignored. Then, for a planet orbiting the sun, the
+movement is therefore ignored unless other information is specified.
+Then, for a planet orbiting the sun, the
 planet position as a function of time is described by Newton's second law:
 \begin{align*}
   \dv[2]{\mathbf{x}}{t} = \frac{\mathbf{F}_G}{M}
 \end{align*}
 where $M$ is the planet mass. This is equivalent to one ODE (ordinary differential
-equation) for each direction component, i.e. three separate equations in the
+equation) for each direction component, i.e. three coupled equations in the
 three-dimensional case.
 
 For the numerical methods the above second order vector ODE is more convenient to
@@ -160,10 +163,23 @@ and hence the acceleration, depends on the distance between the celestial bodies
 This results in six coupled, first-order, linear differential equations.
 
 \subsection{Numerical algorithms}
+\label{sec:numalgos}
 The algorithms used are both based on Taylor expansions, the forward Euler
 scheme approximates position and velocity to first order, while the Verlet
 method combines a second order approximation with the fact that the acceleration
 is only position dependent.
+
+For both methods, the time is discretized to $N$ integration points so that
+\begin{align*}
+  t \rightarrow t_i = t_0 + i \Delta{t}
+\end{align*}
+where $\Delta{t} = \frac{t_\text{f} - t_0}{N}$ is the time step and $i = 0, 1, \hdots, N$.
+From this a discretization of position follows, i.e.
+\begin{align*}
+  x(t) = x(t_i) \rightarrow x_i
+\end{align*}
+and similarly for velocity and acceleration so that $v(t_i) \rightarrow v_i$ and
+$a(t_i) \rightarrow a_i$.
 
 \subsubsection{Forward Euler}
 The Euler method (forward Euler) is the most basic numerical method to solve
@@ -201,8 +217,9 @@ multiplication and one addition), which sums to four operations per iteration.
 With the Verlet method, the quantity $\Delta{t}^2 / 2$ can be precomputed and
 $a_{i}$ only needs to be computed once per iteration and saved for the next.
 The Verlet method therefore requires six FLOPS per iteration. The calculation
-of the accelerations have not been considered, because the number of FLOPS depends
-on how many planets are in the system.
+of the accelerations has not been considered, but it is easy to conclude that
+as more planets are added to the system a smaller relative difference in timings
+should be observed between the two forwarding algorithms.
 \subsection{Initial conditions}
 To find a unique solution to the set of coupled equations a set of initial conditions needs
 to be specified. For the set of three coupled second order equations solved in this project,
@@ -339,10 +356,9 @@ For the Earth-Sun system, the Earth requires an initial velocity of
 $v = 2 \pi \sqrt{2}$ to escape the solar system, by equation ~\ref{eq:escapevelocity}.
 
 
-
 \subsection{Models}
 In this project, four separate situations are tested. This makes it possible to test the versatility of the
-algorithms in different circumstances, and to investigate multiple special situations.
+algorithms in different circumstances and to investigate multiple special situations.
 \subsubsection{Earth-Sun system - Comparison of Forward Euler and Velocity-Verlet}
 \label{seq:earthsunmethod}
 For the simple case of the Earth-Sun system, the positions of the Sun and Earth are
@@ -355,7 +371,7 @@ The total energy in the system over time is shown in a plot, and used for
 comparing the algorithms.
 
 This simulation was then ran for multiple numbers of steps per year, and for
-each simulation the energy and total runtime in C++ was saved.
+each simulation the energy and total runtime in C++ was fetched.
 \subsubsection{Three-body problem}
 The Earth-Sun system is expanded to include the most massive planet in the Solar System, Jupiter.
 An ideal number of time steps per year is found by trial and error. In this and the remaining models, the Velocity
@@ -364,15 +380,15 @@ Euler scheme. The impact of the inclusion of Jupiter on the Earth orbit is inves
 for different variations of the mass of Jupiter, first the actual mass $M_\text{jupiter}$,
 and then $10 M_\text{jupiter}$ and $1000 M_\text{jupiter}$.
 \subsubsection{Full Solar System simulation}
-The simulation is here fully extended to include every planet (Pluto is also included,
-for historical reasons). The initial
-conditions from NASA are now used.
+The simulation is here fully extended to include every planet (Pluto is also included
+for historical reasons). The initial conditions from NASA are now used.
 \subsubsection{The perihelion precession of Mercury}
 The gravitational force is modified to include general relativistic effects, and
 the system is simulated with only the Sun and Mercury. The other planets are removed,
 because only the relativistic effect on the perihelion precession is investigated.
-To ensure that the time resolution in the simulation was sufficient, bla bla bla
-was done.
+The relativistic perihelion shift is known to be very subtle, and an increase in the time resolution
+was made to notice the effect. The perihelion shift over time was computed with
+and without the relativistic correction for comparison.
 \section{Results}
 The resulting data from the simulations is presented, and separated for each
 model investigated.
@@ -394,13 +410,16 @@ The energies over time for both algorithms
 are shown in figures ~\ref{fig:eulerenergy} and ~\ref{fig:verletenergy}.
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{figures/energy_euler.eps}
-  \caption{Euler energy - Earth-Sun}
+  \caption{Total energy over one year for the simple Earth-Sun system,
+  forwarded with the Euler scheme. The distribution among kinetic and potential
+  energy is also shown.}
   \label{fig:eulerenergy}
 \end{figure}
 
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{figures/energy_verlet.eps}
-  \caption{Verlet energy Earth-Sun}
+  \caption{Total energy for one year for the Earth-Sun system, here forwarded
+  with the Velocity Verlet solver.}
   \label{fig:verletenergy}
 \end{figure}
 
@@ -422,7 +441,7 @@ appears a complete orbit, as expected for the Earth with the given initial condi
 With the Euler method, the Earth visibly spirals outwards with time.
 
 The difference is also very clear from the energy figures. With the Verlet
-implementation the energy approximately sinusoidally oscillates one period
+implementation the energy oscillates approximately sinusoidally for one period
 and returns to the initial (and correct) value after one year. The amplitude of
 this error is also very small, note the scale of the axis.
 On the other hand, the Euler method linearly loses energy as time progresses. This
@@ -438,15 +457,16 @@ Energy error vs. execution time and number of steps.
 
 \section{Conclusion}
 \label{sec:conclusion}
-Concluding it all with a conclusion.
-
-From the comparison of the two numerical differential equation solvers, the
+From the comparison of the two numerical differential equation solvers the
 Velocity Verlet method completely outperformed the Euler scheme. The small
 cost in execution speed is rendered negligible when compared to the monumental
 increase in orbit accuracy and subsequent conservation of energy. For simulating planet
 orbits and solving most other problems where the second derivatives only depend
 on the function value, the Velocity Verlet algorithm should therefore be
 preferred over the Euler method.
+
+An interesting extension to this project would be to compare the Verlet solver
+with both the Euler-Cromer scheme and multiple orders of the Runge-Kutta method.
 \bibliography{references}
 \blankpage
 \appendix
@@ -456,13 +476,9 @@ The Velocity Verlet method is derived for one dimension ($x$), but is easily
 generalized for three dimensions by simply repeating the procedure with $y$
 or $z$ instead of $x$. The derivation can also be generalized to three dimensions
 simply by considering $x$ as a vector $\mathbf{x} = (x, y, z)$.
-The position and time is discretized to $n$ integration points so that
-\begin{align*}
-  x(t) &\rightarrow x(t_i) &&= x_i \\
-  t &\rightarrow t_i &&= t_0 + i\Delta{t}
-\end{align*}
-where $\Delta{t} = \frac{t_\text{final} - t_0}{n-1}$ the time step size. The velocity
-is similarly discretized to each time point so that $v(t) \rightarrow v_i$.
+
+The position and time is discretized as discussed in section ~\ref{sec:numalgos}.
+
 Taylor expanding the position and velocity yields
 \begin{align*}
   x_{i+1} &= x_i + \Delta{t} x'_i + \frac{\Delta{t}^2}{2} x''_i + O(\Delta{t}^3) \\
