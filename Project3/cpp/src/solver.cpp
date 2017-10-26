@@ -141,6 +141,7 @@ void Solver::readParameters(const std::string& filename){
     use_all_planets         = root["use all planets"].asBool();
     freezeSun               = root["freeze sun"].asBool();
     twoBodyApproximation    = root["use two body approximation"].asBool();
+    gravitationalExponent   = root["gravitational exponent"].asDouble();
     planets_to_use          = root["use planets"];
 
     std::cout << freezeSun << std::endl;
@@ -180,8 +181,10 @@ void Solver::initSystem(){
         throw std::runtime_error("No planets found during initialization");
 
     std::string using_planets = "Using planets ";
-    for(auto &planet: sys.planets)
+    for(auto &planet: sys.planets){
         using_planets += planet->name + ", ";
+        planet->beta = gravitationalExponent;
+    }
     std::cout << using_planets << std::endl;
 
     // Set up the energy array with the format
