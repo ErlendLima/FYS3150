@@ -125,6 +125,7 @@ model for the forces in our solar system (Newtonian gravity) is derived, and the
 are used to solve the time development of the planets in the solar system. Several analytical results are reproduced by the program, such as conservation of energy and angular momentum, escape velocities and the perihelion precession of Mercury.
 \section{Theory}
 \label{sec:theory}
+\subsection{Newtonian gravity}
 For planetary motion, the only force present is gravity. Newton's law of gravitation
 states that any two objects in the universe attract each other by a force given
 by
@@ -158,12 +159,13 @@ These equations are solved for three dimensions. Note that the gravitational for
 and hence the acceleration, depends on the distance between the celestial bodies.
 This results in six coupled, first-order, linear differential equations.
 
+\subsection{Numerical algorithms}
 The algorithms used are both based on Taylor expansions, the forward Euler
 scheme approximates position and velocity to first order, while the Verlet
 method combines a second order approximation with the fact that the acceleration
-is only position dependent. In the following the algorithims are stated.
+is only position dependent.
 
-\subsection{Forward Euler}
+\subsubsection{Forward Euler}
 The Euler method (forward Euler) is the most basic numerical method to solve
 ODEs. This widely known algorithm applied to ~\ref{eq:coupledequations} is given by
 \begin{align*}
@@ -174,7 +176,7 @@ ODEs. This widely known algorithm applied to ~\ref{eq:coupledequations} is given
 \end{align*}
 These equations are derived by simply Taylor expanding the position and velocity
 and omitting the error terms.
-\subsection{Velocity Verlet}
+\subsubsection{Velocity Verlet}
 The velocity Verlet method is based on Taylor-expanding the position and velocity
 to second order, and specialized for cases where the acceleration is only
 dependent on position. The algorithm (see ~\ref{sec:velocityverlet} for details)
@@ -191,7 +193,16 @@ is required to calculate the velocity in the next step. Because $a_{i+1} = a(x_{
 the position in the next step is computed prior to the velocity. This algorithm
 therefore is suited to solve for planetary motion, because gravity is only
 position dependent and the only force that acts within the system.
-
+\subsubsection{Comparison of number of floating point operations}
+Before the solver is implemented and the timings are compared, it is interesting
+to compare the number of FLOPS (floating point operations) per iteration of the
+algorithms. Both lines of the Euler simulation requires two FLOPS (one
+multiplication and one addition), which sums to four operations per iteration.
+With the Verlet method, the quantity $\Delta{t}^2 / 2$ can be precomputed and
+$a_{i}$ only needs to be computed once per iteration and saved for the next.
+The Verlet method therefore requires six FLOPS per iteration. The calculation
+of the accelerations have not been considered, because the number of FLOPS depends
+on how many planets are in the system.
 \subsection{Initial conditions}
 To find a unique solution to the set of coupled equations a set of initial conditions needs
 to be specified. For the set of three coupled second order equations solved in this project,
@@ -221,13 +232,20 @@ of gravitation). This yields
 as the potential energy of an object (mass $m$) with respect to some object (mass $M$),
 separated by a distance $r$.
 \subsubsection{Angular momentum}
-Yolo
+The total angular momentum of the system should also be conserved. The orbital
+angular momentum of an object is given as
+\begin{align}
+  \mathbf{L} = \mathbf{r} \times \mathbf{p}
+\end{align}
+where $\mathbf{p} = m \mathbf{v}$ is the momentum of the object and $\mathbf{r}$
+is the position of the object with respect to the system center of mass (COM).
 \subsection{Escape velocity}
 The escape velocity is the minimum speed needed for an object to escape from the
 gravitational influence of an object with mass. The expression for the escape
 velocity of an object in the gravitational field of some other object with mass
 $M_\odot$ at a distance $r$ is given by
 \begin{align}
+  \label{eq:escapevelocity}
   v_e = |\mathbf{v_e}| = \sqrt{\frac{2GM_\odot}{r}}
 \end{align}
 See ~\ref{sec:escapevelocityderivation} for a complete derivation of this expression.
@@ -242,10 +260,11 @@ this error was corrected when Einstein showed that results from general relativi
 perihelion precession. To correct for general relativity spacetime shift, the gravitational force can be modified to
 \begin{align}
 \label{eq:mercuryprecession}
-\mathbf{F_G} = \frac{G M_\odot M_\text{Mercury}}{r^3}\left[1 + \frac{3l^2}{r^2c^2} \right] \hat{\mathbf{r}}
+\mathbf{F_G} = \frac{G M_\odot M_\text{Mercury}}{r^2}\left[1 + \frac{3l^2}{r^2c^2} \right] \hat{\mathbf{r}}
 \end{align}
 where $l = |\mathbf{l}|$ is the norm of the angular momentum per mass of Mercury, $c$ is the speed of light and
-$\mathbf{r}$ is the relative position of Mercury with respect to the Sun.
+$\mathbf{r}$ is the relative position of Mercury with respect to the Sun. See \cite{project3}
+for a more complete description.
 \section{Method}
 \label{sec:method}
 \subsection{Choice of units}
@@ -269,7 +288,8 @@ constant is given by
 \end{align}
 \subsection{Initial values}
 The initial values of the solar system bodies are fetched from the NASA HORIZONS
-Web-Interface, see \cite{nasa}.
+Web-Interface, see \cite{nasa}. This process was automated with the Python script
+\texttt{getnasa.py} (See git repository).
 \subsection{Calculation of conserved properties}
 \subsubsection{Total energy}
 The total energy and it's distribution among total potential and kinetic energy
@@ -293,6 +313,17 @@ where $M_i$ is the mass and $\mathbf{x}_i$ the position of planet number $i$
   E_{i,\text{tot}} = K_i + U_i
 \end{align}
 \subsubsection{Angular momentum}
+The total angular momentum is calculated by summing the angular momenta of
+every object in the system. The calculation can simply be written as
+\begin{align}
+  \mathbf{L}_i = \sum_j \mathbf{r}_{j,i} \times \mathbf{p}_{j,i}
+\end{align}
+where $j$ indicates the planet index, $i$ is the time step index and $r$ is the
+position relative to the center of mass. The center of mass of the system
+is calculated with
+\begin{align}
+  \mathbf{R}_\text{COM} = \frac{1}{M_\text{tot}} \sum_j M_j r_j
+\end{align}
 \subsubsection{Relative quantities}
 In the analysis, because of the unusual units used, it is more intuitive to
 consider the relative energy (the energy divided by the initial energy). At time step $i$
@@ -304,6 +335,10 @@ The relative energy is referred to as the energy $E$ in the results and
 discussion. The total angular momentum is scaled similarly.
 
 \subsection{Bisection method to find escape velocities numerically}
+For the Earth-Sun system, the Earth requires an initial velocity of
+$v = 2 \pi \sqrt{2}$ to escape the solar system, by equation ~\ref{eq:escapevelocity}.
+
+
 
 \subsection{Models}
 In this project, four separate situations are tested. This makes it possible to test the versatility of the
@@ -315,9 +350,12 @@ forwarded for a year with both algorithms. The Sun is placed at the origin with
 no initial velocity, and for simplicity Earth is given an initial position 1 AU
 away from the Sun in the x-direction. It is given an initial velocity $v = 2\pi$ AU/yr
 in the y-direction, which analytically should lead to a perfect circular motion
-if the Sun is kept stationary. The simulation is done with $N = 1000$ time steps.
+if the Sun is kept stationary. The primary simulation is done with $N = 1000$ time steps.
 The total energy in the system over time is shown in a plot, and used for
 comparing the algorithms.
+
+This simulation was then ran for multiple numbers of steps per year, and for
+each simulation the energy and total runtime in C++ was saved.
 \subsubsection{Three-body problem}
 The Earth-Sun system is expanded to include the most massive planet in the Solar System, Jupiter.
 An ideal number of time steps per year is found by trial and error. In this and the remaining models, the Velocity
@@ -336,6 +374,8 @@ because only the relativistic effect on the perihelion precession is investigate
 To ensure that the time resolution in the simulation was sufficient, bla bla bla
 was done.
 \section{Results}
+The resulting data from the simulations is presented, and separated for each
+model investigated.
 \label{sec:results}
 \subsection{Earth-Sun system - Comparison of Euler and Verlet methods}
 \label{sec:earthsunresults}
@@ -350,11 +390,8 @@ $N = 1000$ time steps.
   velocity is in the positive y-direction.}
   \label{fig:earthsunorbits}
 \end{figure}
-Notice that the Verlet method computes what appears a complete orbit, as expected
-for the Earth with the given initial conditions. With the Euler method, the Earth
-visibly spirals outwards with time. The energies over time for both algorithms
+The energies over time for both algorithms
 are shown in figures ~\ref{fig:eulerenergy} and ~\ref{fig:verletenergy}.
-
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{figures/energy_euler.eps}
   \caption{Euler energy - Earth-Sun}
@@ -366,16 +403,50 @@ are shown in figures ~\ref{fig:eulerenergy} and ~\ref{fig:verletenergy}.
   \caption{Verlet energy Earth-Sun}
   \label{fig:verletenergy}
 \end{figure}
+
 \subsection{Three-body problem}
 \subsection{Full solar system simulation}
 \subsection{The perihelion precession of Mercury}
 
 \section{Discussion}
 \label{sec:discussion}
-Discussion of the results!
+The results from the previous section are discussed systimatically in the order
+presented.
+\subsection{Earth-Sun system}
+Because of the simplicity of the Earth-Sun system, a detailed comparison of the
+algorithms is possible. The expected analytical behaviour is also trivial to
+find, which makes proper error analysis possible. By inspection of the figure with the
+planet positions, it is already evident that the Velocity Verlet method outperforms
+the Euler method in terms of accuracy. Notice that the Verlet method computes what
+appears a complete orbit, as expected for the Earth with the given initial conditions.
+With the Euler method, the Earth visibly spirals outwards with time.
+
+The difference is also very clear from the energy figures. With the Verlet
+implementation the energy approximately sinusoidally oscillates one period
+and returns to the initial (and correct) value after one year. The amplitude of
+this error is also very small, note the scale of the axis.
+On the other hand, the Euler method linearly loses energy as time progresses. This
+is likely caused by the fact that the method systematically makes an error away
+from the Sun, because of the linearization of the accelerations and velocity.
+
+Energy error vs. execution time and number of steps.
+\subsection{Three-body system}
+
+\subsection{Full solar system simulation}
+
+\subsection{Perihelion precession of Mercury}
+
 \section{Conclusion}
 \label{sec:conclusion}
 Concluding it all with a conclusion.
+
+From the comparison of the two numerical differential equation solvers, the
+Velocity Verlet method completely outperformed the Euler scheme. The small
+cost in execution speed is rendered negligible when compared to the monumental
+increase in orbit accuracy and subsequent conservation of energy. For simulating planet
+orbits and solving most other problems where the second derivatives only depend
+on the function value, the Velocity Verlet algorithm should therefore be
+preferred over the Euler method.
 \bibliography{references}
 \blankpage
 \appendix
