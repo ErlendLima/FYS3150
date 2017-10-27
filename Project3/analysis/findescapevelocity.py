@@ -19,7 +19,7 @@ class Escaper(Runner):
         self.get_planet('Earth')['velocity'] = [0.0, 0.0, 0.0]
         self.get_planet('Earth')['position'][0] = [1.0, 0.0, 0.0]
 
-    def change_velocity(self, new_velocity) -> None:
+    def change_velocity(self, new_velocity):
         self.get_planet('Earth')['velocity'][0] = new_velocity
 
     def get_velocity(self):
@@ -47,10 +47,10 @@ class Escaper(Runner):
         while abs(N-N_prev) > 1e-2:
             self.change_velocity(N)
             out, _ = self.run_simulation()
-            print(f"Simulation ran in {self.extract_time(out)} s")
-            print(f"Velocity is {N}")
+            print("Simulation ran in {} s".format(self.extract_time(out)))
+            print("Velocity is {}".format(N))
             if self.has_escaped():
-                print(f"Earth escaped with velocity = {N}")
+                print("Earth escaped with velocity = {}".format(N))
                 nmax = N
             else:
                 nmin = N
@@ -60,12 +60,14 @@ class Escaper(Runner):
 
     def find_convergence(self):
         velocities = []
-        years = [1, 10, 100, 1000, 10_000]
+        years = [1, 10, 100, 1000, 5000, 10000]
+        # years = [1, 10]
         for year in years:
-            print(f"Simulating for {year} years")
+            print("Simulating for {} years".format(year))
             self['number of years'] = year
             velocity = self.run()
             velocities.append(velocity)
+        plt.figure(figsize=(9,7))
         plt.semilogx(years, velocities, '-o', label='Numerical')
         plt.semilogx(years, np.ones_like(years) * 2*pi*sqrt(2), label='Theoretical')
         plt.xlabel('Simulation period [years]')
@@ -81,6 +83,7 @@ class Escaper(Runner):
         for beta in betas:
             self['gravitational exponent'] = beta
             velocities.append(self.run())
+        fig = plt.figure(figsize=(10,7))
         plt.plot(betas, velocities, '-o')
         plt.xlabel(r'$\beta$')
         plt.ylabel('Escape Velocity [AU/year]')

@@ -32,7 +32,7 @@ class BatchRunner(Runner):
 
     def run(self, steps=[10, 20, 30, 50, 100, 200, 500,
                          1000, 1500, 2000, 3000, 5000,
-                         8000, 10_000, 50_000, 100_000, 1_000_000]):
+                         8000, 10000, 50000, 100000, 1000000]):
         self.setup_parameters(min=min(steps))
         num_steps = len(steps)
         self.data = pd.DataFrame({'verlet': np.zeros(num_steps),
@@ -44,7 +44,7 @@ class BatchRunner(Runner):
         for step in steps:
             step = int(step)
             self['steps per year'] += step
-            print(f"{counter}: {step}")
+            print("{}: {}".format(counter, step))
             for method in ['verlet', 'euler']:
                 self['method'] = method
                 out, _ = self.run_simulation()
@@ -63,16 +63,16 @@ class BatchRunner(Runner):
         if load:
             self.load('runnerdata.csv')
 
-        fig, (error, time) = plt.subplots(nrows=2)
-        error.loglog(self.data['step'], self.data['euler'], label='Euler')
-        error.loglog(self.data['step'], self.data['verlet'], label='Verlet')
-        error.set_xlabel("Stepsize")
-        error.set_ylabel("Relative energy after one orbit")
-        time.plot(self.data['step'], self.data['euler time'], label='Euler')
-        time.plot(self.data['step'], self.data['verlet time'], label='Verlet')
-        error.set_xlabel("Stepsize")
+        fig, (error, time) = plt.subplots(nrows=2, figsize = (10,10), sharex=True)
+        error.semilogx(self.data['step'], self.data['euler'], label='Euler')
+        error.semilogx(self.data['step'], self.data['verlet'], label='Verlet')
+        # error.set_xlabel("Steps per year")
+        error.set_ylabel("Energy")
+        time.semilogx(self.data['step'], self.data['euler time'], label='Euler')
+        time.semilogx(self.data['step'], self.data['verlet time'], label='Verlet')
         time.set_ylabel("Time [s]")
-        fig.legend()
+        time.set_xlabel("Number of time steps")
+        fig.legend(loc="center", ncol=2)
         fig.savefig('../latex/figures/timing.eps')
         plt.show()
 
