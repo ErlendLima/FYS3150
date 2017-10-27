@@ -37,9 +37,9 @@ class Runner:
         for planet in self['planets']:
             if name == planet['name']:
                 return planet
-        raise IndexError(f"{planet} does not exist")
+        raise IndexError("{} does not exist".format(planet))
 
-    def run_simulation(self) -> str:
+    def run_simulation(self):
         self.save_parameters(self.parameters)
         process = subprocess.Popen(self.exe_path, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE, shell=True)
@@ -47,31 +47,31 @@ class Runner:
         return out.decode('ascii'), err.decode('ascii')
 
     @staticmethod
-    def extract_time(out: str) -> str:
+    def extract_time(out: str):
         time = float(out.split()[-1][:-1])  # Ugly ass code. Regex doesn't work
         return time
 
-    def run_analysis(self, arguments: str) -> None:
-        args = f"python {self.analysis_path} {self.position_path} {self.energy_path} {arguments}"
+    def run_analysis(self, arguments):
+        args = "python {} {} {} {}".format(self.analysis_path, self.position_path, self.energy_path, arguments)
         args = shlex.split(args)
         process = subprocess.run(args)
 
-    def get_energy(self) -> str:
+    def get_energy(self):
         return np.loadtxt(self.energy_path)
 
-    def get_position(self) -> str:
+    def get_position(self):
         position = np.loadtxt(self.position_path)
         N, M = position.shape
         return position.reshape(N, 3, M//3, order='F')
 
-    def revert_parameters(self) -> None:
+    def revert_parameters(self):
         self.save_parameters(self.original_params)
 
-    def load_parameters(self) -> str:
+    def load_parameters(self):
         with open(self.param_path, 'r') as param_file:
             param_json = json.load(param_file)
         return param_json
 
-    def save_parameters(self, param_json: str) -> None:
+    def save_parameters(self, param_json: str):
         with open(self.param_path, 'w') as param_file:
             json.dump(param_json, param_file, indent=4)
