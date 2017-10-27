@@ -16,12 +16,8 @@ class Escaper(Runner):
         self['freeze sun'] = True
         self['use two body approximation'] = False
         self['method'] = 'verlet'
-        self.get_planet('Earth')['velocity'][1] = 0.0
-        self.get_planet('Earth')['velocity'][2] = 0.0
-        self.get_planet('Earth')['position'][1] = 0.0
-        self.get_planet('Earth')['position'][0] = 1.0
-        self.get_planet('Earth')['position'][1] = 0.0
-        self.get_planet('Earth')['position'][2] = 0.0
+        self.get_planet('Earth')['velocity'] = [0.0, 0.0, 0.0]
+        self.get_planet('Earth')['position'][0] = [1.0, 0.0, 0.0]
 
     def change_velocity(self, new_velocity) -> None:
         self.get_planet('Earth')['velocity'][0] = new_velocity

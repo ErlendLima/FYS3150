@@ -142,16 +142,17 @@
         }
     ],
     "method": "verlet",
-    "steps per year": 1e5,
-    "number of years": 300,
-    "do save results": true,
-    "use all planets": true,
+    "steps per year": 1e6,
+    "number of years": 100,
+    "do save results": false,
+    "use all planets": false,
     "freeze sun": true,
     "use two body approximation": false,
+    "use relativistic correction": false,
+    "save period": 1000,
     "gravitational exponent": 2,
     "use planets": [
         "Sun",
-        "Earth",
-        "Jupiter"
+        "Mercury"
     ]
 }

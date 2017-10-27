@@ -2,6 +2,10 @@
 
 ![Travis CI](https://travis-ci.org/Caronthir/FYS3150.svg?branch=master)
 [![Coverage Status](https://coveralls.io/repos/github/Caronthir/FYS3150/badge.svg?branch=master)](https://coveralls.io/github/Caronthir/FYS3150?branch=master)
+<a href="https://scan.coverity.com/projects/fys3150">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/14080/badge.svg"/>
+</a>
 
 <p align="center">
 <b><a href="#overview">Overview</a></b>
@@ -31,10 +35,6 @@ The report itself and associated LaTeX files are available in the `latex` direct
 
 
 ## Usage (C++)
-The project is divided into source code and the written rapport. The source code
-is located across three different directories: analysis, cpp and julia. The
-resulting data produced by the C++ program is read by the analysis code located
-in analysis, while julia does both its own computations and its own plotting.
 
 Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1 and JSONcpp. On Ubuntu these can be installed with
 ```console

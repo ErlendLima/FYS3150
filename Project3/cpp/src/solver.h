@@ -38,6 +38,7 @@ private:
     void updateEnergy(unsigned int n);
     void updateAngMom(unsigned int n);
     void nop(const std::shared_ptr<Planet>) const{};
+    bool doSaveStep(unsigned int currentStep);
 
     bool saveFlag = true;
     std::string savepath = "../data";
@@ -47,8 +48,14 @@ private:
     bool use_all_planets = true;
     bool freezeSun = false;
     bool twoBodyApproximation = false;
+    bool relativisticCorrection = false;
     double gravitationalExponent = 2;
 
+    unsigned int savePeriod;
+    unsigned int saveableSteps;
+    unsigned int saveStep = 0;
+    unsigned int previousStep = 421321414; // Random value
+    bool         previousAnswer;
     arma::mat angMomArray;
     arma::mat energyArray;
     std::chrono::high_resolution_clock::time_point startWallTime;

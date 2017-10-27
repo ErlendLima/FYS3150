@@ -7,6 +7,7 @@ class vec3
 public:
     vec3();
     vec3(double a, double b,double c);
+    vec3(double a);
 
 
     double components[3];

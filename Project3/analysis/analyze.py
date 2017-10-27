@@ -58,10 +58,11 @@ class Analyzer:
 
     def plot_angular_momentum(self):
         fig = plt.figure(figsize=(9, 7))
+        ax = fig.add_subplot(111)
         time = self.energy[0, :]
-        plt.plot(time, self.angular_momentum)
-        plt.xlabel(r"Time [yr]")
-        plt.ylabel(r"Total Angular Momentum [AU$^2$/yr]")
+        ax.plot(time, self.angular_momentum)
+        ax.set_xlabel(r"Time [yr]")
+        ax.set_ylabel(r"Total Angular Momentum [AU$^2$/yr]")
         plt.show()
 
     def plot_energy(self):

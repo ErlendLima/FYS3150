@@ -7,6 +7,7 @@
 #include "Vec3/vec3.h"
 using std::vector;
 
+enum class Force{NEWTONIAN, RELATIVISTIC};
 class Planet
 {
 public:
@@ -19,6 +20,7 @@ public:
   void calculateAcc(const Planet& other);
   void calculateAccRelativistic(const Planet& other);
   void force(const Planet& other);
+  void newtonianForce(const Planet& other);
   void relativisticForce(const Planet& other);
   double kineticEnergy() const {return 0.5*mass*pow(vel.length(),2);};
   double potentialEnergy(const Planet& other) const;
@@ -26,8 +28,10 @@ public:
   void resetAcc();
   void resetF();
   void writePosToMat(unsigned int);
+  void setForce(const Force& mechanics);
   // Vars
   const std::string name;
+  std::function<void(const Planet& other)> calculateForce;
   double mass;
   vec3 pos;
   vec3 vel;

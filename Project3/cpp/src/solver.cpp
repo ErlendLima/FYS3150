@@ -4,7 +4,6 @@
 #include <chrono>
 #include <cmath>
 #include <memory>
-#include <omp.h>
 #include <algorithm>
 #include <armadillo>
 #include <jsoncpp/json/json.h>
@@ -51,7 +50,7 @@ int Solver::solve(){
       std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
       return -1;
     }
-    if(saveFlag) saveToFile();
+    saveToFile();
     return 0;
 }
 
@@ -80,20 +79,24 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepOne,
         // The first 'planet' is the sun, and receives special treatment
         for(unsigned int j = 0; j < sys.planets.size(); j++){
             if(freezeSun && j == 0){
-                sys.planets[j]->writePosToMat(i);
+                if(doSaveStep(i))
+                    sys.planets[j]->writePosToMat(saveStep);
                 continue;
             }
             stepTwo(sys.planets[j]);
-            sys.planets[j]->writePosToMat(i);
+            if(doSaveStep(i))
+                sys.planets[j]->writePosToMat(saveStep);
         }
         // Write out the progress for each 10% increment
         if(i/static_cast<double>(n) >= progress){
             std::cout << 100*progress << "% completed" << std::endl;
             progress += 0.1;
         }
-        updateEnergy(i);
+        if(doSaveStep(i)){
+            updateEnergy(saveStep);
+            angMomArray(saveStep) = sys.angularMomentum();
+        }
         sys.updateCOM();
-        angMomArray(i) = sys.angularMomentum();
     }
     endTiming();
 }
@@ -152,16 +155,38 @@ void Solver::readParameters(const std::string& filename){
     use_all_planets         = root["use all planets"].asBool();
     freezeSun               = root["freeze sun"].asBool();
     twoBodyApproximation    = root["use two body approximation"].asBool();
+    relativisticCorrection  = root["use relativistic correction"].asBool();
     gravitationalExponent   = root["gravitational exponent"].asDouble();
     planets_to_use          = root["use planets"];
+    savePeriod              = root["save period"].asInt();
 
     // Act on the read parameters
     n = num_years*N_per_year;
     dt = 1.0/N_per_year;
 
-    std::cout << "Simulating " << num_years << " year(s) with "
-              << N_per_year << " steps per year.\n";
     std::transform(smethod.begin(), smethod.end(), smethod.begin(), ::tolower);
+
+    std::cout << "Simulating " << num_years << " year(s) with "
+              << N_per_year << " steps per year, for a total of "
+              << n << " steps and a time step of " << dt << std::endl;
+
+    if(relativisticCorrection)
+        std::cout << "Using relativistic mechanics" << std::endl;
+    else
+        std::cout << "Using Newtonian mechanics" << std::endl;
+
+    if(saveFlag)
+        std::cout << "Saving all data" << std::endl;
+    else
+        std::cout << "Saving data each " << savePeriod << " step." << std::endl;
+
+    saveableSteps = n/savePeriod;
+    int loss          = n % savePeriod;
+    if(saveFlag)
+        saveableSteps = n;
+    else
+        std::cout << "Saving " << saveableSteps << " steps with a loss of " << loss << " steps." << std::endl;
+
     if(smethod == "euler")
         method = Method::EULER;
     else if(smethod == "verlet")
@@ -187,7 +212,7 @@ void Solver::initSystem(){
                 vec3(planets[i]["velocity"][0].asDouble(),
                      planets[i]["velocity"][1].asDouble(),
                      planets[i]["velocity"][2].asDouble()),
-                n);
+                saveableSteps);
     }
     if(sys.planets.size() <= 0)
         throw std::runtime_error("No planets found during initialization");
@@ -196,13 +221,17 @@ void Solver::initSystem(){
     for(auto &planet: sys.planets){
         using_planets += planet->name + ", ";
         planet->beta = gravitationalExponent;
+        if(relativisticCorrection)
+            planet->setForce(Force::RELATIVISTIC);
+        else
+            planet->setForce(Force::NEWTONIAN);
     }
     std::cout << using_planets << std::endl;
 
     // Set up the energy array with the format
     // time - kinetic energy - potential energy
-    energyArray = arma::zeros(3, n+1);
-    angMomArray = arma::zeros(n+1);
+    energyArray = arma::zeros(3, saveableSteps+1);
+    angMomArray = arma::zeros(saveableSteps+1);
     sys.sort();
 }
 
@@ -217,12 +246,34 @@ bool Solver::usePlanet(const std::string& planet_name) const{
     return false;
 }
 
+bool Solver::doSaveStep(unsigned int currentStep){
+    // Memonize the function
+    if(currentStep == previousStep) return previousAnswer;
+
+    if(saveFlag){
+        saveStep = currentStep;
+        previousAnswer = true;
+        previousStep = currentStep;
+        return true;
+    } else if ((currentStep % savePeriod) == 0){
+        saveStep = currentStep / savePeriod;
+        if (saveStep <= saveableSteps){
+            previousAnswer = true;
+            previousStep = currentStep;
+            return true;
+        }
+    }
+    previousStep = currentStep;
+    previousAnswer = false;
+    return false;
+}
+
 void Solver::saveToFile(){
     // Save the position
     std::ofstream positionstream;
     positionstream.open(savepath + "/position.txt");
     // Loop over time points
-    for(unsigned int i = 0; i < n; i++){
+    for(unsigned int i = 0; i < saveableSteps; i++){
         // Loop over planets
         unsigned int j = 0;
         for(auto & planet: sys.planets){
