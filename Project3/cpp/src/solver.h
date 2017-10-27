@@ -39,6 +39,7 @@ private:
     void updateAngMom(unsigned int n);
     void nop(const std::shared_ptr<Planet>) const{};
     bool doSaveStep(unsigned int currentStep);
+    void measurePerihelion(unsigned int step);
 
     bool saveFlag = true;
     std::string savepath = "../data";
@@ -49,7 +50,10 @@ private:
     bool freezeSun = false;
     bool twoBodyApproximation = false;
     bool relativisticCorrection = false;
+    bool saveAnyResults = false;
     double gravitationalExponent = 2;
+    bool findPerihelionPrecession = false;
+    std::vector<std::pair<double, double>> perihelions;
 
     unsigned int savePeriod;
     unsigned int saveableSteps;

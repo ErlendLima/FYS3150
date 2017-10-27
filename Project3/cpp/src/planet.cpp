@@ -48,8 +48,8 @@ void Planet::relativisticForce(const Planet& other){
     vec3 diff = other.pos - pos;
     double l = angularMomentum(vec3(0.0));
     double r_squared  = diff.lengthSquared();
-    force(other); // SHOULD I ALSO DIVIDE BY THE MASS HERE?
-    F = (1 + 3*l/(r_squared*c*c));
+    newtonianForce(other); // SHOULD I ALSO DIVIDE BY THE MASS HERE?
+    F *= (1 + 3*l/(r_squared*c*c));
 }
 
 void Planet::calculateAcc(const Planet& other){
@@ -84,4 +84,20 @@ void Planet::writePosToMat(unsigned int i){
     pos_array(0,i) = pos[0];
     pos_array(1,i) = pos[1];
     pos_array(2,i) = pos[2];
+}
+
+double Planet::getPerihelionPrecessionAngle(const Planet& sun, bool& isAtPerihelion){
+    vec3 r = distance(sun);
+    double dist = r.lengthSquared();
+    // Shift array to make it faster to access in memory
+    previousDistances[2] = previousDistances[1];
+    previousDistances[1] = previousDistances[0];
+    previousDistances[0] = dist;
+    if(previousDistances[0] > previousDistances[1] &&
+       previousDistances[1] < previousDistances[2]){
+        isAtPerihelion = true;
+        return atan2(r[1], r[0]);
+    }
+    isAtPerihelion = false;
+    return 0.0;
 }

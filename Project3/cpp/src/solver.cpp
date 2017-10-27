@@ -3,6 +3,7 @@
 #include <ctime>
 #include <chrono>
 #include <cmath>
+#include <iomanip>
 #include <memory>
 #include <algorithm>
 #include <armadillo>
@@ -21,13 +22,13 @@ Solver::Solver(const std::string& parameterpath){
 }
 
 int Solver::solve(){
-  // Wrapper for initializing, solving and saving the solution of the system.
-  initSystem();
+    // Wrapper for initializing, solving and saving the solution of the system.
+    initSystem();
 
-  std::function<void(std::shared_ptr<Planet>)> stepOne;
-  std::function<void(std::shared_ptr<Planet>)> stepTwo;
+    std::function<void(std::shared_ptr<Planet>)> stepOne;
+    std::function<void(std::shared_ptr<Planet>)> stepTwo;
 
-  switch (method){
+    switch (method){
     case Method::EULER:
       std::cout << "=== Simulating system with Euler's method ===" << std::endl;
       stepOne = std::bind(&Solver::nop, this, _1);
@@ -50,7 +51,8 @@ int Solver::solve(){
       std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
       return -1;
     }
-    saveToFile();
+    if(saveAnyResults)
+        saveToFile();
     return 0;
 }
 
@@ -96,6 +98,8 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepOne,
             updateEnergy(saveStep);
             angMomArray(saveStep) = sys.angularMomentum();
         }
+        if(findPerihelionPrecession)
+            measurePerihelion(i);
         sys.updateCOM();
     }
     endTiming();
@@ -144,6 +148,16 @@ void Solver::updateEnergy(unsigned int step){
     energyArray(2, step) = sys.potentialEnergy();
 }
 
+void Solver::measurePerihelion(unsigned int step) {
+    bool isAtPerihelion = false;
+    double theta = sys.planets[1]->getPerihelionPrecessionAngle(*sys.planets[0], isAtPerihelion);
+    if(isAtPerihelion){
+        double time = step*dt;
+        std::cout << "Perihelion angle " << std::setprecision(15) << theta  << std::endl;
+        perihelions.push_back(std::pair<double, double>(time, theta));
+    }
+}
+
 void Solver::readParameters(const std::string& filename){
     // Load the JSON file and read the relevant parameters
     std::ifstream parameters(filename);
@@ -156,9 +170,11 @@ void Solver::readParameters(const std::string& filename){
     freezeSun               = root["freeze sun"].asBool();
     twoBodyApproximation    = root["use two body approximation"].asBool();
     relativisticCorrection  = root["use relativistic correction"].asBool();
+    findPerihelionPrecession= root["find perihelion precession"].asBool();
     gravitationalExponent   = root["gravitational exponent"].asDouble();
     planets_to_use          = root["use planets"];
     savePeriod              = root["save period"].asInt();
+    saveAnyResults          = root["do save any results"].asBool();
 
     // Act on the read parameters
     n = num_years*N_per_year;
@@ -175,17 +191,24 @@ void Solver::readParameters(const std::string& filename){
     else
         std::cout << "Using Newtonian mechanics" << std::endl;
 
-    if(saveFlag)
-        std::cout << "Saving all data" << std::endl;
-    else
-        std::cout << "Saving data each " << savePeriod << " step." << std::endl;
+    if(saveAnyResults){
+        saveableSteps = n/savePeriod;
+        int loss      = n % savePeriod;
+        if(saveFlag){
+            saveableSteps = n;
+            std::cout << "Saving all data" << std::endl;
+        } else {
+            std::cout << "Saving data each " << savePeriod << " step." << std::endl;
+            std::cout << "Saving " << saveableSteps << " steps with a loss of " << loss << " steps." << std::endl;
+        }
+    } else {
+        saveableSteps = 1;
+        std::cout << "Not saving any data." << std::endl;
+    }
 
-    saveableSteps = n/savePeriod;
-    int loss          = n % savePeriod;
-    if(saveFlag)
-        saveableSteps = n;
-    else
-        std::cout << "Saving " << saveableSteps << " steps with a loss of " << loss << " steps." << std::endl;
+    if(findPerihelionPrecession)
+        std::cout << "Finding perihelion precession" << std::endl;
+
 
     if(smethod == "euler")
         method = Method::EULER;
@@ -247,6 +270,7 @@ bool Solver::usePlanet(const std::string& planet_name) const{
 }
 
 bool Solver::doSaveStep(unsigned int currentStep){
+    if(!saveAnyResults) return false;
     // Memonize the function
     if(currentStep == previousStep) return previousAnswer;
 
@@ -287,9 +311,18 @@ void Solver::saveToFile(){
     }
     positionstream.close();
 
-    // Save the energy
+    // Save the energy and angular momentum
     energyArray.save(savepath + "/energy.txt", arma::raw_ascii);
     angMomArray.save(savepath + "/angmom.txt", arma::raw_ascii);
+    // Save perihelion time points and angles
+    if(findPerihelionPrecession){
+        std::ofstream thetastream;
+        thetastream.open(savepath + "/precession.txt");
+        for(auto& timenangle: perihelions){
+            thetastream << timenangle.first << " " << timenangle.second << '\n';
+        }
+        thetastream.close();
+    }
 }
 
 void Solver::startTiming(){

@@ -51,8 +51,8 @@ class Runner:
         time = float(out.split()[-1][:-1])  # Ugly ass code. Regex doesn't work
         return time
 
-    def run_analysis(self, arguments):
-        args = "python {} {} {} {}".format(self.analysis_path, self.position_path, self.energy_path, arguments)
+    def run_analysis(self, arguments:str = '') -> None:
+        args = "python {} {}".format(self.analysis_path, arguments)
         args = shlex.split(args)
         process = subprocess.run(args)
 
