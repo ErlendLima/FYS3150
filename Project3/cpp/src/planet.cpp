@@ -2,6 +2,7 @@
 
 #define G 39.478417604357434475337963
 #define c 63239.7263
+#define pi 3.141592653589793238462643
 using std::placeholders::_1;
 
 Planet::Planet(const std::string& namme, double M, vec3 pos0, vec3 vel0, unsigned int n)
@@ -46,10 +47,10 @@ void Planet::relativisticForce(const Planet& other){
     // Modified force with relativistic effects on spacetime
     // Assume the center of mass is at the origin
     vec3 diff = other.pos - pos;
-    double l = angularMomentum(vec3(0.0));
+    double l_squared = angularMomentum(vec3(0.0)).lengthSquared();
     double r_squared  = diff.lengthSquared();
     newtonianForce(other); // SHOULD I ALSO DIVIDE BY THE MASS HERE?
-    F *= (1 + 3*l/(r_squared*c*c));
+    F *= (1 + 3*l_squared/(mass*mass*r_squared*c*c));
 }
 
 void Planet::calculateAcc(const Planet& other){
@@ -68,8 +69,8 @@ double Planet::potentialEnergy(const Planet& other) const{
     return -G*mass*other.mass/distance(other);
 }
 
-double Planet::angularMomentum(const vec3& COM) const{
-    return (pos - COM).cross2d(mass * vel);
+vec3 Planet::angularMomentum(const vec3& COM) const{
+    return (pos - COM).cross(mass * vel);
 }
 
 void Planet::resetAcc(){
@@ -96,7 +97,7 @@ double Planet::getPerihelionPrecessionAngle(const Planet& sun, bool& isAtPerihel
     if(previousDistances[0] > previousDistances[1] &&
        previousDistances[1] < previousDistances[2]){
         isAtPerihelion = true;
-        return atan2(r[1], r[0]);
+        return atan(r[1]/r[0])*3600*180/pi;
     }
     isAtPerihelion = false;
     return 0.0;

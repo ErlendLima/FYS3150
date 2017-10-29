@@ -66,7 +66,7 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepOne,
     sys.updateCOM();
     updateForces();
     updateEnergy(0);
-    angMomArray(0) = sys.angularMomentum();
+    angMomArray(0) = sys.angularMomentum().length();
     double progress = 0.1;
     // Loop over time
     for(unsigned int i = 1; i <= n; i++){
@@ -96,7 +96,7 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepOne,
         }
         if(doSaveStep(i)){
             updateEnergy(saveStep);
-            angMomArray(saveStep) = sys.angularMomentum();
+            angMomArray(saveStep) = sys.angularMomentum().length();
         }
         if(findPerihelionPrecession)
             measurePerihelion(i);
@@ -319,7 +319,7 @@ void Solver::saveToFile(){
         std::ofstream thetastream;
         thetastream.open(savepath + "/precession.txt");
         for(auto& timenangle: perihelions){
-            thetastream << timenangle.first << " " << timenangle.second << '\n';
+            thetastream << std::setprecision(12) << timenangle.first << " " << timenangle.second << '\n';
         }
         thetastream.close();
     }
