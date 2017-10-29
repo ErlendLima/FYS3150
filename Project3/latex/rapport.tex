@@ -475,7 +475,7 @@ expression.
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{figures/escapevelocity.eps}
   \caption{Numerically calculated escape velocities for different simulation
-  periods. Notice the convergence to the analytical value.}
+  periods. Note the convergence to the analytical value.}
   \label{fig:escvel}
 \end{figure}
 
@@ -492,7 +492,8 @@ As the exponent \(\beta\) in~\eqref{eq:duckling} was increased from \(2\) to
 
 The three-body problem was approximated with the Sun fixed or freely moving, and
 where the mass of Jupiter was normal, ten times as large or a hundred times as
-large. Figure~\ref{fig:animals} shows the results.
+large. Figure~\ref{fig:animals} shows the results. These were produced by running
+the simulation for \(15\) years with \(10^{7}\) steps each year.
 \begin{figure}
   \begin{tabular}{cc}
     \centering
@@ -508,22 +509,22 @@ large. Figure~\ref{fig:animals} shows the results.
     \end{subfigure}\\
     \begin{subfigure}[b]{0.5\columnwidth}
       \includegraphics[width=\columnwidth]{figures/jupiter_10.eps}
-        \caption{Fixed sun with a \(10x\) Jupiter mass}
+        \caption{Fixed sun with a \(10\times\) Jupiter mass}
         \label{fix10}
     \end{subfigure}&
     \begin{subfigure}[b]{0.5\columnwidth}
         \includegraphics[width=\columnwidth]{figures/jupiter2_10.eps}
-        \caption{Free sun with a \(10x\) Jupiter mass}
+        \caption{Free sun with a \(10\times\) Jupiter mass}
         \label{free10}
     \end{subfigure}\\
     \begin{subfigure}[b]{0.5\columnwidth}
         \includegraphics[width=\columnwidth]{figures/jupiter_100.eps}
-        \caption{Fixed sun with a \(1000x\) Jupiter mass}
+        \caption{Fixed sun with a \(1000\times\) Jupiter mass}
         \label{fix1000}
     \end{subfigure}&
     \begin{subfigure}[b]{0.5\columnwidth}
       \includegraphics[width=\columnwidth]{figures/jupiter2_100.eps}
-        \caption{Free sun with a \(1000x\) Jupiter mass}
+        \caption{Free sun with a \(1000\times\) Jupiter mass}
         \label{free1000}
     \end{subfigure}\\
     \end{tabular}
@@ -532,10 +533,10 @@ large. Figure~\ref{fig:animals} shows the results.
 
 \subsection{Full solar system simulation}
 
-A system of the full solar system was performed for a period of \(12\) years in
-three dimensions. The resulting plot is shown is figure~\ref{fig:fullsystem}.
+A system of the full solar system was performed for a period of \(300\) years in
+three dimensions using \(10^{6}\) steps per year. The resulting plot is shown is figure~\ref{fig:fullsystem}.
 Figures~\ref{fig:fullsystemenergy} and~\ref{fig:fullsystemang} shows the
-relative energy and angular momentum of the system.
+relative energy and angular momentum of the system. 
 
 \begin{figure}[H]
   \centering
@@ -563,7 +564,10 @@ relative energy and angular momentum of the system.
 
 The perihelion precession of Mercury is shown in figures~\ref{fig:newtonper}
 and~\ref{fig:relatper} for pure Newtonian Mechanics and with relativistic
-correction, respectively. These were produced by using \(10^{7}\) steps per year.
+correction, respectively. These were produced by using \(10^{7}\) steps per year
+over a century. A simulation with \(10^{6}\) steps were also run. In this case,
+the precession in figure~\ref{fig:newtonper} was larger by a factor of \(10\)
+while the precession in figure~\ref{fig:relatper} was smaller by about one arch degree.
 
 \begin{figure}[H]
   \centering
@@ -634,7 +638,7 @@ tenfold, the fixed sun system remains almost unchanged (figure~\ref{fix10}), whi
 free sun system now begins to move (figure~\ref{free10}). If one inspects the orbit of the Earth in
 the fixed sun system more closely, the tidal effects from Jupiter becomes
 apparent. As the mass of Jupiter is increased further to \(1000\) times its
-original mass, the orbits become chaotic. The simulation becomes very sensitive
+original mass, the orbits become chaotic (figures~\ref{fix1000} and~\ref{free1000}). The simulation becomes very sensitive
 to changes in the time resolution. If the time resolution is too small, it only
 takes a few years before the Earth gets flung out of the solar system.
 
@@ -670,6 +674,13 @@ increase in orbit accuracy and subsequent conservation of energy. For simulating
 orbits and solving most other problems where the second derivatives only depend
 on the function value, the Velocity Verlet algorithm should therefore be
 preferred over the Euler method.
+
+The model was shown to be robust when simulating a two body system, a three body
+system and a full solar system. It should be noted that if the bodies are of
+comparable size, such as the Sun and Jupiter with \(1000\) times its mass, the
+movement becomes chaotic. By implementing a relativistic correction to the
+gravity, the perihelion precession of Mercury was found to be \(42.93''\), very
+close to the theoretical value of \(43''\).
 
 An interesting extension to this project would be to compare the Verlet solver
 with both the Euler-Cromer scheme and Runge-Kutta methods.
