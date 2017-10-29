@@ -26,7 +26,7 @@ public:
     void updateTotalEnergy();
     double potentialEnergy() const;
     double kineticEnergy() const;
-    double angularMomentum() const;
+    vec3 angularMomentum() const;
     void readParameters(const std::string& filename);
     void sort();
     vec3 COM; // Center of mass of the system

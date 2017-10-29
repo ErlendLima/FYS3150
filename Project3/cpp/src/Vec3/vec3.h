@@ -35,6 +35,7 @@ public:
     double length() const;
 
     vec3 randint(int min, int max);
+    vec3 cross(const vec3 &other);
     double cross2d(const vec3 &other);
 };
 

@@ -28,24 +28,36 @@ class Analyzer:
         return data
 
     def plot(self):
-        self.plot_position()
+        # self.plot_position()
         self.plot_angular_momentum()
-        self.plot_energy()
+        # self.plot_energy()
 
     def plot_position(self):
         fig = plt.figure(figsize=(9, 7))
         if not self.plot2d:
             ax = fig.add_subplot(111, projection='3d')
-            ax.scatter(*self.position[0, :, 0], marker='o',
-                       c=(1, 0.6, 0), s=200)
+            # ax.scatter(*self.position[0, :, 0], marker='o',
+                       # c=(1, 0.6, 0), s=200)
             for n in range(self.position.shape[2]):
                 ax.plot(*self.position[:, :, n].T)
+            xmin = np.min(self.position[:, 0, :])
+            ymin = np.min(self.position[:, 1, :])
+            zmin = np.min(self.position[:, 2, :])
+            xmax = np.max(self.position[:, 0, :])
+            ymax = np.max(self.position[:, 1, :])
+            zmax = np.max(self.position[:, 2, :])
+            axmax = max([xmax, ymax, zmax])
+            axmin = min([xmin, ymin, zmin])
+            for axlim in [ax.set_xlim3d, ax.set_ylim3d, ax.set_zlim3d]:
+                axlim([axmin, axmax])
         else:
             ax = fig.add_subplot(111)
-            ax.scatter(*self.position[0, 0:2, 0], marker='o',
-                       c=(1, 0.6, 0), s=200)
+            # ax.scatter(*self.position[0, 0:2, 0], marker='o',
+                       # c=(1, 0.6, 0), s=200)
             for n in range(self.position.shape[2]):
                 ax.plot(*self.position[:, 0:2, n].T)
+            for n in range(self.position.shape[2]):
+                ax.plot(*self.position[-1, 0:2, n].T, 'o')
         # ax.legend()
         ax.set_xlabel('X [AU]')
         ax.set_ylabel('Y [AU]')
@@ -54,6 +66,7 @@ class Analyzer:
         else:
             ax.axis('equal')
 
+        plt.show()
         fig.savefig('../latex/figures/position.eps', dpi=1200)
 
     def plot_angular_momentum(self):
@@ -63,6 +76,7 @@ class Analyzer:
         ax.plot(time, self.angular_momentum)
         ax.set_xlabel(r"Time [yr]")
         ax.set_ylabel(r"Total Angular Momentum [AU$^2$/yr]")
+        fig.savefig('../latex/figures/angularmom.eps', dpi=1200)
         plt.show()
 
     def plot_energy(self):

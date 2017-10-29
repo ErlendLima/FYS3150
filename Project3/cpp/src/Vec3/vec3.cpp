@@ -116,3 +116,11 @@ double vec3::cross2d(const vec3 &other){
     double y = -other.components[0]*components[1];
     return x+y;
 }
+
+vec3 vec3::cross(const vec3 &other){
+    vec3 result;
+    result(0) = components[1]*other.components[2] - components[2]*other.components[1];
+    result(1) = components[2]*other.components[0] - components[0]*other.components[2];
+    result(2) = components[0]*other.components[1] - components[1]*other.components[0];
+    return result;
+}

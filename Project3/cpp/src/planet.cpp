@@ -47,9 +47,9 @@ void Planet::relativisticForce(const Planet& other){
     // Modified force with relativistic effects on spacetime
     // Assume the center of mass is at the origin
     vec3 diff = other.pos - pos;
-    double l_squared = angularMomentum(vec3(0.0)).lengthSquared();
+    double l_squared = angularMomentum(vec3(0.0)).lengthSquared()/(mass*mass);
     double r_squared  = diff.lengthSquared();
-    newtonianForce(other); // SHOULD I ALSO DIVIDE BY THE MASS HERE?
+    newtonianForce(other);
     F *= (1 + 3*l_squared/(mass*mass*r_squared*c*c));
 }
 
@@ -97,7 +97,8 @@ double Planet::getPerihelionPrecessionAngle(const Planet& sun, bool& isAtPerihel
     if(previousDistances[0] > previousDistances[1] &&
        previousDistances[1] < previousDistances[2]){
         isAtPerihelion = true;
-        return atan(r[1]/r[0])*3600*180/pi;
+        std::cout << dist << std::endl;
+        return atan2(r[1], r[0]);
     }
     isAtPerihelion = false;
     return 0.0;

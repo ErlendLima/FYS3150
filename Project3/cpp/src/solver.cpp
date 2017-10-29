@@ -51,8 +51,7 @@ int Solver::solve(){
       std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
       return -1;
     }
-    if(saveAnyResults)
-        saveToFile();
+    saveToFile();
     return 0;
 }
 
@@ -319,7 +318,7 @@ void Solver::saveToFile(){
         std::ofstream thetastream;
         thetastream.open(savepath + "/precession.txt");
         for(auto& timenangle: perihelions){
-            thetastream << std::setprecision(12) << timenangle.first << " " << timenangle.second << '\n';
+            thetastream << std::setprecision(15) << timenangle.first << " " << timenangle.second << '\n';
         }
         thetastream.close();
     }

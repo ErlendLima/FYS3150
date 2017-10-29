@@ -142,10 +142,10 @@
         }
     ],
     "method": "verlet",
-    "steps per year": 1e7,
-    "number of years": 1,
+    "steps per year": 1000000.0,
+    "number of years": 100,
     "do save results": true,
-    "do save any results": true,
+    "do save any results": false,
     "use all planets": false,
     "freeze sun": true,
     "use two body approximation": false,

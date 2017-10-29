@@ -24,7 +24,7 @@ public:
     void relativisticForce(const Planet& other);
     double kineticEnergy() const {return 0.5*mass*pow(vel.length(),2);};
     double potentialEnergy(const Planet& other) const;
-    double angularMomentum(const vec3& COM) const;
+    vec3 angularMomentum(const vec3& COM) const;
     void resetAcc();
     void resetF();
     void writePosToMat(unsigned int);

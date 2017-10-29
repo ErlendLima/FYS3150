@@ -27,12 +27,13 @@ double SolarSys::potentialEnergy() const{
   return energy;
 }
 
-double SolarSys::angularMomentum() const{
+vec3 SolarSys::angularMomentum() const{
   // Returns total angular momentum in the system
-  double angmom = 0.0;
+  vec3 angmom = 0.0;
   for(auto & planet: planets){
     angmom += planet->angularMomentum(COM);
   }
+  angmom.print();
   return angmom;
 }
 
