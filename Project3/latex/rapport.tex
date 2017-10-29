@@ -107,16 +107,12 @@ was predicted by general relativity) was also reproduced by the numerical implem
 
 \section{Introduction}
 \label{sec:introduction}
-The n-body problem consists of predicting the individual motions of a group of objects
-interacting with each other gravitationally. The motivation for finding solutions
-to this problem comes from the desire to understand the relative motion of the
-objects in the solar system. The methods used to solve these types of problems are also applicable in
-similar problems in statistical and molecular dynamics.
-
-For the simple case of two celestial bodies it is trivial to solve the time
-development of the system analytically. When more objects are added however,
-analytical solutions are hard to come by, and numerical methods are required to find
-approximated solutions.
+The \(n\)-body problem consists of predicting the individual motion of a group of objects
+interacting with every other object through some force. This might be celestial
+bodies dancing together through gravity, or molecules jiggling from
+electromagnetism. It is trivial to find an analytical solution for a system of
+two bodies, but for three or more bodies, an analytical solution does not exist
+spare a few special cases. Instead, one have to resort to approximations.
 
 In this paper, the equations of motion are written as a coupled set of first-order linear equations, and
 the classic forward Euler and Velocity Verlet algorithms are employed to simulate the solar system,
@@ -128,7 +124,7 @@ and the perihelion precession of Mercury.
 \section{Theory}
 \label{sec:theory}
 \subsection{Newtonian gravity}
-For planetary motion, the only force present is gravity. Newton's law of gravitation
+Planetary motion is only governed by gravity. Newton's law of gravitation
 states that any two objects in the universe attract each other by a force given
 by
 \begin{align}
@@ -138,14 +134,14 @@ where $m_1$ and $m_2$ are the masses of the objects, $G$ is the
 gravitational constant and $r$ is the distance between the objects. In the
 case examined in this paper, it is assumed that the solar mass is much larger
 than the planet masses ($M_\odot \gg M_\text{planet}$), and the solar
-movement is therefore ignored unless other information is specified.
-Then, for a planet orbiting the sun, the
+movement is therefore ignored unless otherwise specified.
+For a planet orbiting the sun, the
 planet position as a function of time is described by Newton's second law:
 \begin{align*}
   \dv[2]{\mathbf{x}}{t} = \frac{\mathbf{F}_G}{M}
 \end{align*}
 where $M$ is the planet mass. This is equivalent to one ODE (ordinary differential
-equation) for each direction component, i.e. three coupled equations in the
+equation) for each direction component, i.e.\@ three coupled equations in the
 three-dimensional case.
 
 For the numerical methods the above second order vector ODE is more convenient to
@@ -164,7 +160,7 @@ This results in six coupled, first-order, linear differential equations.
 
 \subsection{Numerical algorithms}
 \label{sec:numalgos}
-The algorithms used are both based on Taylor expansions, the forward Euler
+The algorithms used are both based on Taylor expansions. The forward Euler
 scheme approximates position and velocity to first order, while the Verlet
 method combines a second order approximation with the fact that the acceleration
 is only position dependent.
@@ -183,7 +179,7 @@ $a(t_i) \rightarrow a_i$.
 
 \subsubsection{Forward Euler}
 The Euler method (forward Euler) is the most basic numerical method to solve
-ODEs. This widely known algorithm applied to ~\ref{eq:coupledequations} is given by
+ODEs. This widely known algorithm applied to~\ref{eq:coupledequations} is given by
 \begin{align*}
   \begin{split}
   v_{i+1} = v_{i} + a_{i}\Delta{t} \\
@@ -195,7 +191,7 @@ and omitting the error terms.
 \subsubsection{Velocity Verlet}
 The velocity Verlet method is based on Taylor-expanding the position and velocity
 to second order, and specialized for cases where the acceleration is only
-dependent on position. The algorithm (see ~\ref{sec:velocityverlet} for details)
+dependent on position. The algorithm (see appendix~\ref{sec:velocityverlet} for details)
 applied to the problem examined in this paper is given by the following equations:
 \begin{align}
   \begin{split}
@@ -244,7 +240,7 @@ distance, which is set to $r = \infty$ (i.e. using the definition of potential e
 of gravitation). This yields
 \begin{align*}
   \label{eq:potentialenergy}
- E_p = -\int_\infty^r F_G \text{d} r = -\frac{GmM}{r}
+ E_p = -\int_\infty^r F_G\: \text{d} r = -\frac{GmM}{r}
 \end{align*}
 as the potential energy of an object (mass $m$) with respect to some object (mass $M$),
 separated by a distance $r$.
@@ -265,15 +261,17 @@ $M_\odot$ at a distance $r$ is given by
   \label{eq:escapevelocity}
   v_e = |\mathbf{v_e}| = \sqrt{\frac{2GM_\odot}{r}}
 \end{align}
-See ~\ref{sec:escapevelocityderivation} for a complete derivation of this expression.
+See appendix~\ref{sec:escapevelocityderivation} for a complete derivation of this expression.
 
 \subsection{Perihelion precession of Mercury}
 In Newtonian physics, any object that orbits a massive star or planet will have an elliptical orbit with
 the spherical mass approximately at focus. In the solar system, the closest point to the Sun of an orbit is called
-the perihelion. Multiple effects in the solar system cause the elliptical orbits to rotate, in the sense that the perihelia
+the perihelion. Multiple effects in the solar system cause the elliptical orbits
+to rotate, in the sense that the perihelion
 precesses around the sun. The most significant effect comes from the gravitational forces from the other bodies in
-the solar system. For Mercury, the Newtonian based-explanations were insufficient in predicting the precession, and
-this error was corrected when Einstein showed that results from general relativity closely agrees with the observed
+the solar system. The Newtonian based-explanations were insufficient in
+predicting the perihelion precession of Mercury, but
+this was corrected when Einstein showed that results from general relativity closely agrees with the observed
 perihelion precession. To correct for general relativity spacetime shift, the gravitational force can be modified to
 \begin{align}
 \label{eq:mercuryprecession}
@@ -317,7 +315,7 @@ and discretized velocity $v_i$ is simply given by
 \begin{align}
   K_i = \frac{1}{2} m v_i^2
 \end{align}
-The potential energy of a planet is given by equation ~\ref{eq:potentialenergy}.
+The potential energy of a planet is given by~\eqref{eq:potentialenergy}.
 This needs to be summed for each distance $r$ between the respective planets. To
 avoid double-counting the potential energies, the potential energy is calculated
 as
@@ -352,19 +350,27 @@ The relative energy is referred to as the energy $E$ in the results and
 discussion. The total angular momentum is scaled similarly.
 
 \subsection{Bisection method to find escape velocities numerically}
-For the Earth-Sun system, the Earth requires an initial velocity of
-$v = 2 \pi \sqrt{2}$ AU/yr to escape the solar system by equation ~\ref{eq:escapevelocity}.
+Applying~\eqref{eq:escapevelocity} to the Earth-Sun system, the Earth requires an initial velocity of
+$v = 2 \pi \sqrt{2}$ AU/yr to escape the solar system.
 
 A bisection inspired method was developed to find this value numerically. For the
 full algorithm see \texttt{findescapevelocity.py} in the Git repository. A challenge
-with this method is to determine the amount of years of simulation required to
-determine if the planet has escaped or not. This was found by trial and error.
+with this method was to determine the amount of years of simulation required to
+determine if the planet has escaped or not. As the initial velocity of the Earth
+approaches the escape velocity, the Earth will take longer and longer to change
+direction and fall back towards the sun. Taking this to the limit, the Earth will
+simply come to a halt ``at the end of'' the solar system. Finding the escape
+velocity of the earth is therefore infeasible as the simulation would have to
+run for an infinite amount of time. Instead, the simulation period was increased
+steadily after the bisection method converged, showing how the escape velocity
+converged to \(2\pi\sqrt{2}\) as time increased.
 
 The force of gravity was then modified by changing the exponent for the radius
 in the force expression, i.e. a modification of the type
-\begin{align*}
+\begin{equation}
+  \label{eq:duckling}
   \tilde{F}_G = \frac{G m_1 m_2}{r^\beta}
-\end{align*}
+\end{equation}
 where $\beta \in [2,3]$ are tested. Notice that $\beta = 2$ results in the correct
 Newtonian expression. The escape velocity was then computed with the method
 described above for multiple $\beta$.
@@ -408,7 +414,7 @@ model investigated.
 \label{sec:results}
 \subsection{Earth-Sun system - Comparison of Euler and Verlet methods}
 \label{sec:earthsunresults}
-See figure ~\ref{fig:earthsunorbits} for a comparison of the Forward Euler and
+See figure~\ref{fig:earthsunorbits} for a comparison of the Forward Euler and
 Velocity Verlet algorithms for a one-year simulation of the Sun-Earth system with
 $N = 1000$ time steps.
 \begin{figure}[H]
@@ -420,12 +426,12 @@ $N = 1000$ time steps.
   \label{fig:earthsunorbits}
 \end{figure}
 The energies over time for both algorithms
-are shown in figures ~\ref{fig:eulerenergy} and ~\ref{fig:verletenergy}.
+are shown in figures~\ref{fig:eulerenergy} and~\ref{fig:verletenergy}.
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{figures/energy_euler.eps}
   \caption{Total energy over one year for the simple Earth-Sun system,
   forwarded with the Euler scheme. The distribution among kinetic and potential
-  energy is also shown.}
+  energy is also shown. The values are relative to the initial value.}
   \label{fig:eulerenergy}
 \end{figure}
 
@@ -437,7 +443,7 @@ are shown in figures ~\ref{fig:eulerenergy} and ~\ref{fig:verletenergy}.
 \end{figure}
 
 For a comparison of the errors and computation timings for both algorithms, see
-figure ~\ref{fig:timing}.
+figure~\ref{fig:timing}.
 
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{figures/timing.eps}
@@ -448,6 +454,10 @@ figure ~\ref{fig:timing}.
 
 \subsection{Escape velocity}
 
+Figure~\ref{fig:escvel} shows the behavior of the convergence of the bisection
+method for finding the escape velocity of the Earth-Sun system numerically. As
+the number simulation period increases, the method converges to the analytical
+expression. 
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{figures/escapevelocity.eps}
   \caption{Numerically calculated escape velocities for different simulation
@@ -455,6 +465,8 @@ figure ~\ref{fig:timing}.
   \label{fig:escvel}
 \end{figure}
 
+As the exponent \(\beta\) in~\eqref{eq:duckling} was increased from \(2\) to
+\(3\), the escape velocity decreased, as is visible from figure~\ref{fig:hei}.
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{figures/escapevelocitybeta.eps}
   \caption{Escape velocity calculated with the bisection method for different
@@ -463,9 +475,78 @@ figure ~\ref{fig:timing}.
 \end{figure}
 
 \subsection{Three-body problem}
-\subsection{Full solar system simulation}
-\subsection{The perihelion precession of Mercury}
 
+The three-body problem was approximated with the Sun fixed or freely moving, and
+where the mass of Jupiter was normal, ten times as large or a hundred times as
+large. Figure~\ref{fig:anmals} shows the results.
+\begin{figure}
+  \begin{tabular}{cc}
+    \centering
+    \begin{subfigure}[b]{0.5\columnwidth}
+        \includegraphics[width=\columnwidth]{figures/jupiter_1.eps}
+        \caption{Fixed sun with a normal Jupiter mass}
+        \label{fix1}
+    \end{subfigure}&
+    \begin{subfigure}[b]{0.5\columnwidth}
+        \includegraphics[width=\columnwidth]{figures/jupiter2_1.eps}
+        \caption{Free sun with a normal Jupiter mass}
+        \label{free1}
+    \end{subfigure}\\
+    \begin{subfigure}[b]{0.5\columnwidth}
+      \includegraphics[width=\columnwidth]{figures/jupiter_10.eps}
+        \caption{Fixed sun with a \(10x\) Jupiter mass}
+        \label{fix10}
+    \end{subfigure}&
+    \begin{subfigure}[b]{0.5\columnwidth}
+        \includegraphics[width=\columnwidth]{figures/jupiter2_10.eps}
+        \caption{Free sun with a \(10x\) Jupiter mass}
+        \label{free10}
+    \end{subfigure}\\
+    \begin{subfigure}[b]{0.5\columnwidth}
+        \includegraphics[width=\columnwidth]{figures/jupiter_100.eps}
+        \caption{Fixed sun with a \(1000x\) Jupiter mass}
+        \label{fix1000}
+    \end{subfigure}&
+    \begin{subfigure}[b]{0.5\columnwidth}
+      \includegraphics[width=\columnwidth]{figures/jupiter2_100.eps}
+        \caption{Free sun with a \(1000x\) Jupiter mass}
+        \label{free1000}
+    \end{subfigure}\\
+    \end{tabular}
+    \caption{The numerical solutions for the three body problem under different parameters.}\label{fig:animals}
+\end{figure}
+
+\subsection{Full solar system simulation}
+
+A system of the full solar system was performed for a period of \(12\) years in
+three dimensions. The resulting plot is shown is figure~\ref{fig:fullsystem}.
+Figures~\ref{fig:fullsystemenergy} and~\ref{fig:fullsystemang} shows the
+relative energy and angular momentum of the system.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/fullsystem.eps}
+  \caption{\label{fig:fullsystem} The evolution of the solar system as time
+    progresses over a period of \(300\) years.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/fullsystem_energy.eps}
+  \caption{\label{fig:fullsystemenergy} The change in relative energy
+    of the solar system.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/fullsystem_ang.eps}
+  \caption{\label{fig:fullsystemang} The change in angular momentum of the solar
+  system.}
+\end{figure}
+
+
+\subsection{The perihelion precession of Mercury}
+:(
 \section{Discussion}
 \label{sec:discussion}
 The results from the previous section are discussed systimatically in the order
@@ -487,7 +568,7 @@ On the other hand, the Euler method linearly loses energy as time progresses. Th
 is likely caused by the fact that the method systematically makes an error away
 from the Sun, because of the linearization of the accelerations and velocity.
 
-From figure ~\ref{fig:timing} the relative difference in simulation time is visibly
+From figure~\ref{fig:timing} the relative difference in simulation time is visibly
 very small for the methods, much smaller than what was predicted from counting
 the number of FLOPS. This can likely be explained by the time taken to write
 positions and other information to memory and files, which is shared by both methods.
@@ -497,17 +578,41 @@ results with conserved energy and angular momentum and at the same time limit
 simulation time to within a reasonable value.
 
 \subsection{Escape velocity}
-By inspecting figure ~\ref{fig:escvel}, the numerical method seems to converge
-to the analytical value when the time resolution is increased. What is on the x-axis, eg veit ikkje?%TODO: IS THIS CORRECT?
+By inspecting figure~\ref{fig:escvel}, it is clear that the escape velocity
+approaches the analytical solution as the simulation period increases. This is
+in line with expectations. As the simulation time increases, the Earth has more
+time to come slow down before falling back towards the sun, allowing the
+bijection method to more accurately converge to the analytical solution.
+
+The figure also reveals how effective the bijection method is. A single year of
+simulation yields an escape velocity with a relative error of \(16\%\), while
+ten years of simulation has a relative error of \(3.2\%\). Such short simulation
+periods with a two body problem are very quick to compute, making bijection
+method converges within a few fractions of a seconds to an answer which is
+surprisingly close to the real velocity. 
 
 When Newton's law of gravitation is weakened, the escape velocity is expected
-to decrease. The expected behaviour is observed in the results.
+to decrease. This is observed in the results.
 \subsection{Three-body system}
+The system remains stable after Jupiter is added, both where the sun is fixed
+and where it is allowed to move (figures~\ref{fix1} and~\ref{free1}).
+When the mass of Jupiter is increased by a
+tenfold, the fixed sun system remains almost unchanged (figure~\ref{fix10}), while the sun the in
+free sun system now begins to move (figure~\ref{free10}). If one inspects the orbit of the Earth in
+the fixed sun system more closely, the tidal effects from Jupiter becomes
+apparent. As the mass of Jupiter is increased further to \(1000\) times its
+original mass, the orbits become chaotic. The simulation becomes very sensitive
+to changes in the time resolution. If the time resolution is too small, it only
+takes a few years before the Earth gets flung out of the solar system.
 
 \subsection{Full solar system simulation}
-
+The full solar system remains stable after \(300\) years, with the total energy
+and angular momentum almost perfectly preserved. It is not perfectly conserved,
+however, indicating that numerical errors are influencing the outcome. This is
+also noticeable in the innermost orbits.
 
 \subsection{Perihelion precession of Mercury}
+:(
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -531,7 +636,7 @@ generalized for three dimensions by simply repeating the procedure with $y$
 or $z$ instead of $x$. The derivation can also be generalized to three dimensions
 simply by considering $x$ as a vector $\mathbf{x} = (x, y, z)$.
 
-The position and time is discretized as discussed in section ~\ref{sec:numalgos}.
+The position and time is discretized as discussed in section~\ref{sec:numalgos}.
 
 Taylor expanding the position and velocity yields
 \begin{align*}
