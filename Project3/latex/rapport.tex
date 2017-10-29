@@ -89,12 +89,16 @@
 \date{\today}
 
 \begin{abstract}
-Two numerical algorithms are used to solve systems of coupled ODE's by simulating a n-body problem, our solar system.
-The algorithms used are the Forward Euler and Velocity-Verlet algorithms. With only two additional floating point operations per
-iteration of the algorithm, the Verlet method is shown to completely outperform the Euler scheme in terms of numerical accuracy and stability,
-with a small cost in execution speed. By investigating the solutions for different step sizes, $10^5$ time steps per year resulted in
-solutions with an acceptable compromise between numerical precision and speed. The perihelion precession of Mercury (which
-was predicted by general relativity) was also reproduced by the numerical implementation.
+Two numerical algorithms are used to solve systems of coupled ODE's representing
+the\(n\)-body problem of the solar system, namely Forward Euler and Velocity-Verlet. With
+only two additional floating point operations per 
+iteration of the algorithm, the Verlet method is shown to completely outperform
+the Euler scheme in terms of numerical accuracy and stability, 
+with a small cost in execution speed. By investigating the solutions for
+different step sizes, $10^5$ time steps per year resulted in 
+solutions with an acceptable compromise between numerical precision and speed.
+The perihelion precession of Mercury resulting from a relativistic correction
+was also reproduced to be \(42.39''\) where the theoretical value is \(43''\).
 \end{abstract}
 \maketitle
 \tableofcontents
@@ -478,7 +482,7 @@ As the exponent \(\beta\) in~\eqref{eq:duckling} was increased from \(2\) to
 
 The three-body problem was approximated with the Sun fixed or freely moving, and
 where the mass of Jupiter was normal, ten times as large or a hundred times as
-large. Figure~\ref{fig:anmals} shows the results.
+large. Figure~\ref{fig:animals} shows the results.
 \begin{figure}
   \begin{tabular}{cc}
     \centering
@@ -546,7 +550,26 @@ relative energy and angular momentum of the system.
 
 
 \subsection{The perihelion precession of Mercury}
-:(
+
+The perihelion precession of Mercury is shown in figures~\ref{fig:newtonper}
+and~\ref{fig:relatper} for pure Newtonian Mechanics and with relativistic
+correction, respectively. These were produced by using \(10^{7}\) steps per year.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/newtonprecession.eps}
+  \caption{\label{fig:newtonper} The precession of Mercury over a century with
+    pure Newtonian mechanics.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/precession.eps}
+  \caption{\label{fig:relatper} The precession of Mercury over a century using
+    the relativistic correction.}
+\end{figure}
+
+
 \section{Discussion}
 \label{sec:discussion}
 The results from the previous section are discussed systimatically in the order
@@ -612,11 +635,25 @@ however, indicating that numerical errors are influencing the outcome. This is
 also noticeable in the innermost orbits.
 
 \subsection{Perihelion precession of Mercury}
-:(
+The perihelion precession of Mercury from pure Newtonian mechanics is
+oscillating around zero, see figure~\ref{fig:newtonper}. This stems from the
+fact that any deviation from \(\frac{1}{r^{2}}\) in the expression of the force
+of gravity will lead to orbits that are not closed. Any orbit which is not
+perfectly elliptical will experience precession. Since the numerical methods
+are imperfect, there will be tiny errors acting as a deviation from
+\(\frac{1}{r^{2}}\), and so there will be a precession without any physical
+significance. This is confirmed from that fact that increasing the time
+resolution decreases the illusory precession.
+
+By adding the relativistic precession, the precession of the perihelion becomes
+apparent. After a century, the precession is \(42.93''\), close to the theoretical
+value of \(43''\).
 
 \section{Conclusion}
 \label{sec:conclusion}
-From the comparison of the two numerical differential equation solvers the
+By implementing the forward Euler scheme and Velocity Verlet to solve the
+\(n\)-body problem, it was shown that it is possible to approximate the movement
+of celestial bodies. From the comparison of the two methods it is clear that the
 Velocity Verlet method completely outperformed the Euler scheme. The small
 cost in execution speed is rendered negligible when compared to the monumental
 increase in orbit accuracy and subsequent conservation of energy. For simulating planet
