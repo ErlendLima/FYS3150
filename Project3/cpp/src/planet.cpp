@@ -47,7 +47,7 @@ void Planet::relativisticForce(const Planet& other){
     // Modified force with relativistic effects on spacetime
     // Assume the center of mass is at the origin
     vec3 diff = other.pos - pos;
-    double l_squared = angularMomentum(vec3(0.0));
+    double l_squared = angularMomentum(vec3(0.0)).lengthSquared();
     double r_squared  = diff.lengthSquared();
     newtonianForce(other);
     F *= (1 + 3*l_squared/(mass*mass*r_squared*c*c));
@@ -69,8 +69,8 @@ double Planet::potentialEnergy(const Planet& other) const{
     return -G*mass*other.mass/distance(other);
 }
 
-double Planet::angularMomentum(const vec3& COM) const{
-    return (pos - COM).cross2d(mass * vel);
+vec3 Planet::angularMomentum(const vec3& COM) const{
+    return (pos - COM).cross(mass * vel);
 }
 
 void Planet::resetAcc(){

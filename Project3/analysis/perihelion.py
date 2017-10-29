@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 class Perihelion(Runner):
     def setup(self):
-        self['number of years'] = 10
+        self['number of years'] = 100
         self['do save results'] = False
         self['do save any results'] = True
         self['use all planets'] = False
@@ -20,8 +20,8 @@ class Perihelion(Runner):
         self['method'] = 'verlet'
         self.get_planet('Sun')['position'] = [0.0, 0.0, 0.0]
         self.get_planet('Sun')['Velocity'] = [0.0, 0.0, 0.0]
-        self.get_planet('Mercury')['velocity'] = [12.44, 0.0, 0.0]
-        self.get_planet('Mercury')['position'] = [0.0, 0.3075, 0.0]
+        self.get_planet('Mercury')['velocity'] = [0.0, 12.4415373, 0.0]
+        self.get_planet('Mercury')['position'] = [0.307491008, 0.0, 0.0]
 
     def run(self):
         out, _ = self.run_simulation()
@@ -31,9 +31,9 @@ class Perihelion(Runner):
 
     def getPerihelion(self):
         timenangle = np.loadtxt("../data/precession.txt");
-        print(timenangle.shape)
-        print(timenangle[:, 1] - timenangle[0, 1])
-        plt.plot(timenangle[:, 0], timenangle[:, 1], 'o')
+        # print(timenangle.shape)
+        # print(timenangle[:, 1] - timenangle[0, 1])
+        plt.plot(timenangle[:, 0], (timenangle[:, 1]-timenangle[0,1]))
         plt.xlabel("Time [yr]")
         plt.ylabel("Precession angle")
         plt.show()
