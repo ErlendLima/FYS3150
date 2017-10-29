@@ -91,11 +91,11 @@
 \begin{abstract}
 Two numerical algorithms are used to solve systems of coupled ODE's representing
 the\(n\)-body problem of the solar system, namely Forward Euler and Velocity-Verlet. With
-only two additional floating point operations per 
+only two additional floating point operations per
 iteration of the algorithm, the Verlet method is shown to completely outperform
-the Euler scheme in terms of numerical accuracy and stability, 
+the Euler scheme in terms of numerical accuracy and stability,
 with a small cost in execution speed. By investigating the solutions for
-different step sizes, $10^5$ time steps per year resulted in 
+different step sizes, $10^5$ time steps per year resulted in
 solutions with an acceptable compromise between numerical precision and speed.
 The perihelion precession of Mercury resulting from a relativistic correction
 was also reproduced to be \(42.39''\) where the theoretical value is \(43''\).
@@ -402,6 +402,12 @@ Verlet algorithm is used because of the far superior accurary compared to the
 Euler scheme. The impact of the inclusion of Jupiter on the Earth orbit is investigated
 for different variations of the mass of Jupiter, first the actual mass $M_\text{jupiter}$,
 and then $10 M_\text{jupiter}$ and $1000 M_\text{jupiter}$.
+
+This was done both with and without the Sun held stationary. In the case where
+the Sun is allowed to move it is given an initial velocity equal in size and
+in the opposite direction as the total linear momentum of the objects in the system.
+This ensures theoretically that the system center of mass remains stationary, however
+small trunctation and round-off errors might perturb the center of mass slightly.
 \subsubsection{Full Solar System simulation}
 The simulation is here fully extended to include every planet (Pluto is also included
 for historical reasons). The initial conditions from NASA are now used.
@@ -412,6 +418,10 @@ because only the relativistic effect on the perihelion precession is investigate
 The relativistic perihelion shift is known to be very subtle, and an increase in the time resolution
 was made to notice the effect. The perihelion shift over time was computed with
 and without the relativistic correction for comparison.
+
+Mercury was given an initial velocity in the positive y-direction, with a
+magnitude equal to the maximum orbital speed (the perihelion speed). The initial
+position was set at the perihelion distance along the x-axis.
 \section{Results}
 The resulting data from the simulations is presented, and separated for each
 model investigated.
@@ -461,7 +471,7 @@ figure~\ref{fig:timing}.
 Figure~\ref{fig:escvel} shows the behavior of the convergence of the bisection
 method for finding the escape velocity of the Earth-Sun system numerically. As
 the number simulation period increases, the method converges to the analytical
-expression. 
+expression.
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{figures/escapevelocity.eps}
   \caption{Numerically calculated escape velocities for different simulation
@@ -612,7 +622,7 @@ simulation yields an escape velocity with a relative error of \(16\%\), while
 ten years of simulation has a relative error of \(3.2\%\). Such short simulation
 periods with a two body problem are very quick to compute, making bijection
 method converges within a few fractions of a seconds to an answer which is
-surprisingly close to the real velocity. 
+surprisingly close to the real velocity.
 
 When Newton's law of gravitation is weakened, the escape velocity is expected
 to decrease. This is observed in the results.
