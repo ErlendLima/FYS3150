@@ -37,17 +37,17 @@ The report itself and associated LaTeX files are available in the `latex` direct
 
 ## Analysis Scripts
 
-There are several Python scripts which do the analysis of the output from the C++ program. Here follows a
-list explaining what each of them do
+There are several Python scripts which do the analysis of the output from the C++ program. Here is a
+table explaining the function to each script. Python 3.6 is required.
 
 | Script                  | Function                                                                                                          |
 | ------                  | --------                                                                                                          |
-| `getnasa.py`            | Contacts NASA through telnet and downloads all bodies in the targets.txt file into a JSON file                    |
-| `analyze.py`            | A general script which plots the position, energy and angular moment from the output. Can also animate the orbits |
-| `batchrun.py`           | Compares Euler and Verlet in terms of running time                                                                |
-| `findescapevelocity.py` | Uses a clever methods to find the escape velocity of earth                                                        |
-| `jupiterrunner.py`      | Solves the 3-body problem with the Sun, Earth and Jupiter                                                         |
-| `perihelion.py`         | Measure the perihelion precession of Mercury from the relativistic correction                                     |
+| `getnasa.py`            | Contacts NASA through telnet and downloads all bodies in the targets.txt file into a JSON file.                   |
+| `analyze.py`            | A general script which plots the position, energy and angular moment from the output. Can also animate the orbits.|
+| `batchrun.py`           | Compares Euler and Verlet in terms of running time.                                                               |
+| `findescapevelocity.py` | Uses a bijection method to find the escape velocity of Earth.                                                     |
+| `jupiterrunner.py`      | Solves the 3-body problem consisting of the Sun, Earth and Jupiter.                                               |
+| `perihelion.py`         | Measure the perihelion precession of Mercury from relativistic effects.                                 |
 
 
 ## Usage (C++)
@@ -92,7 +92,9 @@ Testing is not implemented in the C++ version.
 <!-- Better support for debugging and stricter compiler flags can be turned on using `cmake -DCMAKE_BUILD_TYPE=DEBUG`. -->
 
 ## Usage (Julia)
-The Julia version is not completed, and does not count as a part of this assignment.
+The Julia version is not completed, and does not count as a part of this assignment. 
+This is left here to stand as a testament to the hubris of students.
+
 The version of Julia required is at least 0.6.0
 
 These can be tested by running
