@@ -13,12 +13,12 @@ int main(int argc, char *argv[]) {
   // Initialize solver and run simulation. The initial values and other parameters
   // are provided in a .json file. See git repo for detailed description.
   std::string parameterpath = "../data/parameters.json";
-  // try {
+  try {
       Solver solver(parameterpath);
       solver.solve();
-  // } catch (std::exception &ex) {
-  //     std::cerr << "Error: " << ex.what() << std::endl;
-  // }
+  } catch (std::exception &ex) {
+      std::cerr << "Error: " << ex.what() << std::endl;
+  }
 
   return 0;
 }

@@ -33,7 +33,6 @@ vec3 SolarSys::angularMomentum() const{
   for(auto & planet: planets){
     angmom += planet->angularMomentum(COM);
   }
-  angmom.print();
   return angmom;
 }
 

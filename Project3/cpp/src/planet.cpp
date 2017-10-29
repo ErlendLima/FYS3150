@@ -47,7 +47,7 @@ void Planet::relativisticForce(const Planet& other){
     // Modified force with relativistic effects on spacetime
     // Assume the center of mass is at the origin
     vec3 diff = other.pos - pos;
-    double l_squared = angularMomentum(vec3(0.0)).lengthSquared()/(mass*mass);
+    double l_squared = angularMomentum(vec3(0.0));
     double r_squared  = diff.lengthSquared();
     newtonianForce(other);
     F *= (1 + 3*l_squared/(mass*mass*r_squared*c*c));
@@ -69,8 +69,8 @@ double Planet::potentialEnergy(const Planet& other) const{
     return -G*mass*other.mass/distance(other);
 }
 
-vec3 Planet::angularMomentum(const vec3& COM) const{
-    return (pos - COM).cross(mass * vel);
+double Planet::angularMomentum(const vec3& COM) const{
+    return (pos - COM).cross2d(mass * vel);
 }
 
 void Planet::resetAcc(){
@@ -88,7 +88,7 @@ void Planet::writePosToMat(unsigned int i){
 }
 
 double Planet::getPerihelionPrecessionAngle(const Planet& sun, bool& isAtPerihelion){
-    vec3 r = distance(sun);
+    vec3 r = sun.pos - pos;
     double dist = r.lengthSquared();
     // Shift array to make it faster to access in memory
     previousDistances[2] = previousDistances[1];
@@ -97,7 +97,6 @@ double Planet::getPerihelionPrecessionAngle(const Planet& sun, bool& isAtPerihel
     if(previousDistances[0] > previousDistances[1] &&
        previousDistances[1] < previousDistances[2]){
         isAtPerihelion = true;
-        std::cout << dist << std::endl;
         return atan2(r[1], r[0]);
     }
     isAtPerihelion = false;

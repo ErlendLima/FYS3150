@@ -28,9 +28,9 @@ class Analyzer:
         return data
 
     def plot(self):
-        # self.plot_position()
+        self.plot_position()
         self.plot_angular_momentum()
-        # self.plot_energy()
+        self.plot_energy()
 
     def plot_position(self):
         fig = plt.figure(figsize=(9, 7))

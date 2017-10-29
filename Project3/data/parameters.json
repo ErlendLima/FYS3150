@@ -144,8 +144,8 @@
     "method": "verlet",
     "steps per year": 1000000.0,
     "number of years": 100,
-    "do save results": true,
-    "do save any results": false,
+    "do save results": false,
+    "do save any results": true,
     "use all planets": false,
     "freeze sun": true,
     "use two body approximation": false,
@@ -155,6 +155,6 @@
     "gravitational exponent": 2,
     "use planets": [
         "Sun",
-        "Mercury"
+        "Earth"
     ]
 }
