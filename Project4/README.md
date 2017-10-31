@@ -26,7 +26,7 @@
 
 
 <!-- <img height="700px" align="center" src="latex/figures/solarsys.png?raw=true"> -->
-![Animation of the solar system](https://github.com/Caronthir/FYS3150/blob/master/Project3/latex/figures/animation.gif)
+![Animation of the solar system](https://github.com/Caronthir/FYS3150/blob/master/Project/latex/figures/animation.gif)
 
 ## Overview
 The aim of [Project 4](https://compphysics.github.io/ComputationalPhysics/doc/Projects/2017/Project4/pdf/Project4.pdf) in FYS3150
@@ -40,7 +40,6 @@ table explaining the function to each script. Python 3.6 is required.
 
 | Script                  | Function                                                                                                          |
 | ------                  | --------                                                                                                          |
-| `getnasa.py`            | Contacts NASA through telnet and downloads all bodies in the targets.txt file into a JSON file.                   |
 | `analyze.py`            | A general script which plots the position, energy and angular moment from the output. Can also animate the orbits.|
 ## Usage (C++)
 
