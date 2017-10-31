@@ -10,7 +10,7 @@ project(${PROJECT_NAME})
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O3 -Wall -fopenmp  -std=c++14 -D_GLIBCXX_PARALLEL -Wextra -Wshadow -Wfloat-equal -Wundef -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual -Wswitch-default -march=native -Wswitch-enum -Wconversion -Wunreachable-code -Wformat=2")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -fopenmp -std=c++14 -D_GLIBCXX_PARALLEL -Wfloat-equal -march=native -Wunreachable-code -Wshadow")
 
-set(include_files src/main.cpp src/planet.cpp src/solarSys.cpp src/solver.cpp src/Vec3/vec3.cpp)
+set(include_files src/main.cpp src/ising.cpp)
 set(executable_name solve)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -61,7 +61,7 @@ if (test)
   endif (APPLE)
 
   # This adds another subdirectory, which has 'project(googletest)'.
-  add_subdirectory(../../googletest [binary-dir])
+  add_subdirectory(../../googletest gtest)
 
   enable_testing()
 
@@ -72,7 +72,7 @@ if (test)
   ##############
   # Unit Tests
   ##############
-  add_executable(runUnitTests test/test_solve.cpp)
+  add_executable(runUnitTests test/test.cpp)
 
   # Standard linking to gtest stuff.
   target_link_libraries(runUnitTests gtest gtest_main)
@@ -87,6 +87,5 @@ if (test)
   # You can also omit NAME and COMMAND. The second argument could be some other
   # test executable.
   # add_test(that-other-test-I-made runUnitTests)
-  add_test(jacobi runUnitTests)
-  add_test(find_max_offidag runUnitTests)
+  add_test(mag runUnitTests)
 endif()
