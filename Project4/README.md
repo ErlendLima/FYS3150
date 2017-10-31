@@ -30,9 +30,7 @@
 
 ## Overview
 The aim of [Project 4](https://compphysics.github.io/ComputationalPhysics/doc/Projects/2017/Project4/pdf/Project4.pdf) in FYS3150
-is to develop code for simulating the solar system using Euler's Forward method and Velocity Verlet.
-This is implemented in both C++ and Julia, and further analysis and plotting is done by Python. 
-Python is also used for collecting the initial conditions from [NASA](https://ssd.jpl.nasa.gov/?horizons).
+is something something.
 The report itself and associated LaTeX files are available in the `latex` directory.
 
 ## Analysis Scripts
@@ -44,20 +42,12 @@ table explaining the function to each script. Python 3.6 is required.
 | ------                  | --------                                                                                                          |
 | `getnasa.py`            | Contacts NASA through telnet and downloads all bodies in the targets.txt file into a JSON file.                   |
 | `analyze.py`            | A general script which plots the position, energy and angular moment from the output. Can also animate the orbits.|
-| `batchrun.py`           | Compares Euler and Verlet in terms of running time.                                                               |
-| `findescapevelocity.py` | Uses a bijection method to find the escape velocity of Earth.                                                     |
-| `jupiterrunner.py`      | Solves the 3-body problem consisting of the Sun, Earth and Jupiter.                                               |
-| `perihelion.py`         | Measure the perihelion precession of Mercury from relativistic effects.                                 |
-
-
 ## Usage (C++)
 
 Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1 and JSONcpp. On Ubuntu these can be installed with
 ```console
-sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev libjsoncpp-1 libjsoncpp-dev
+sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev
 ```
-Note that the path to jsoncpp is not standardized. This program assumes it lies in `<include path>/jsoncpp/json/json.h`. 
-If you get a compilation error, create a symlink from the path to your `json.h` to `jsoncpp/json/json.h`.
 
 If the
 requirements are satisfied, the makefile can be created and run with
@@ -76,20 +66,19 @@ The rapport and all supporting material is located in the `latex` directory.
 The document is compatible with PdfLaTeX, LuaTeX and XeLaTeX.
 
 ## Testing (C++)
-Testing is not implemented in the C++ version.
-<!-- The framework [Google Test](https://github.com/google/googletest) is used to write unit tests. Google test is -->
-<!-- imported as git submodule. To make it work, type -->
+The framework [Google Test](https://github.com/google/googletest) is used to write unit tests. Google test is
+imported as git submodule. To make it work, type
 
-<!-- ```console -->
-<!-- git submodule init -->
-<!-- git submodule update -->
-<!-- ``` -->
+```console
+ git submodule init
+ git submodule update
+```
 
-<!-- Google test is fully integrated into CMake, making it easy to both add and run the tests. In order -->
-<!-- to compile the tests, type `cmake -Dtest=ON`. For actually running the tests, run `./runUnitTests` or -->
-<!-- `make test`. -->
+Google test is fully integrated into CMake, making it easy to both add and run the tests. In order
+to compile the tests, type `cmake -Dtest=ON`. For actually running the tests, run `./runUnitTests` or
+`make test`.
 
-<!-- Better support for debugging and stricter compiler flags can be turned on using `cmake -DCMAKE_BUILD_TYPE=DEBUG`. -->
+Better support for debugging and stricter compiler flags can be turned on using `cmake -DCMAKE_BUILD_TYPE=DEBUG`.
 
 ## Usage (Julia)
 The Julia version is not completed, and does not count as a part of this assignment. 

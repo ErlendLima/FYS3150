@@ -2,7 +2,7 @@ language: julia
 julia:
   - 0.6
 env:
-  - TEST_DIR=Project3/julia
+  - TEST_DIR=Project4/julia/test
 git:
   submodules: false
 # Use sed to replace the SSH URL with the public URL, then initialize submodules
