@@ -36,9 +36,11 @@ class Analyzer:
 
     def plot_expectations(self):
         fig = plt.figure(figsize=(9, 7))
-        ax_energy, ax_magnetic = fig.subplots(1, 2, sharex=True)
+        ax_energy, ax_magnetic = fig.subplots(2, 1, sharex=True)
         ax_energy.plot(self.energy)
+        ax_energy.set_title("Energy")
         ax_magnetic.plot(self.magnetic)
+        ax_magnetic.set_title("Magnetic moment")
         plt.show()
 
     def update_lines(self, num, plot, text):
@@ -69,11 +71,11 @@ if __name__ == '__main__':
     parser.add_argument('--search_path', type=os.path.abspath,
                         default='../data/',
                         help="Directory to search for input files")
-    parser.add_argument('--evolution', type=str, default="evolution50000by20by20.bin",
+    parser.add_argument('--evolution', type=str, default="evolution100000by50by50.bin",
                         help="The file containing the positions")
-    parser.add_argument('--energy', type=str, default="energies50000.bin",
+    parser.add_argument('--energy', type=str, default="energies100000.bin",
                         help="The file containing the energies")
-    parser.add_argument('--magnetic', type=str, default="magneticmoment50000.bin",
+    parser.add_argument('--magnetic', type=str, default="magneticmoment100000.bin",
                         help="The file containing the angular momenta")
     parser.add_argument('--plot2d', help="Plot as 2D",
                         action="store_true")

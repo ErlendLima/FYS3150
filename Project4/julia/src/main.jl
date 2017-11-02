@@ -1,3 +1,4 @@
 include("ising.jl")
 using Ising
-ising()
+@time ising()
+

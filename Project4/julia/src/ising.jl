@@ -7,10 +7,24 @@ function pprintln(x)
     println("")
 end
 
+mutable struct model
+    Λ::Array{Int8}
+    temperature::T where T<:Real
+    latticesize::T where T<:Integer
+    saveperiod::T  where T<:Integer
+    J::T           where T<:Real
+    h::T           where T<:Real
+end
+
+function init() end
+
 function neighbours(i, j, A)
-    N = size(A)[1]
+    N = size(A, 1)
     function period(x)
-        a = ((x+N+1)%(N+1))
+        # First ensure that the number is not negative
+        # then wrap it around, and add 1 since Julia
+        # arrays start at 1
+        a = (x + N+1) % (N+1)
         if a == 0
             1
         else
@@ -40,12 +54,19 @@ function savemodel(output, file)
     end
 end
 
+function savesnapshot(m, writeperiod, evolution, energies, magneticmoment)
+    if m % saveperiod == 0
+        # save
+    end
+end
+
 function ising()
-    N = 20
-    M = 50000
+    N = 50
+    M = 1000
     J = 1
     h = 0
-    temperature = 10.0
+    temperature = 1.00
+    saveperiod = 100
     β = 1.0/(1*temperature)
     # Define the lattice Λ with randomly oriented spins.
     # Use Int8 to use as little memory as possible
@@ -54,18 +75,15 @@ function ising()
 
     # Matrices to store data for analysis
     evolution = zeros(Int8, (M, N, N))
-    energies = zeros(Float64, M)
-    magneticmoment = zeros(Float64, M)
-
+    energies = zeros(Float64, M*N^2)
+    magneticmoment = zeros(Float64, M*N^2)
 
     # Since the state space and hence energy space is discrete,
     # the probabilities can be precalculated
     # This is the entire state space to ΔE
     ΔEstates = [-4J, -2J, 0, 2J, 4J]
-    # The partition function
-    Z = sum(exp.(-β*ΔEstates))
     # And the probability for each ΔE
-    probability = Dict(i => exp(-β*i)/Z for i in ΔEstates)
+    ratio = Dict(i => exp(-β*i) for i in ΔEstates)
 
     # Initial values
     evolution[1, :, :] = Λ
@@ -74,14 +92,19 @@ function ising()
 
     # Metropolis Algorithm
     for m in 2:M
-        i, j = rand(rng, 1:N, (1, 2))
-        ΔE = -J*Λ[i, j]*sum(neighbours(i, j, Λ))
-        if ΔE < 0 || rand(rng) > probability[ΔE] # Precompute the probabilities?
-            Λ[i, j] = -Λ[i, j]
+        for σᵢⱼ in Λ
+            i, j = rand(rng, 1:N, (1, 2))
+            ΔE = J*Λ[i, j]*sum(neighbours(i, j, Λ))
+            if ΔE < 0 || rand(rng) <= ratio[ΔE]
+                Λ[i, j] = -Λ[i, j]
+                energies[m] = energies[m-1] + ΔE
+                magneticmoment[m] = magneticmoment[m-1] + 2*Λ[i, j]
+            else
+                energies[m] = energies[m-1]
+                magneticmoment[m] = magneticmoment[m-1]
+            end
         end
         evolution[m, :, :] = Λ
-        energies[m] = energies[m-1] + ΔE
-        magneticmoment[m] = magneticmoment[m-1] + 2*Λ[i, j]
     end
     savemodel(evolution, "../../data/evolution$(M)by$(N)by$(N).bin")
     energystream = open("../../data/energies$(M).bin", "w")
