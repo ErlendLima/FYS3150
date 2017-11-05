@@ -8,23 +8,40 @@ import seaborn as sns
 import argparse
 import os
 import re
+import json
 
 sns.set(context="poster")
 
 
 class Analyzer:
-    def __init__(self, path, evolution_bin, energy_bin, magnetic_bin):
-        self.evolution = self.load_evolution(os.path.join(path, evolution_bin))
-        self.energy = self.load_binary(os.path.join(path, energy_bin))
-        self.magnetic = self.load_binary(os.path.join(path, magnetic_bin))
+    def __init__(self, base_path, meta_path):
+        self.load(base_path, meta_path)
 
-    def load_evolution(self, path):
-        M, I, J = [int(i) for i in re.findall(".*?(\d+)by(\d+)by(\d+)\.bin", path)[0]]
-        data = np.fromfile(path, dtype=np.int8)
-        return data.reshape(M, I, J)
+    # def load_evolution(self, path):
+    #     M, I, J = [int(i) for i in re.findall(".*?(\d+)by(\d+)by(\d+)\.bin", path)[0]]
+    #     data = np.fromfile(path, dtype=np.int8)
+    #     return data.reshape(M, I, J)
 
-    def load_binary(self, path):
-        return np.fromfile(path)
+    def load(self, base_path: str, meta_path: str) -> None:
+        with open(os.path.join(base_path, meta_path)) as fp:
+            meta = json.load(fp)
+
+        self.energy = self.load_block(base_path, meta["energy"])
+        self.magnetic = self.load_block(base_path, meta["magnetic moment"])
+        self.evolution = self.load_block(base_path, meta["evolution"])
+
+    @staticmethod
+    def load_block(base_path: str, block: dict) -> np.ndarray:
+        if block["type"] == "float64":
+            type = np.float64
+        elif block["type"] == "int8":
+            type = np.int8
+        else:
+            raise(RuntimeError(f"{block['type']} from {block['path'] is not supported}"))
+
+        data = np.fromfile(os.path.join(base_path, block["path"]),
+                           dtype=type)
+        return data.reshape(*block["dim"])
 
     def plot(self):
         self.plot_expectations()
@@ -57,7 +74,7 @@ class Analyzer:
 
         system_animation = animation.FuncAnimation(fig, self.update_lines,
                                                    fargs=(plot, text),
-                                                   frames=range(0, self.evolution.shape[0], 100),
+                                                   frames=range(0, self.evolution.shape[0], 1),
                                                    interval=10, blit=False)
         if save:
             system_animation.save('../latex/figures/animation.gif',
@@ -71,12 +88,8 @@ if __name__ == '__main__':
     parser.add_argument('--search_path', type=os.path.abspath,
                         default='../data/',
                         help="Directory to search for input files")
-    parser.add_argument('--evolution', type=str, default="evolution100000by50by50.bin",
-                        help="The file containing the positions")
-    parser.add_argument('--energy', type=str, default="energies100000.bin",
-                        help="The file containing the energies")
-    parser.add_argument('--magnetic', type=str, default="magneticmoment100000.bin",
-                        help="The file containing the angular momenta")
+    parser.add_argument('--meta', type=str, default="meta.json",
+                        help="The file containing the metadata")
     parser.add_argument('--plot2d', help="Plot as 2D",
                         action="store_true")
     parser.add_argument('--animate', help="Animate the orbits",
@@ -84,8 +97,7 @@ if __name__ == '__main__':
     parser.add_argument('--save', help="Save the (animation) plots",
                         action="store_true")
     args = parser.parse_args()
-    analyzer = Analyzer(args.search_path, args.evolution,
-                        args.energy, args.magnetic)
+    analyzer = Analyzer(args.search_path, args.meta)
     if args.animate:
         analyzer.animate(args.save)
     else:

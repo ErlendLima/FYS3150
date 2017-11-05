@@ -1,0 +1,1 @@
+{"evolution":{"dim":[1000,20,20],"type":"int8","path":"evolution.bin"},"magnetic moment":{"dim":[399601],"type":"float64","path":"magneticmoment.bin"},"saveperiod":1000,"energy":{"dim":[399601],"type":"float64","path":"energies.bin"},"seed":1234,"lattice size":20,"MC iterations":1000}

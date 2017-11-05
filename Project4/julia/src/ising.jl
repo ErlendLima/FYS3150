@@ -1,5 +1,8 @@
 module Ising
-export neighbours, ising, hamiltonian
+export neighbours, ising!, hamiltonian, Metadata
+
+include("./metamodel.jl")
+using .Metamodel: Metadata, writedata!
 
 pprint(x) = show(IOContext(STDOUT, limit=false), "text/plain", x)
 function pprintln(x)
@@ -7,16 +10,19 @@ function pprintln(x)
     println("")
 end
 
-mutable struct model
-    Λ::Array{Int8}
-    temperature::T where T<:Real
-    latticesize::T where T<:Integer
-    saveperiod::T  where T<:Integer
-    J::T           where T<:Real
-    h::T           where T<:Real
+function mprint(x)
+    for i in 1:size(x, 1)
+        for j in 1:size(x, 2)
+            if x[i, j] == 1
+                print("██")
+            else
+                print("▒▒")
+            end
+        end
+        print("\n")
+    end
 end
 
-function init() end
 
 function neighbours(i, j, A)
     N = size(A, 1)
@@ -47,36 +53,53 @@ function hamiltonian(A, J, h)
     hamiltonian(A, J) - h*sum(A)
 end
 
-function savemodel(output, file)
-    stream = open(file, "w")
-    for m in 1:size(output, 1)
-        write(stream, output[m, :, :])
-    end
-end
-
 function savesnapshot(m, writeperiod, evolution, energies, magneticmoment)
     if m % saveperiod == 0
         # save
     end
 end
 
-function ising()
-    N = 50
-    M = 1000
-    J = 1
-    h = 0
-    temperature = 1.00
-    saveperiod = 100
+
+function constructlattice(model)
+    if model.initialorientation == :random
+        # Construct the lattice with randomly oriented spins.
+        rand(model.rng, convert(Vector{Int8}, [-1, 1]),
+             (model.latticesize, model.latticesize))
+    elseif model.initialorientation == :up
+        ones(Int8, (model.latticesize, model.latticesize))
+    elseif model.initialorientation == :down
+        -ones(Int8, (model.latticesize, model.latticesize))
+    else
+        throw(ArgumentError("Initial orientation $(model.initialorientation) is not valid."))
+    end
+end
+
+function ising!(model::Metadata, version::Symbol)
+    if version == :parallel
+        isingparallel!(model)
+    elseif version == :serial
+        isingserial!(model)
+    else
+        throw(ArgumentError("$version is not supported"))
+    end
+end
+
+function isingserial!(model::Metadata)
+    N = model.latticesize
+    M = model.MCiterations
+    J = model.J
+    h = model.h
+    temperature = model.temperature
+    saveperiod = model.saveperiod
     β = 1.0/(1*temperature)
-    # Define the lattice Λ with randomly oriented spins.
     # Use Int8 to use as little memory as possible
-    rng = MersenneTwister(1233)
-    Λ = rand(rng, convert(Vector{Int8}, [-1, 1]), (N, N))
+    rng = MersenneTwister(model.seed)
+    Λ = constructlattice(model)
 
     # Matrices to store data for analysis
     evolution = zeros(Int8, (M, N, N))
-    energies = zeros(Float64, M*N^2)
-    magneticmoment = zeros(Float64, M*N^2)
+    energies = zeros(Float64, (M-1)*N^2+1)
+    magneticmoment = zeros(Float64, (M-1)*N^2+1)
 
     # Since the state space and hence energy space is discrete,
     # the probabilities can be precalculated
@@ -91,26 +114,71 @@ function ising()
     magneticmoment[1] = sum(Λ)
 
     # Metropolis Algorithm
-    for m in 2:M
-        for σᵢⱼ in Λ
+    @time for m in 2:M
+        counter = 1
+        for index in eachindex(Λ)
+            n = (N*N)*(m-2) + counter + 1
             i, j = rand(rng, 1:N, (1, 2))
             ΔE = J*Λ[i, j]*sum(neighbours(i, j, Λ))
             if ΔE < 0 || rand(rng) <= ratio[ΔE]
                 Λ[i, j] = -Λ[i, j]
-                energies[m] = energies[m-1] + ΔE
-                magneticmoment[m] = magneticmoment[m-1] + 2*Λ[i, j]
+                energies[n] = energies[n-1] + ΔE
+                magneticmoment[n] = magneticmoment[n-1] + 2*Λ[i, j]
             else
-                energies[m] = energies[m-1]
-                magneticmoment[m] = magneticmoment[m-1]
+                energies[n] = energies[n-1]
+                magneticmoment[n] = magneticmoment[n-1]
             end
+            counter = counter + 1
         end
         evolution[m, :, :] = Λ
     end
-    savemodel(evolution, "../../data/evolution$(M)by$(N)by$(N).bin")
-    energystream = open("../../data/energies$(M).bin", "w")
-    write(energystream, energies)
-    mmomentstream = open("../../data/magneticmoment$(M).bin", "w")
-    write(mmomentstream, magneticmoment)
+    writedata!(model, evolution, energies, magneticmoment)
+end
+
+function isingparallel!(model::Metadata)
+    N = model.latticesize
+    M = model.MCiterations
+    J = model.J
+    h = model.h
+    temperature = model.temperature
+    saveperiod = model.saveperiod
+    β = 1.0/(1*temperature)
+    # Use Int8 to use as little memory as possible
+    rng = MersenneTwister(model.seed)
+    Λ = constructlattice(model)
+
+    # Matrices to store data for analysis
+    evolution = zeros(Int8, (N, N))
+    energy = 0.0
+    magneticmoment = 0.0
+
+    # Since the state space and hence energy space is discrete,
+    # the probabilities can be precalculated
+    # This is the entire state space to ΔE
+    ΔEstates = [-4J, -2J, 0, 2J, 4J]
+    # And the probability for each ΔE
+    ratio = Dict(i => exp(-β*i) for i in ΔEstates)
+
+    # Initial values
+    energies = hamiltonian(Λ, J)
+    magneticmoment = sum(Λ)
+
+    # Metropolis Algorithm
+    @time for m in 2:M
+        for index in eachindex(Λ)
+            i, j = rand(rng, 1:N, (1, 2))
+            ΔE = J*Λ[i, j]*sum(neighbours(i, j, Λ))
+            if ΔE < 0 || rand(rng) <= ratio[ΔE]
+                Λ[i, j] = -Λ[i, j]
+                energy += ΔE
+                magneticmoment += 2*Λ[i, j]
+            end
+        end
+    end
+    println("Energy $energy")
+    println("Magnetic moment $magneticmoment")
+    mprint(Λ)
+    # writedata!(model, Λ, energy, magneticmoment)
 end
 
 end
