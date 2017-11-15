@@ -3,7 +3,8 @@
 
 #include <armadillo>
 #include <json/json.h>
-#include<json/writer.h>
+#include <json/writer.h>
+#include "metamodel.h"
 
 int                  magnetization(arma::imat& A);
 arma::imat           setInitialStateRandom(unsigned int N);
@@ -14,6 +15,5 @@ int                  totalEnergy(arma::imat& A);
 std::map<int,double> makeProbabilities(double beta);
 void                 ising();
 struct               parameters;
-void                 writeMetaData(parameters& params);
 
 #endif /* ISING_H */

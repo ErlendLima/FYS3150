@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include "ising.h"
+#include "metamodel.h"
 
 int main(int argc, char const *argv[]) {
   ising();

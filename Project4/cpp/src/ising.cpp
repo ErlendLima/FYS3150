@@ -7,8 +7,10 @@
 #include <chrono>
 #include <thread>
 #include <json/json.h>
+#include <json/writer.h>
 #include "ising.h"
-#include<json/writer.h>
+#include "metamodel.h"
+#include "metamodel.cpp"
 
 int magnetization(arma::imat& A){
   // Return the magnetization of a state described by A, which is simply the sum
@@ -90,7 +92,7 @@ struct parameters{
   double beta          = 1/temperature;
 
   unsigned int saveperiod;
-  // INITIAL ORIENTATION SHOULD BE HERE
+  // TODO: INITIAL ORIENTATION SHOULD BE HERE
   std::string basepath   = "../data/";
   std::string energypath = "energies.bin";
   std::string magneticmomentpath = "magneticmoment.bin";
@@ -107,8 +109,8 @@ void ising(){
   std::uniform_real_distribution<double> random(0.0,1.0);
 
   // Setup and run simulation of the Ising model.
-  const unsigned int N = params.N;      // Lattice size (N x N)
-  const unsigned int M = params.M;         // Number of MC-iterations
+  unsigned int N = params.N;      // Lattice size (N x N)
+  unsigned int M = params.M;         // Number of MC-iterations
   double beta = 1.0/params.temperature;
   int m;
   int n;
@@ -147,7 +149,7 @@ void ising(){
 
   // Write energy to file
   std::ofstream energy;
-  energy.open("../data/energies.bin", std::ios::out | std::ios::binary);
+  energy.open(params.basepath + params.energypath, std::ios::out | std::ios::binary);
   energy.write((char*)&energies[0], M*sizeof(energies[0]));
   energy.close();
 
@@ -158,33 +160,4 @@ void ising(){
   magmom.close();
 
   writeMetaData(params);
-}
-
-void writeMetaData(parameters& params){
-  std::ofstream metafile("../data/meta.json");
-  Json::Value root;
-  root["evolution"]["dim"]  = Json::arrayValue;
-  root["evolution"]["type"] = "int8";
-  root["evolution"]["path"] = "evolution.bin";
-  root["evolution"]["dim"].append(params.N);
-  root["evolution"]["dim"].append(params.N);
-  root["evolution"]["dim"].append(params.M);
-
-  root["magnetic moment"]["dim"]  = Json::arrayValue;
-  root["magnetic moment"]["type"] = "float64";
-  root["magnetic moment"]["path"] = "magneticmoment.bin";
-  root["magnetic moment"]["dim"].append(params.M);
-
-  root["energy"]["dim"]  = Json::arrayValue;
-  root["energy"]["type"] = "float64";
-  root["energy"]["path"] = "energies.bin";
-  root["energy"]["dim"].append(params.M);
-
-  root["saveperiod"]    = 1000;
-  root["seed"]          = params.seed;
-  root["lattice size"]  = params.N;
-  root["MC iterations"] = params.M;
-  metafile << root << std::endl;
-  metafile.close();
-  //TODO: ENDRE SAVEPERIOD TIL NUMBER OF SAVES
 }
