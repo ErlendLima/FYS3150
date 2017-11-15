@@ -6,11 +6,8 @@
 #include <string>
 #include <chrono>
 #include <thread>
-#include <json/json.h>
-#include <json/writer.h>
 #include "ising.h"
 #include "metamodel.h"
-#include "metamodel.cpp"
 
 int magnetization(arma::imat& A){
   // Return the magnetization of a state described by A, which is simply the sum
@@ -84,34 +81,19 @@ std::map<int,double> makeProbabilities(double beta){
   return probabilities;
 }
 
-struct parameters{
-  int seed             = 1233;
-  const unsigned int N = 2;          // Lattice size (N x N)
-  const unsigned int M = 1000;       // Number of MC Cycles
-  double temperature   = 1.0;
-  double beta          = 1/temperature;
-
-  unsigned int saveperiod;
-  // TODO: INITIAL ORIENTATION SHOULD BE HERE
-  std::string basepath   = "../data/";
-  std::string energypath = "energies.bin";
-  std::string magneticmomentpath = "magneticmoment.bin";
-  std::string metadatapath = "metacpp.json";
-  std::string evolutionpath = "evolution.bin";
-};
 
 void ising(){
-  parameters params;
-  int seed = params.seed;
+  metamodel model;
+  int seed = model.seed;
   // Setup RNG generator
   std::mt19937 gen;
   gen.seed(seed);
   std::uniform_real_distribution<double> random(0.0,1.0);
 
   // Setup and run simulation of the Ising model.
-  unsigned int N = params.N;      // Lattice size (N x N)
-  unsigned int M = params.M;         // Number of MC-iterations
-  double beta = 1.0/params.temperature;
+  unsigned int N = model.N;      // Lattice size (N x N)
+  unsigned int M = model.M;         // Number of MC-iterations
+  double beta = 1.0/model.temperature;
   int m;
   int n;
   int dE;
@@ -149,7 +131,7 @@ void ising(){
 
   // Write energy to file
   std::ofstream energy;
-  energy.open(params.basepath + params.energypath, std::ios::out | std::ios::binary);
+  energy.open(model.basepath + model.energypath, std::ios::out | std::ios::binary);
   energy.write((char*)&energies[0], M*sizeof(energies[0]));
   energy.close();
 
@@ -159,5 +141,5 @@ void ising(){
   magmom.write((char*)&magmoments[0], M*sizeof(magmoments[0]));
   magmom.close();
 
-  writeMetaData(params);
+  writeMetaData(model);
 }

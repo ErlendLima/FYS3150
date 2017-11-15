@@ -1,4 +1,5 @@
 module Ising
+using  MPI
 export neighbours, ising!, hamiltonian, Metadata
 
 include("./metamodel.jl")
@@ -53,14 +54,9 @@ function hamiltonian(A, J, h)
     hamiltonian(A, J) - h*sum(A)
 end
 
-function savesnapshot(m, writeperiod, evolution, energies, magneticmoment)
-    if m % saveperiod == 0
-        # save
-    end
-end
-
 
 function constructlattice(model)
+    # Use Int8 to use as little memory as possible
     if model.initialorientation == :random
         # Construct the lattice with randomly oriented spins.
         rand(model.rng, convert(Vector{Int8}, [-1, 1]),
@@ -74,6 +70,39 @@ function constructlattice(model)
     end
 end
 
+function initializesystem(model::Metadata)
+    N = model.latticesize
+    M = model.MCiterations
+    J = model.J
+    h = model.h
+    temperature = model.temperature
+    saveperiod = model.saveperiod
+    β = 1.0/(1*temperature)
+
+    Λ = constructlattice(model)
+
+    # Since the state space and hence energy space is discrete,
+    # the probabilities can be precalculated
+    # This is the entire state space to ΔE
+    ΔEstates = [-4J, -2J, 0, 2J, 4J]
+    # And the probability for each ΔE
+    ratio = Dict(i => exp(-β*i) for i in ΔEstates)
+
+    # Matrices to store data for analysis
+    if model.version == :parallel
+        evolution = zeros(Int8, (M, N, N))
+        energies = zeros(Float64, (M-1)*N^2+1)
+        magneticmoment = zeros(Float64, (M-1)*N^2+1)
+    elseif model.version == :serial
+        evolution = zeros(Int8, (N, N))
+        energy = 0.0
+        magneticmoment = 0.0
+    else
+        throw(ArgumentError("Unknown model: $(model.version)"))
+    (lattice, ratios, evolution, energies, magneticmoment)
+end
+
+
 function ising!(model::Metadata, version::Symbol)
     if version == :parallel
         isingparallel!(model)
@@ -84,29 +113,11 @@ function ising!(model::Metadata, version::Symbol)
     end
 end
 
+
 function isingserial!(model::Metadata)
     N = model.latticesize
     M = model.MCiterations
-    J = model.J
-    h = model.h
-    temperature = model.temperature
-    saveperiod = model.saveperiod
-    β = 1.0/(1*temperature)
-    # Use Int8 to use as little memory as possible
-    rng = MersenneTwister(model.seed)
-    Λ = constructlattice(model)
-
-    # Matrices to store data for analysis
-    evolution = zeros(Int8, (M, N, N))
-    energies = zeros(Float64, (M-1)*N^2+1)
-    magneticmoment = zeros(Float64, (M-1)*N^2+1)
-
-    # Since the state space and hence energy space is discrete,
-    # the probabilities can be precalculated
-    # This is the entire state space to ΔE
-    ΔEstates = [-4J, -2J, 0, 2J, 4J]
-    # And the probability for each ΔE
-    ratio = Dict(i => exp(-β*i) for i in ΔEstates)
+    Λ, ratio, evolution, energies, magneticmoment = initializesystem(model)
 
     # Initial values
     evolution[1, :, :] = Λ
@@ -118,9 +129,9 @@ function isingserial!(model::Metadata)
         counter = 1
         for index in eachindex(Λ)
             n = (N*N)*(m-2) + counter + 1
-            i, j = rand(rng, 1:N, (1, 2))
+            i, j = rand(model.rng, 1:N, (1, 2))
             ΔE = J*Λ[i, j]*sum(neighbours(i, j, Λ))
-            if ΔE < 0 || rand(rng) <= ratio[ΔE]
+            if ΔE < 0 || rand(model.rng) <= ratio[ΔE]
                 Λ[i, j] = -Λ[i, j]
                 energies[n] = energies[n-1] + ΔE
                 magneticmoment[n] = magneticmoment[n-1] + 2*Λ[i, j]
@@ -138,26 +149,7 @@ end
 function isingparallel!(model::Metadata)
     N = model.latticesize
     M = model.MCiterations
-    J = model.J
-    h = model.h
-    temperature = model.temperature
-    saveperiod = model.saveperiod
-    β = 1.0/(1*temperature)
-    # Use Int8 to use as little memory as possible
-    rng = MersenneTwister(model.seed)
-    Λ = constructlattice(model)
-
-    # Matrices to store data for analysis
-    evolution = zeros(Int8, (N, N))
-    energy = 0.0
-    magneticmoment = 0.0
-
-    # Since the state space and hence energy space is discrete,
-    # the probabilities can be precalculated
-    # This is the entire state space to ΔE
-    ΔEstates = [-4J, -2J, 0, 2J, 4J]
-    # And the probability for each ΔE
-    ratio = Dict(i => exp(-β*i) for i in ΔEstates)
+    Λ, ratio, evolution, energies, magneticmoment = initializesystem(model)
 
     # Initial values
     energies = hamiltonian(Λ, J)
@@ -166,9 +158,9 @@ function isingparallel!(model::Metadata)
     # Metropolis Algorithm
     @time for m in 2:M
         for index in eachindex(Λ)
-            i, j = rand(rng, 1:N, (1, 2))
+            i, j = rand(model.rng, 1:N, (1, 2))
             ΔE = J*Λ[i, j]*sum(neighbours(i, j, Λ))
-            if ΔE < 0 || rand(rng) <= ratio[ΔE]
+            if ΔE < 0 || rand(model.rng) <= ratio[ΔE]
                 Λ[i, j] = -Λ[i, j]
                 energy += ΔE
                 magneticmoment += 2*Λ[i, j]

@@ -8,7 +8,7 @@ mutable struct Metadata
     MCiterations::T          where T<:Integer
     temperature::T           where T<:Real
     saveperiod::T            where T<:Integer
-    J::T                     where T<:Real
+    J::T                     where T<:Integer
     h::T                     where T<:Real
     initialorientation::Symbol
     basepath::String
@@ -24,7 +24,7 @@ mutable struct Metadata
     evolutiondim::Tuple
 
     function Metadata{I<:Integer, R<:Real}(size::I, iter::I, temp::R, orientation::Symbol,
-                       seed::I, path::String)
+                      path::String; seed=rand(Int))
         # Construct a new model by checking that each argument is valid
         # and using default values for several variables
 
@@ -86,21 +86,21 @@ end
 function writemetadata(model::Metadata)
     stream = open(model.basepath * model.metadatapath, "w")
     magneticmeta = Dict("path" => model.magneticmomentpath,
-                        "dim" => model.magneticmomentdim,
+                        "dim"  => model.magneticmomentdim,
                         "type" => "float64")
     energymeta = Dict("path" => model.energypath,
-                      "dim" => model.energydim,
+                      "dim"  => model.energydim,
                       "type" => "float64")
     evolutionmeta = Dict("path" => model.evolutionpath,
-                         "dim" => model.evolutiondim,
+                         "dim"  => model.evolutiondim,
                          "type" => "int8")
-    metadata = Dict("energy" => energymeta,
+    metadata = Dict("energy"          => energymeta,
                     "magnetic moment" => magneticmeta,
-                    "evolution" => evolutionmeta,
-                    "saveperiod" => model.saveperiod,
-                    "seed" => model.seed,
-                    "lattice size" => model.latticesize,
-                    "MC iterations" => model.MCiterations)
+                    "evolution"       => evolutionmeta,
+                    "saveperiod"      => model.saveperiod,
+                    "seed"            => model.seed,
+                    "lattice size"    => model.latticesize,
+                    "MC iterations"   => model.MCiterations)
     JSON.print(stream, metadata)
 end
 
