@@ -78,7 +78,7 @@ if (test)
   target_link_libraries(runUnitTests gtest gtest_main)
 
   # # Extra linking for the project.
-  target_link_libraries(runUnitTests project_lib blas lapack -O1 armadillo)
+  target_link_libraries(runUnitTests project_lib blas lapack -O1 armadillo -ljsoncpp)
 
   # This is so you can do 'make test' to see all your tests run, instead of
   # manually running the executable runUnitTests to see those specific tests.

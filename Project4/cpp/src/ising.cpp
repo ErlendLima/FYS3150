@@ -4,7 +4,11 @@
 #include <array>
 #include <random>
 #include <string>
+#include <chrono>
+#include <thread>
+#include <json/json.h>
 #include "ising.h"
+#include<json/writer.h>
 
 int magnetization(arma::imat& A){
   // Return the magnetization of a state described by A, which is simply the sum
@@ -68,6 +72,7 @@ int totalEnergy(arma::imat& A){
   }
   return E;
 }
+
 std::map<int,double> makeProbabilities(double beta){
   std::array<int, 5> dEStates{-4, -2, 0, 2, 4};
   std::map<int,double> probabilities;
@@ -77,19 +82,34 @@ std::map<int,double> makeProbabilities(double beta){
   return probabilities;
 }
 
+struct parameters{
+  int seed             = 1233;
+  const unsigned int N = 2;          // Lattice size (N x N)
+  const unsigned int M = 1000;       // Number of MC Cycles
+  double temperature   = 1.0;
+  double beta          = 1/temperature;
+
+  unsigned int saveperiod;
+  // INITIAL ORIENTATION SHOULD BE HERE
+  std::string basepath   = "../data/";
+  std::string energypath = "energies.bin";
+  std::string magneticmomentpath = "magneticmoment.bin";
+  std::string metadatapath = "metacpp.json";
+  std::string evolutionpath = "evolution.bin";
+};
+
 void ising(){
+  parameters params;
+  int seed = params.seed;
   // Setup RNG generator
   std::mt19937 gen;
-  gen.seed(1233);
+  gen.seed(seed);
   std::uniform_real_distribution<double> random(0.0,1.0);
 
   // Setup and run simulation of the Ising model.
-  const unsigned int N = 2;      // Lattice size (N x N)
-  const unsigned int M = 1000;         // Number of MC-iterations
-  double J = 1.0;                // Energy
-  double h = 0.0;                // Magnetic field
-  double temperature = 1.0;
-  double beta = 1.0/temperature;
+  const unsigned int N = params.N;      // Lattice size (N x N)
+  const unsigned int M = params.M;         // Number of MC-iterations
+  double beta = 1.0/params.temperature;
   int m;
   int n;
   int dE;
@@ -99,14 +119,13 @@ void ising(){
 
   // Initialize arrays and initial values
   arma::imat state = setInitialStateRandom(N);
-  std::array<arma::imat, M> states; states[0] = state; // Saves every state
+  std::vector<arma::imat> states (M);
+  states[0] = state; // Saves every state
 
-  std::array<double, M> energies;                // Save energy for each state
-  energies.fill(0.0);
+  std::vector<double> energies (M);         // Save energy for each MC Cycle
   energies[0] = totalEnergy(state);
 
-  std::array<int, M> magmoments;          // Hold magnetization for each state
-  magmoments.fill(0);
+  std::vector<int> magmoments (M);          // Hold magnetization for each MC
   magmoments[0] = magnetization(state);
 
   // Loop through MC-cycles
@@ -125,4 +144,47 @@ void ising(){
     energies[i] = energies[i-1] + dE;
     magmoments[i] = magmoments[i-1] + 2*state(m,n);
   }
+
+  // Write energy to file
+  std::ofstream energy;
+  energy.open("../data/energies.bin", std::ios::out | std::ios::binary);
+  energy.write((char*)&energies[0], M*sizeof(energies[0]));
+  energy.close();
+
+  // Write magnetic moment to file
+  std::ofstream magmom;
+  magmom.open("../data/magneticmoment.bin", std::ios::out | std::ios::binary);
+  magmom.write((char*)&magmoments[0], M*sizeof(magmoments[0]));
+  magmom.close();
+
+  writeMetaData(params);
+}
+
+void writeMetaData(parameters& params){
+  std::ofstream metafile("../data/meta.json");
+  Json::Value root;
+  root["evolution"]["dim"]  = Json::arrayValue;
+  root["evolution"]["type"] = "int8";
+  root["evolution"]["path"] = "evolution.bin";
+  root["evolution"]["dim"].append(params.N);
+  root["evolution"]["dim"].append(params.N);
+  root["evolution"]["dim"].append(params.M);
+
+  root["magnetic moment"]["dim"]  = Json::arrayValue;
+  root["magnetic moment"]["type"] = "float64";
+  root["magnetic moment"]["path"] = "magneticmoment.bin";
+  root["magnetic moment"]["dim"].append(params.M);
+
+  root["energy"]["dim"]  = Json::arrayValue;
+  root["energy"]["type"] = "float64";
+  root["energy"]["path"] = "energies.bin";
+  root["energy"]["dim"].append(params.M);
+
+  root["saveperiod"]    = 1000;
+  root["seed"]          = params.seed;
+  root["lattice size"]  = params.N;
+  root["MC iterations"] = params.M;
+  metafile << root << std::endl;
+  metafile.close();
+  //TODO: ENDRE SAVEPERIOD TIL NUMBER OF SAVES
 }
