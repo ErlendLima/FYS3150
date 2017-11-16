@@ -7,9 +7,9 @@
 
 struct metamodel{
     int seed             = 1;
-    const unsigned int N = 200;          // Lattice size (N x N)
+    const unsigned int N = 20;          // Lattice size (N x N)
     const unsigned int M = 10000;       // Number of MC Cycles
-    double temperature   = 1.0;
+    double temperature   = 5.0;
     unsigned int n_saves = 1000;
 
     double beta                    = 1/temperature;
@@ -20,6 +20,10 @@ struct metamodel{
     std::string magneticmomentpath = "magneticmoment.bin";
     std::string metadatapath       = "metacpp.json";
     std::string evolutionpath      = "evolution.bin";
+
+    double Tstart = 1.0;
+    double Tstop  = 7.0;
+    double Tstep  = 0.2;
 };
 void writeMetaData(metamodel&);
 void save(metamodel&, std::vector<arma::imat>& states,

@@ -10,7 +10,7 @@ project(${PROJECT_NAME})
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O3 -Wall -fopenmp  -std=c++14 -D_GLIBCXX_PARALLEL -Wextra -Wshadow -Wfloat-equal -Wundef -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual -Wswitch-default -march=native -Wswitch-enum -Wconversion -Wunreachable-code -Wformat=2")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -fopenmp -std=c++14 -D_GLIBCXX_PARALLEL -Wfloat-equal -march=native -Wunreachable-code -Wshadow")
 
-set(include_files src/main.cpp src/ising.cpp src/metamodel.cpp)
+set(include_files src/main.cpp src/ising.cpp src/metamodel.cpp src/solver.cpp)
 set(executable_name solve)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -41,15 +41,21 @@ endif()
 # Normal Libraries & Executables
 ################################
 find_package(Armadillo REQUIRED)
+find_package(MPI REQUIRED)
 include_directories("src")
 add_library(project_lib ${include_files})
 message("${executable_name} ${include_files}")
 add_executable(${executable_name} ${include_files})
+
+# add this line only when you are using openmpi which has different c++ bindings
+add_definitions(-DOMPI_SKIP_MPICXX)
+
 # Key idea: SEPARATE OUT your main() function into its own file so it can be its
 # own executable. Separating out main() means you can add this library to be
 # used elsewhere.
 
-target_link_libraries(solve project_lib blas lapack -O1 armadillo -ljsoncpp)
+target_link_libraries(solve project_lib blas lapack -O1 armadillo -ljsoncpp
+                      ${MPI_LIBRARIES})
 
 ################################
 # Testing

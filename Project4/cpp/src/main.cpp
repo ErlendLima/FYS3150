@@ -8,8 +8,10 @@
 #include <stdlib.h>
 #include "ising.h"
 #include "metamodel.h"
+#include "solver.h"
 
 int main(int argc, char const *argv[]) {
-  ising();
+  // ising();
+  solve_sys();
   return 0;
 }

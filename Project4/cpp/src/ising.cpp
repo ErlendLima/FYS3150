@@ -76,11 +76,10 @@ std::map<int,double> makeProbabilities(double beta){
   std::array<int, 5> dEStates{-4, -2, 0, 2, 4};
   std::map<int,double> probabilities;
   for(const auto& dE: dEStates){
-    probabilities[dE] = exp(-beta*static_cast<double>(dE));
+    probabilities[dE] = exp(-beta*dE);
   }
   return probabilities;
 }
-
 
 void ising(){
   metamodel model;
@@ -134,9 +133,54 @@ void ising(){
       energies[i] = energy;
       magmoments[i] = magmoment;
   }
-
   // Save all data to binary files
   save(model, states, energies, magmoments);
   // Write metadata to be read by Python before reading binary files
   writeMetaData(model);
+}
+
+void isingParallel(double T, std::vector<double>& expectationValues, const metamodel& model){
+  int seed = model.seed;
+  // Setup RNG generator
+  std::mt19937 gen;
+  gen.seed(seed);
+  std::uniform_real_distribution<double> random(0.0,1.0);
+
+  // Setup and run simulation of the Ising model. Unpack some vals from model.
+  unsigned int N = model.N;      // Lattice size (N x N)
+  unsigned int M = model.M;         // Number of MC-iterations
+  int m, n, dE;
+
+  // Create probability map for possible energy changes
+  auto probabilities = makeProbabilities(model.beta);
+
+  // Initialize values
+  arma::imat state = setInitialStateRandom(N);
+  double energy = totalEnergy(state);
+  int magMoment = magnetization(state);
+
+  // Loop through MC-cycles
+  unsigned int numSpinsTot = N*N;
+  for(unsigned int i = 1; i < M; i++){
+    // Loop over the number of nodes in the lattice
+    for(unsigned int j = 0; j < numSpinsTot; j++){
+        // Choose row (m) and column (n) index to perturb/flip given acceptance
+        m = static_cast<int>(random(gen)*N);
+        n = static_cast<int>(random(gen)*N);
+        // Calculate consequent change of energy
+        dE = 2*state(m,n)*sumNeighbors(m,n,state);
+        // Metropolis algorithm
+        if(dE < 0 || random(gen) <= probabilities[dE]){
+          state(m,n) *= -1;
+          energy += dE;
+          magMoment += 2*state(m,n);
+        }
+      }
+  }
+// Add relevant values to total array
+expectationValues[0] += energy;
+expectationValues[1] += energy*energy;
+expectationValues[2] += magMoment;
+expectationValues[3] += magMoment*magMoment;
+expectationValues[4] += fabs(magMoment);
 }
