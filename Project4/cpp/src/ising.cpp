@@ -75,8 +75,8 @@ int totalEnergy(arma::imat& A){
 std::map<int,double> makeProbabilities(double beta){
   std::array<int, 5> dEStates{-4, -2, 0, 2, 4};
   std::map<int,double> probabilities;
-  for(const auto& E: dEStates){
-    probabilities[E] = exp(-beta*static_cast<double>(E));
+  for(const auto& dE: dEStates){
+    probabilities[dE] = exp(-beta*static_cast<double>(dE));
   }
   return probabilities;
 }
@@ -90,56 +90,53 @@ void ising(){
   gen.seed(seed);
   std::uniform_real_distribution<double> random(0.0,1.0);
 
-  // Setup and run simulation of the Ising model.
+  // Setup and run simulation of the Ising model. Unpack some vals from model.
   unsigned int N = model.N;      // Lattice size (N x N)
   unsigned int M = model.M;         // Number of MC-iterations
-  double beta = 1.0/model.temperature;
-  int m;
-  int n;
-  int dE;
+  int m, n, dE;
 
   // Create probability map for possible energy changes
-  auto probabilities = makeProbabilities(beta);
+  auto probabilities = makeProbabilities(model.beta);
 
   // Initialize arrays and initial values
   arma::imat state = setInitialStateRandom(N);
-  std::vector<arma::imat> states (M);
+  std::cout << sizeof(state(0,0)) << std::endl;
+  std::vector<arma::imat> states (model.M);
   states[0] = state; // Saves every state
 
-  std::vector<double> energies (M);         // Save energy for each MC Cycle
-  energies[0] = totalEnergy(state);
+  std::vector<double> energies (model.M);         // Save energy for each MC Cycle
+  double energy = totalEnergy(state);
+  energies[0] = energy;
 
-  std::vector<int> magmoments (M);          // Hold magnetization for each MC
-  magmoments[0] = magnetization(state);
+  std::vector<int> magmoments (model.M);          // Hold magnetization for each MC
+  int magmoment = magnetization(state);
+  magmoments[0] = magmoment;
 
   // Loop through MC-cycles
+  unsigned int nSpinsTot = N*N;
   for(unsigned int i = 1; i < M; i++){
-    // Choose row (m) and column (n) index to perturb/flip given acceptance
-    m = static_cast<int>(random(gen)*N);
-    n = static_cast<int>(random(gen)*N);
-    // Calculate consequent change of energy
-    dE = state(m,n)*sumNeighbors(m,n,state);
-    // Metropolis algorithm
-    if(dE < 0 && random(gen) < probabilities[dE]){
-      state(m,n) = -state(m,n);
-    }
-    // Update states
-    states[i] = state;
-    energies[i] = energies[i-1] + dE;
-    magmoments[i] = magmoments[i-1] + 2*state(m,n);
+    for(unsigned int j = 0; j < nSpinsTot; j++){
+        // Choose row (m) and column (n) index to perturb/flip given acceptance
+        m = static_cast<int>(random(gen)*N);
+        n = static_cast<int>(random(gen)*N);
+        // Calculate consequent change of energy
+        dE = 2*state(m,n)*sumNeighbors(m,n,state);
+        // Metropolis algorithm
+        if(dE < 0 || random(gen) <= probabilities[dE]){
+        // if(random(gen) <= probabilities[dE]){
+          state(m,n) *= -1;
+          energy += dE;
+          magmoment += 2*state(m,n);
+        }
+      }
+      // Update states
+      states[i] = state;
+      energies[i] = energy;
+      magmoments[i] = magmoment;
   }
 
-  // Write energy to file
-  std::ofstream energy;
-  energy.open(model.basepath + model.energypath, std::ios::out | std::ios::binary);
-  energy.write((char*)&energies[0], M*sizeof(energies[0]));
-  energy.close();
-
-  // Write magnetic moment to file
-  std::ofstream magmom;
-  magmom.open("../data/magneticmoment.bin", std::ios::out | std::ios::binary);
-  magmom.write((char*)&magmoments[0], M*sizeof(magmoments[0]));
-  magmom.close();
-
+  // Save all data to binary files
+  save(model, states, energies, magmoments);
+  // Write metadata to be read by Python before reading binary files
   writeMetaData(model);
 }

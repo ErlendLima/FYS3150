@@ -2,22 +2,27 @@
 #define METAMODEL_H
 
 #include <iostream>
+#include <armadillo>
+#include <string>
 
 struct metamodel{
-    int seed             = 1233;
-    const unsigned int N = 2;          // Lattice size (N x N)
-    const unsigned int M = 1000;       // Number of MC Cycles
+    int seed             = 1;
+    const unsigned int N = 200;          // Lattice size (N x N)
+    const unsigned int M = 10000;       // Number of MC Cycles
     double temperature   = 1.0;
-    double beta          = 1/temperature;
+    unsigned int n_saves = 1000;
 
-    unsigned int saveperiod;
-    // TODO: INITIAL ORIENTATION SHOULD BE HERE
-    std::string basepath   = "../data/";
-    std::string energypath = "energies.bin";
+    double beta                    = 1/temperature;
+    unsigned int saveperiod        = M/n_saves;
+    std::string initialOrientation = "random"; // Can be random, up, down
+    std::string basepath           = "../data/";
+    std::string energypath         = "energies.bin";
     std::string magneticmomentpath = "magneticmoment.bin";
-    std::string metadatapath = "metacpp.json";
-    std::string evolutionpath = "evolution.bin";
+    std::string metadatapath       = "metacpp.json";
+    std::string evolutionpath      = "evolution.bin";
 };
 void writeMetaData(metamodel&);
+void save(metamodel&, std::vector<arma::imat>& states,
+          std::vector<double>& energies, std::vector<int>& magmoments);
 
 #endif /* METAMODEL_H */
