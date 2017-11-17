@@ -4,63 +4,73 @@
 #include <fstream>
 #include "metamodel.h"
 
-void writeMetaData(metamodel& model){
-  std::ofstream metafile("../data/meta.json");
+void Metamodel::write() const{
+  std::ofstream metafile(basepath+metapath);
   Json::Value root;
   root["evolution"]["dim"]  = Json::arrayValue;
   root["evolution"]["type"] = "int64";
   root["evolution"]["path"] = "evolution.bin";
-  root["evolution"]["dim"].append(model.M);
-  root["evolution"]["dim"].append(model.N);
-  root["evolution"]["dim"].append(model.N);
+  root["evolution"]["dim"].append(M);
+  root["evolution"]["dim"].append(N);
+  root["evolution"]["dim"].append(N);
 
 
   root["magnetic moment"]["dim"]  = Json::arrayValue;
   root["magnetic moment"]["type"] = "int32";
   root["magnetic moment"]["path"] = "magneticmoment.bin";
-  root["magnetic moment"]["dim"].append(model.M);
+  root["magnetic moment"]["dim"].append(M);
 
   root["energy"]["dim"]  = Json::arrayValue;
   root["energy"]["type"] = "float64";
   root["energy"]["path"] = "energies.bin";
-  root["energy"]["dim"].append(model.M);
+  root["energy"]["dim"].append(M);
 
   root["saveperiod"]    = 1000;
-  root["seed"]          = model.seed;
-  root["lattice size"]  = model.N;
-  root["MC iterations"] = model.M;
+  root["seed"]          = seed;
+  root["lattice size"]  = N;
+  root["MC iterations"] = M;
   metafile << root << std::endl;
   metafile.close();
   //TODO: ENDRE SAVEPERIOD TIL NUMBER OF SAVES
 }
 
-void save(metamodel& model, std::vector<arma::imat>& states, std::vector<double>& energies, std::vector<int>& magmoments){
+void Metamodel::save(std::vector<arma::imat>& states, std::vector<double>& energies, std::vector<int>& magmoments) const{
   // Write energy to file
   std::ofstream energyStream;
-  energyStream.open(model.basepath + model.energypath, std::ios::out | std::ios::binary);
-  energyStream.write((char*)&energies[0], model.M*sizeof(energies[0]));
+  energyStream.open(basepath + energypath, std::ios::out | std::ios::binary);
+  binaryDump(energyStream, energies);
   energyStream.close();
 
   // Write magnetic moment to file
   std::ofstream magmom;
-  magmom.open(model.basepath + model.magneticmomentpath, std::ios::out | std::ios::binary);
-  magmom.write((char*)&magmoments[0], model.M*sizeof(magmoments[0]));
+  magmom.open(basepath + magneticmomentpath, std::ios::out | std::ios::binary);
+  binaryDump(magmom, magmoments);
   magmom.close();
 
   std::ofstream evoStream;
-  evoStream.open(model.basepath + model.evolutionpath, std::ios::out | std::ios::binary);
-  for(size_t MCCycle = 0; MCCycle < model.M; MCCycle++){
-    evoStream.write((char*)&states[MCCycle](0,0), model.N*model.N*sizeof(states[0](0,0)));
-  }
+  evoStream.open(basepath + evolutionpath, std::ios::out | std::ios::binary);
+  binaryDump(evoStream, states);
   evoStream.close();
 }
 
-void dumpExpValsToFile(std::ofstream& file, std::vector<double>& expVals, metamodel& model, double T, int numProcessors){
+template<typename T>
+void Metamodel::binaryDump(std::ofstream& stream, const std::vector<T>& container) const{
+    stream.write((char*)&container[0], M*sizeof(container[0]));
+}
+
+void Metamodel::binaryDump(std::ofstream& stream, const std::vector<arma::imat>& container){
+    for(size_t MCCycle = 0; MCCycle < M; MCCycle++){
+        stream.write((char*)&container[MCCycle](0,0), N*N*sizeof(container[0](0,0)));
+    }
+}
+
+void Metamodel::saveExpectationValues(std::ofstream& file, std::vector<double>& expVals,
+                                      double T, int numProcessors) const{
   // This code is a little bit ugly, should be rewritten. Dumps values for a given
   // temperature to file.
-  unsigned int M = model.M*numProcessors;
-  double factor   = 1.0/(model.M);
-  double spinNorm = 1.0/(model.N*model.N);
+  unsigned int Mprime = M*numProcessors;
+  double factor   = 1.0/(M);
+  double spinNorm = 1.0/(N*N);
 
   double expectE        = expVals[0]*factor;
   double expectESquared = expVals[1]*factor;
