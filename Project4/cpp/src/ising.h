@@ -13,7 +13,7 @@ int                  sumNeighbors(unsigned int i, unsigned int j, const arma::im
 int                  totalEnergy(const arma::imat& A);
 std::map<int,double> makeProbabilities(double beta);
 void                 ising(const Metamodel& model);
-void                 isingParallel(double T, std::vector<double>& expectationValues,
+void                 isingParallel(std::vector<double>& expectationValues,
                                    const Metamodel& model);
 
 #endif /* ISING_H */

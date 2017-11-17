@@ -8,6 +8,7 @@
 void solve_sys(){
     // Sets up paralellization and repeatedly calls the ising - metropolis algorithm
     Metamodel model = Metamodel(); // Fetch model struct with parameters
+    model.parallel = true;
     std::ofstream outstream;
 
     // Fetch from model because writing model.N everywhere looks ugly
@@ -31,25 +32,27 @@ void solve_sys(){
 
     if(RankProcess == 0){
         outstream.open(model.basepath + model.solverpath);
+        // Write the header
+        outstream << "Temperature A B C Heat_capacity D E F G H\n";
     }
 
     // Run MC Sampling by looping over temperatures
     for(double T = model.Tstart; T <= model.Tstop; T += model.Tstep){
         std::vector<double> LocalExpectationValues = {0.0, 0.0, 0.0, 0.0, 0.0};
-        isingParallel(T, LocalExpectationValues, model);
-        std::vector<double> TotExpectationValues = {0.0, 0.0, 0.0, 0.0, 0.0};
+        model.setTemperature(T);
+        isingParallel(LocalExpectationValues, model);
+        std::vector<double>TotExpectationValues = {0.0, 0.0, 0.0, 0.0, 0.0};
         for(int i = 0; i < 5; i++){
             MPI_Reduce(&LocalExpectationValues[i], &TotExpectationValues[i], 1,
                        MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         }
-        if(RankProcess == 0){
+
+        if(RankProcess == 0)
             model.saveExpectationValues(outstream, TotExpectationValues, T, NProcesses);
-        }
     }
 
-    if(RankProcess == 0){
+    if(RankProcess == 0)
         outstream.close();
-    }
 
   MPI_Finalize();
 }

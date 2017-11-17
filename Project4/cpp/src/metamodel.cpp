@@ -14,7 +14,6 @@ void Metamodel::write() const{
   root["evolution"]["dim"].append(N);
   root["evolution"]["dim"].append(N);
 
-
   root["magnetic moment"]["dim"]  = Json::arrayValue;
   root["magnetic moment"]["type"] = "int32";
   root["magnetic moment"]["path"] = "magneticmoment.bin";
@@ -29,6 +28,7 @@ void Metamodel::write() const{
   root["seed"]          = seed;
   root["lattice size"]  = N;
   root["MC iterations"] = M;
+  root["parallel"]      = parallel;
   metafile << root << std::endl;
   metafile.close();
   //TODO: ENDRE SAVEPERIOD TIL NUMBER OF SAVES
@@ -64,10 +64,10 @@ void Metamodel::binaryDump(std::ofstream& stream, const std::vector<arma::imat>&
     }
 }
 
-void Metamodel::saveExpectationValues(std::ofstream& file, std::vector<double>& expVals,
+void Metamodel::saveExpectationValues(std::ofstream& stream, std::vector<double>& expVals,
                                       double T, int numProcessors) const{
   // This code is a little bit ugly, should be rewritten. Dumps values for a given
-  // temperature to file.
+  // temperature to stream.
   unsigned int Mprime = M*numProcessors;
   double factor   = 1.0/(M);
   double spinNorm = 1.0/(N*N);
@@ -81,17 +81,17 @@ void Metamodel::saveExpectationValues(std::ofstream& file, std::vector<double>& 
   double varE = (expectESquared - expectE*expectE)*spinNorm;
   double varM = (expectMSquared - expectM*expectM)*spinNorm;
 
-  double Cv = (expectESquared - expectE*expectE)/T/T*spinNorm;
+  double Cv  = (expectESquared - expectE*expectE)/T/T*spinNorm;
   double sus = (expectMSquared - expectMFabs*expectMFabs)/T*spinNorm;
 
-  file << T << " "
-       << expectE*spinNorm << " "
-       << expectESquared*spinNorm << " "
-       << varE << " "
-       << Cv << " "
-       << expectM*spinNorm <<  " "
-       << expectMSquared*spinNorm << " "
-       << expectMFabs*spinNorm << " "
-       << varM << " "
-       << sus << "\n";
+  stream << T << " "
+         << expectE*spinNorm << " "
+         << expectESquared*spinNorm << " "
+         << varE << " "
+         << Cv << " "
+         << expectM*spinNorm <<  " "
+         << expectMSquared*spinNorm << " "
+         << expectMFabs*spinNorm << " "
+         << varM << " "
+         << sus << "\n";
 }

@@ -138,7 +138,7 @@ void ising(const Metamodel& model){
   model.write();
 }
 
-void isingParallel(double T, std::vector<double>& expectationValues, const Metamodel& model){
+void isingParallel(std::vector<double>& expectationValues, const Metamodel& model){
     const int seed = model.seed;
     // Setup RNG generator
     std::mt19937 gen;
@@ -151,12 +151,12 @@ void isingParallel(double T, std::vector<double>& expectationValues, const Metam
     int m, n, dE;
 
     // Create probability map for possible energy changes
-    const auto probabilities = makeProbabilities(model.beta);
+    auto probabilities = makeProbabilities(model.beta);
 
     // Initialize values
     arma::imat state = setInitialStateRandom(N);
-    double energy = totalEnergy(state);
-    int magMoment = magnetization(state);
+    double energy    = totalEnergy(state);
+    int magMoment    = magnetization(state);
 
     // Loop through MC-cycles
     unsigned int numSpinsTot = N*N;
@@ -166,13 +166,16 @@ void isingParallel(double T, std::vector<double>& expectationValues, const Metam
             // Choose row (m) and column (n) index to perturb/flip given acceptance
             m = static_cast<int>(random(gen)*N);
             n = static_cast<int>(random(gen)*N);
+
             // Calculate consequent change of energy
             dE = 2*state(m,n)*sumNeighbors(m,n,state);
+
             // Metropolis algorithm
-            if(dE < 0 || random(gen) <= probabilities.at(dE)){
+            std::cout << dE << std::endl;
+            if(dE < 0 || random(gen) <= probabilities[dE]){
                 state(m,n) *= -1;
-                energy += dE;
-                magMoment += 2*state(m,n);
+                energy     += dE;
+                magMoment  += 2*state(m,n);
             }
         }
     }

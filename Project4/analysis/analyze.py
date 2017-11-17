@@ -7,8 +7,8 @@ import matplotlib.animation as animation
 import seaborn as sns
 import argparse
 import os
-import re
 import json
+import pandas as pd
 
 sns.set(context="poster")
 
@@ -17,18 +17,17 @@ class Analyzer:
     def __init__(self, base_path, meta_path):
         self.load(base_path, meta_path)
 
-    # def load_evolution(self, path):
-    #     M, I, J = [int(i) for i in re.findall(".*?(\d+)by(\d+)by(\d+)\.bin", path)[0]]
-    #     data = np.fromfile(path, dtype=np.int8)
-    #     return data.reshape(M, I, J)
-
     def load(self, base_path: str, meta_path: str) -> None:
         with open(os.path.join(base_path, meta_path)) as fp:
             meta = json.load(fp)
 
-        self.energy = self.load_block(base_path, meta["energy"])
-        self.magnetic = self.load_block(base_path, meta["magnetic moment"])
-        self.evolution = self.load_block(base_path, meta["evolution"])
+        if meta['parallel']:
+            self.parallel = True
+            self.expectation_values = 0 # Load data.txt here
+        else:
+            self.energy = self.load_block(base_path, meta["energy"])
+            self.magnetic = self.load_block(base_path, meta["magnetic moment"])
+            self.evolution = self.load_block(base_path, meta["evolution"])
 
     @staticmethod
     def load_block(base_path: str, block: dict) -> np.ndarray:
@@ -36,8 +35,10 @@ class Analyzer:
             type = np.float64
         elif block["type"] == "int8":
             type = np.int8
+        elif block["type"] == "int16":
+            type = np.int16
         else:
-            raise(RuntimeError(f"{block['type']} from {block['path'] is not supported}"))
+            raise(RuntimeError(f"{block['type']} from {block['path']} is not supported"))
 
         data = np.fromfile(os.path.join(base_path, block["path"]),
                            dtype=type)
@@ -52,6 +53,9 @@ class Analyzer:
         plt.show()
 
     def plot_expectations(self):
+        pass
+
+    def plot_energy_magnetic_moment(self):
         fig = plt.figure(figsize=(9, 7))
         ax_energy, ax_magnetic = fig.subplots(2, 1, sharex=True)
         ax_energy.plot(self.energy)
