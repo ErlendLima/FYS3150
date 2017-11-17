@@ -36,11 +36,16 @@ class Analyzer:
             type = np.float64
         elif block["type"] == "int8":
             type = np.int8
+        elif block["type"] == "int32":
+            type = np.int32
+        elif block["type"] == "int64":
+            type = np.int64
+        elif block["type"] == "uint64":
+            type = np.uint64
         else:
             raise(RuntimeError(f"{block['type']} from {block['path'] is not supported}"))
 
-        data = np.fromfile(os.path.join(base_path, block["path"]),
-                           dtype=type)
+        data = np.fromfile(os.path.join(base_path, block["path"]), dtype=type)
         return data.reshape(*block["dim"])
 
     def plot(self):
