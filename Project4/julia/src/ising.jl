@@ -1,7 +1,7 @@
 module Ising
-using  MPI
 export neighbours, ising!, hamiltonian, Metadata
 
+using  MPI
 include("./metamodel.jl")
 using .Metamodel: Metadata, writedata!
 
@@ -99,6 +99,7 @@ function initializesystem(model::Metadata)
         magneticmoment = 0.0
     else
         throw(ArgumentError("Unknown model: $(model.version)"))
+    end
     (lattice, ratios, evolution, energies, magneticmoment)
 end
 

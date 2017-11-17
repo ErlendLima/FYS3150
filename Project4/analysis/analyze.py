@@ -7,8 +7,8 @@ import matplotlib.animation as animation
 import seaborn as sns
 import argparse
 import os
-import re
 import json
+import pandas as pd
 
 sns.set(context="poster")
 
@@ -17,18 +17,17 @@ class Analyzer:
     def __init__(self, base_path, meta_path):
         self.load(base_path, meta_path)
 
-    # def load_evolution(self, path):
-    #     M, I, J = [int(i) for i in re.findall(".*?(\d+)by(\d+)by(\d+)\.bin", path)[0]]
-    #     data = np.fromfile(path, dtype=np.int8)
-    #     return data.reshape(M, I, J)
-
     def load(self, base_path: str, meta_path: str) -> None:
         with open(os.path.join(base_path, meta_path)) as fp:
             meta = json.load(fp)
 
-        self.energy = self.load_block(base_path, meta["energy"])
-        self.magnetic = self.load_block(base_path, meta["magnetic moment"])
-        self.evolution = self.load_block(base_path, meta["evolution"])
+        if meta['parallel']:
+            self.parallel = True
+            self.expectation_values = pd.read_csv("../data/data.txt", sep=" ")
+        else:
+            self.energy = self.load_block(base_path, meta["energy"])
+            self.magnetic = self.load_block(base_path, meta["magnetic moment"])
+            self.evolution = self.load_block(base_path, meta["evolution"])
 
     @staticmethod
     def load_block(base_path: str, block: dict) -> np.ndarray:
@@ -36,6 +35,8 @@ class Analyzer:
             type = np.float64
         elif block["type"] == "int8":
             type = np.int8
+        elif block["type"] == "int16":
+            type = np.int16
         elif block["type"] == "int32":
             type = np.int32
         elif block["type"] == "int64":
@@ -43,20 +44,30 @@ class Analyzer:
         elif block["type"] == "uint64":
             type = np.uint64
         else:
-            raise(RuntimeError(f"{block['type']} from {block['path'] is not supported}"))
+            raise(RuntimeError(f"{block['type']} from {block['path']} is not supported"))
 
         data = np.fromfile(os.path.join(base_path, block["path"]), dtype=type)
         return data.reshape(*block["dim"])
 
     def plot(self):
-        self.plot_expectations()
+        self.plot_expectations('Cv')
+        self.plot_expectations('sus')
 
     def plot_inital(self):
         initial = self.evolution[0, :, :]
         plt.matshow(initial)
         plt.show()
 
-    def plot_expectations(self):
+    def plot_expectations(self, key):
+        fig = plt.figure(figsize=(9,7))
+        ax = fig.subplots()
+        ax.plot(self.expectation_values['Temperature'],
+                self.expectation_values[key])
+        ax.set_xlabel("Temperature")
+        ax.set_ylabel(key)
+        plt.show()
+
+    def plot_energy_magnetic_moment(self):
         fig = plt.figure(figsize=(9, 7))
         ax_energy, ax_magnetic = fig.subplots(2, 1, sharex=True)
         ax_energy.plot(self.energy)
