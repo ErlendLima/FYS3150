@@ -54,3 +54,34 @@ void save(metamodel& model, std::vector<arma::imat>& states, std::vector<double>
   }
   evoStream.close();
 }
+
+void dumpExpValsToFile(std::ofstream& file, std::vector<double>& expVals, metamodel& model, double T, int numProcessors){
+  // This code is a little bit ugly, should be rewritten. Dumps values for a given
+  // temperature to file.
+  unsigned int M = model.M*numProcessors;
+  double factor   = 1.0/(model.M);
+  double spinNorm = 1.0/(model.N*model.N);
+
+  double expectE        = expVals[0]*factor;
+  double expectESquared = expVals[1]*factor;
+  double expectM        = expVals[2]*factor;
+  double expectMSquared = expVals[3]*factor;
+  double expectMFabs    = expVals[4]*factor;
+
+  double varE = (expectESquared - expectE*expectE)*spinNorm;
+  double varM = (expectMSquared - expectM*expectM)*spinNorm;
+
+  double Cv = (expectESquared - expectE*expectE)/T/T*spinNorm;
+  double sus = (expectMSquared - expectMFabs*expectMFabs)/T*spinNorm;
+
+  file << T << " "
+       << expectE*spinNorm << " "
+       << expectESquared*spinNorm << " "
+       << varE << " "
+       << Cv << " "
+       << expectM*spinNorm <<  " "
+       << expectMSquared*spinNorm << " "
+       << expectMFabs*spinNorm << " "
+       << varM << " "
+       << sus << "\n";
+}

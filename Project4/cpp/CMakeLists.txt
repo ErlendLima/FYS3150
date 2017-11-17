@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
+project(ITK_MPI)
 
 # Options. Turn on with 'cmake -Dmyvarname=ON'.
 option(TEST "Build all tests." OFF) # Makes boolean 'test' available.
@@ -43,6 +44,7 @@ endif()
 find_package(Armadillo REQUIRED)
 find_package(MPI REQUIRED)
 include_directories("src")
+include_directories(${MPI_INCLUDE_PATH})
 add_library(project_lib ${include_files})
 message("${executable_name} ${include_files}")
 add_executable(${executable_name} ${include_files})
