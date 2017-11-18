@@ -2,6 +2,7 @@
 #include <json/writer.h>
 #include <iostream>
 #include <fstream>
+#include <type_traits>
 #include "metamodel.h"
 
 void Metamodel::write() const{
@@ -70,15 +71,15 @@ void Metamodel::save(std::vector<arma::imat>& states, std::vector<double>& energ
   evoStream.close();
 }
 
-template<typename T>
+template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
 void Metamodel::binaryDump(std::ofstream& stream, const std::vector<T>& container) const{
     stream.write((char*)&container[0], M*sizeof(container[0]));
 }
 
 template<typename T>
-void Metamodel::binaryDump(std::ofstream& stream, const std::vector<arma::Mat<T>>& container){
-    for(size_t MCCycle = 0; MCCycle < M; MCCycle++){
-        stream.write((char*)&container[MCCycle](0,0), N*N*sizeof(container[0](0,0)));
+void Metamodel::binaryDump(std::ofstream& stream, const std::vector<arma::Mat<T>>& container) const{
+    for(const auto& matrix: container){
+        stream.write((char*)&matrix(0,0), N*N*sizeof(matrix(0,0)));
     }
 }
 

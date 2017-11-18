@@ -1,10 +1,10 @@
 {
-	"MC iterations" : 10000,
+	"MC iterations" : 100000,
 	"energy" : 
 	{
 		"dim" : 
 		[
-			10000
+			100000
 		],
 		"path" : "energies.bin",
 		"type" : "float64"
@@ -13,7 +13,7 @@
 	{
 		"dim" : 
 		[
-			10000,
+			100000,
 			20,
 			20
 		],
@@ -25,12 +25,12 @@
 	{
 		"dim" : 
 		[
-			10000
+			100000
 		],
 		"path" : "magneticmoment.bin",
 		"type" : "int32"
 	},
-	"parallel" : true,
+	"parallel" : false,
 	"saveperiod" : 1000,
-	"seed" : 1
+	"seed" : 2
 }

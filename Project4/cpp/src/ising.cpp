@@ -86,7 +86,7 @@ void ising(const Metamodel& model){
   // Setup RNG generator
   std::mt19937 gen;
   gen.seed(seed);
-  std::uniform_real_distribution<double> random(0.0,1.0);
+  std::uniform_real_distribution<double> random(0.0, 1.0);
 
   // Setup and run simulation of the Ising model. Unpack some vals from model.
   unsigned int N = model.N;      // Lattice size (N x N)
@@ -136,7 +136,7 @@ void ising(const Metamodel& model){
   model.write();
 }
 
-void isingParallel(std::vector<double>& expectationValues, const Metamodel& model, int waitNSteps){
+void isingParallel(std::vector<double>& expectationValues, const Metamodel& model, unsigned int waitNSteps){
     const int seed = model.seed;
     // Setup RNG generator
     std::mt19937 gen;

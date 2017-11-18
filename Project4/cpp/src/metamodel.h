@@ -17,10 +17,11 @@ public:
               std::vector<double>& energies, std::vector<int>& magmoments) const;
     void saveExpectationValues(std::ofstream& file, std::vector<double>&, double T,
                                int numProcessors, int waitNSteps) const;
-    template<typename T>
+    template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
     void binaryDump(std::ofstream&, const std::vector<T>&) const;
     template<typename T>
-    void binaryDump(std::ofstream&, const std::vector<arma::Mat<T>>&);
+    void binaryDump(std::ofstream&, const std::vector<arma::Mat<T>>&) const;
+    // void binaryDump(std::ofstream&, const std::vector<arma::imat>&);
     void setTemperature(double T){temperature = T; beta = 1/T;};
 
     int          seed        = 1;
