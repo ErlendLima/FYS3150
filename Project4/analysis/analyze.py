@@ -17,6 +17,17 @@ class Analyzer:
     def __init__(self, base_path, meta_path):
         self.load(base_path, meta_path)
 
+        self.labels = {'Cv'       : r'Heat Capacity $C_V$',
+                       'E'        : r'Energy $\langle E \rangle$',
+                       'Mabs'     : r'$\langle |M| \rangle$',
+                       'sus'      : r'Susceptibility $\chi$',
+                       'T'        : r'Temperature',
+                       'ESquared' : r'$\langle E^2 \rangle$',
+                       'MSquared' : r'$\langle M^2 \rangle$',
+                       'M'        : r'Magnetic Moment $\langle M \rangle$',
+                       'varE'     : r'$V(E)$',
+                       'varM'     : r'$V(M)$'}
+
     def load(self, base_path: str, meta_path: str) -> None:
         with open(os.path.join(base_path, meta_path)) as fp:
             meta = json.load(fp)
@@ -51,6 +62,8 @@ class Analyzer:
 
     def plot(self):
         self.plot_expectations('Cv')
+        self.plot_expectations('E')
+        self.plot_expectations('Mabs')
         self.plot_expectations('sus')
 
     def plot_inital(self):
@@ -59,12 +72,22 @@ class Analyzer:
         plt.show()
 
     def plot_expectations(self, key):
-        fig = plt.figure(figsize=(9,7))
+        fig = plt.figure()
         ax = fig.subplots()
-        ax.plot(self.expectation_values['Temperature'],
-                self.expectation_values[key])
-        ax.set_xlabel("Temperature")
-        ax.set_ylabel(key)
+        ax.plot(self.expectation_values['T'],
+                self.expectation_values[key], label = "Numeric")
+
+        if key == 'Cv':
+            T_arr = np.linspace(self.expectation_values['T'][0],
+                                self.expectation_values['T'].tail(1),
+                                1001)
+            inst = Analytic2x2(T_arr)
+            ax.plot(T_arr, inst.CV_hyp()/4, label = "Analytic")
+
+        ax.set_xlabel(self.labels['T'])
+        ax.set_ylabel(self.labels[key])
+        ax.legend()
+        plt.tight_layout()
         plt.show()
 
     def plot_energy_magnetic_moment(self):
@@ -98,6 +121,51 @@ class Analyzer:
         else:
             plt.show()
 
+class Analytic2x2:
+    def __init__(self, T):
+        self.T = T
+        self.beta = 1/T
+        self.arg = 8*self.beta
+
+    def partition_function(self):
+        return 4*np.cosh(self.arg) + 12
+
+    def energy(self):
+        numer = 8*np.sinh(8*beta)
+        div   = 4*np.cosh(self.arg) + 12
+        return -numer/div
+
+    def energy_squared(self):
+        numer = 256*np.cosh(self.arg)
+        div   = 4*np.cosh(self.arg) + 12
+        return numer/div
+
+    def abs_magnetization(self):
+        numer = 2*np.exp(self.arg) + 4
+        div   = np.cosh(self.arg) + 3
+        return numer/div
+
+    def magnetization_squared(self):
+        numer = 8*np.exp(self.arg) + 4
+        div   = np.cosh(self.arg) + 3
+        return numer/div
+
+    def heat_capacity(self):
+        fac1 = 128*(np.exp(self.arg) + np.exp(-self.arg))
+        fac2 = -16*np.exp(self.arg) + 16*np.exp(-self.arg)
+        div  = 2*np.exp(self.arg) + 2*np.exp(-self.arg) + 12
+        return self.beta**2 * ((fac1/div) - (fac2/div)**2)
+
+    def CV_hyp(self):
+        fac1 = 256*np.cosh(self.arg)
+        fac2 = -32*np.sinh(self.arg)
+        denom = 4*np.cosh(self.arg) + 12
+        return self.beta**2 * ( (fac1/denom) - (fac2/denom)**2)
+
+    def susceptibility(self):
+        num = 32*np.exp(self.arg) + 32
+        div = 2*np.exp(self.arg) + 2*np.exp(-self.arg) + 12
+        return self.beta*num/div
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Analyzes data for project 3')

@@ -42,7 +42,8 @@ void Metamodel::read(const std::string& filename) {
     parameters >> root;
     Tstart             = root["Tstart"].asDouble();
     Tstop              = root["Tstop"].asDouble();
-    Tstep              = root["Tstep"].asDouble();
+    Tnumber            = root["Tnumber"].asDouble();
+    Tstep              = (Tstop - Tstart)/Tnumber;
     parallel           = root["parallel"].asBool();
     seed               = root["seed"].asInt();
     N                  = root["lattice size"].asInt();
@@ -82,12 +83,11 @@ void Metamodel::binaryDump(std::ofstream& stream, const std::vector<arma::Mat<T>
 }
 
 void Metamodel::saveExpectationValues(std::ofstream& stream, std::vector<double>& expVals,
-                                      double T, int numProcessors) const{
-  // This code is a little bit ugly, should be rewritten. Dumps values for a given
-  // temperature to stream.
-  unsigned int Mprime = M*numProcessors;
-  double factor   = 1.0/(M);
-  double spinNorm = 1.0/(N*N);
+                                      double T, int numProcessors, int waitNSteps) const{
+  // Dumps values for a given temperature to stream.
+  unsigned int Mprime   = M*numProcessors;
+  double       factor   = 1.0/(M - waitNSteps);
+  double       spinNorm = 1.0/(N*N);
 
   double expectE        = expVals[0]*factor;
   double expectESquared = expVals[1]*factor;

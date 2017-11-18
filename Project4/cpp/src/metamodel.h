@@ -16,7 +16,7 @@ public:
     void save(std::vector<arma::imat>& states,
               std::vector<double>& energies, std::vector<int>& magmoments) const;
     void saveExpectationValues(std::ofstream& file, std::vector<double>&, double T,
-                               int numProcessors) const;
+                               int numProcessors, int waitNSteps) const;
     template<typename T>
     void binaryDump(std::ofstream&, const std::vector<T>&) const;
     template<typename T>
@@ -41,9 +41,10 @@ public:
     std::string  metapath           = "meta.json";
     bool         parallel           = false;
 
-    double Tstart = 2.0;
-    double Tstop  = 3.0;
-    double Tstep  = 0.1;
+    double Tstart  = 2.0;
+    double Tstop   = 3.0;
+    double Tnumber = 100;
+    double Tstep   = (Tstop - Tstart)/(Tnumber);
 };
 
 #endif /* METAMODEL_H */

@@ -98,7 +98,6 @@ void ising(const Metamodel& model){
 
   // Initialize arrays and initial values
   arma::imat state = setInitialStateRandom(N);
-  std::cout << sizeof(state(0,0)) << std::endl;
   std::vector<arma::imat> states (model.M);
   states[0] = state; // Saves every state
 
@@ -121,7 +120,6 @@ void ising(const Metamodel& model){
         dE = 2*state(m,n)*sumNeighbors(m,n,state);
         // Metropolis algorithm
         if(dE < 0 || random(gen) <= probabilities.at(dE)){
-        // if(random(gen) <= probabilities[dE]){
           state(m,n) *= -1;
           energy += dE;
           magmoment += 2*state(m,n);
@@ -138,7 +136,7 @@ void ising(const Metamodel& model){
   model.write();
 }
 
-void isingParallel(std::vector<double>& expectationValues, const Metamodel& model){
+void isingParallel(std::vector<double>& expectationValues, const Metamodel& model, int waitNSteps){
     const int seed = model.seed;
     // Setup RNG generator
     std::mt19937 gen;
@@ -171,18 +169,18 @@ void isingParallel(std::vector<double>& expectationValues, const Metamodel& mode
             dE = 2*state(m,n)*sumNeighbors(m,n,state);
 
             // Metropolis algorithm
-            if(dE < 0 || random(gen) <= probabilities.at(dE)){
+            if(dE < 0 ||random(gen) <= probabilities.at(dE)){
                 state(m,n) *= -1;
                 energy     += dE;
                 magMoment  += 2*state(m,n);
             }
         }
+        if(i > waitNSteps){
+          expectationValues[0] += energy;
+          expectationValues[1] += energy*energy;
+          expectationValues[2] += magMoment;
+          expectationValues[3] += magMoment*magMoment;
+          expectationValues[4] += fabs(magMoment);
+        }
     }
-
-    // Add relevant values to total array
-    expectationValues[0] += energy;
-    expectationValues[1] += energy*energy;
-    expectationValues[2] += magMoment;
-    expectationValues[3] += magMoment*magMoment;
-    expectationValues[4] += fabs(magMoment);
 }
