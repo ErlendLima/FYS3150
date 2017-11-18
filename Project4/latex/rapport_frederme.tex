@@ -30,7 +30,9 @@
 \usepackage{amsmath} \usepackage{amsthm} \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{enumerate}
-\usepackage{tikz} \usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{backgrounds}
+\usepackage{float}
 \usepackage[procnames]{listings}
 \usepackage{pstool} \usepackage{pgfplots}
 \usepackage{wrapfig} \usepackage{graphicx} \usepackage{epstopdf}
@@ -150,30 +152,63 @@ This is a much better approximation to an infinitely large lattice, because
 each spin has access to four neighbors.
 
 \subsection{Metropolis algorithm}
-
+Monte-Carlo simulations are used to model the time development of the system.
+With some initial configuration, an algorithm that over time modifies the system
+to an equilibrium state needs to be employed. A method which has been shown to
+do this is the famous Metropolis algorithm. See chapter .. in CITE for a detailed explaination
+of the algorithm, the main steps are as follows:
+\begin{enumerate}
+  \item Select randomly $N^2$ spins in the lattice.
+  \item Calculate the system change in energy $\Delta E$ if a randomly selected spin was to
+  be flipped.
+  \item Draw a random number from the uniform distribution, and compare
+  \begin{align*}
+    U(0,1) \leq e^{-\beta \Delta E}.
+  \end{align*}
+  If this is true, the spin is flipped. If this evaluates as false, do not flip
+  the spin. If $\Delta E < 0$ the spin is flipped regardless, to model that physical
+  systems usually tend to lower energy configurations.
+\end{enumerate}
+When this is repeated multiple times the system will converge to the equilibrium
+state. In this model, the system development with Monte-Carlo cycles can therefore be
+considered the system development with time.
 \subsection{Phase transitions in the Ising model}
 
 \subsection{Analytic solution in the 2 x 2 lattice case}
+For the simple case of a $2 \times 2$ periodic boundary lattice analytic
+expressions can be computed, which will be used to check that the numerical
+implementation produces acceptable results. The four spins are enumerated as in
+figure ~\ref{fig:22lattice}.
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}[thick]
-    \draw[->] (0,0) -- (0,.3)  node [label=left:{s1}] {};
-    \draw[->] (1,0) -- (1,.3)  node [label=right:{s2}] {};
-    \draw[->] (0,1) -- (0,1.3) node [label=left:{s3}] {};
-    \draw[->] (1,1) -- (1,1.3) node [label=right:{s4}] {};
+    \draw[->] (0,0) -- (0,.3)  node [label=left:{$s_1$}] {};
+    \draw[->] (1,0) -- (1,.3)  node [label=right:{$s_2$}] {};
+    \draw[->] (0,1) -- (0,1.3) node [label=left:{$s_3$}] {};
+    \draw[->] (1,1) -- (1,1.3) node [label=right:{$s_4$}] {};
   \end{tikzpicture}
-  \caption{2 x 2 lattice with all spins pointing up and an example of enumerating
-  the lattice sites.}
+  \caption{$2 \times 2$ enumerated lattice with all spins pointing up.}
   \label{fig:22lattice}
 \end{figure}
+By simply counting the possible microstates and subsequent macrostates,
 \section{Method}
 \label{sec:method}
 \subsection{Energy calculations}
 
 \subsection{Periodic boundaries}
-In this paper, the boundaries are held open to mimic real-world behaviour and
+In this paper, the boundaries are set periodic to mimic real-world behaviour and
 thus acheive better results. A clever method was used to implement this, which
-is available in the source code.
+involves utilizing modulo division. In c++ arrays of length $N$ are indexed from
+$0$ up to, and including $N-1$, so the expression
+\begin{align*}
+  i_\text{checked} = (i + N) \% N
+\end{align*}
+should return opposite index when the boundaries are crossed, and the same
+index when inside the boundaries. We see that if $i \in [0, N-1]$ then $i$
+remains unchanged, which is what we want. If $i = N$ (outside the upper boundary),
+then the returned $i$ will be converted to $0$, which is the next element for
+periodic boundaries. Also, if the lower boundary is crossed, i.e $i = -1$, then
+the expression returns $N - 1$, exactly what is expected of the function.
 
 \subsection{Metropolis algorithm}
 
