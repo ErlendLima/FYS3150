@@ -36,6 +36,7 @@ class Analyzer:
             self.parallel = True
             self.expectation_values = pd.read_csv("../data/data.txt", sep=" ")
         else:
+            self.parallel = False
             self.energy = self.load_block(base_path, meta["energy"])
             self.magnetic = self.load_block(base_path, meta["magnetic moment"])
             self.evolution = self.load_block(base_path, meta["evolution"])
@@ -61,10 +62,13 @@ class Analyzer:
         return data.reshape(*block["dim"])
 
     def plot(self):
-        self.plot_expectations('Cv')
-        self.plot_expectations('E')
-        self.plot_expectations('Mabs')
-        self.plot_expectations('sus')
+        if self.parallel:
+            self.plot_expectations('Cv')
+            self.plot_expectations('E')
+            self.plot_expectations('Mabs')
+            self.plot_expectations('sus')
+        else:
+            self.plot_energy_magnetic_moment()
 
     def plot_inital(self):
         initial = self.evolution[0, :, :]
