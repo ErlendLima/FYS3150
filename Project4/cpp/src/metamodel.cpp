@@ -34,6 +34,22 @@ void Metamodel::write() const{
   //TODO: ENDRE SAVEPERIOD TIL NUMBER OF SAVES
 }
 
+void Metamodel::read(const std::string& filename) {
+    std::ifstream parameters(filename);
+    if (!parameters.good())
+        throw std::runtime_error("Could not find parameters");
+    Json::Value root;
+    parameters >> root;
+    Tstart             = root["Tstart"].asDouble();
+    Tstop              = root["Tstop"].asDouble();
+    Tstep              = root["Tstep"].asDouble();
+    parallel           = root["parallel"].asBool();
+    seed               = root["seed"].asInt();
+    N                  = root["lattice size"].asInt();
+    M                  = root["monte carlo cycles"].asInt();
+    initialOrientation = root["initial orientation"].asString();
+}
+
 void Metamodel::save(std::vector<arma::imat>& states, std::vector<double>& energies, std::vector<int>& magmoments) const{
   // Write energy to file
   std::ofstream energyStream;
@@ -58,7 +74,8 @@ void Metamodel::binaryDump(std::ofstream& stream, const std::vector<T>& containe
     stream.write((char*)&container[0], M*sizeof(container[0]));
 }
 
-void Metamodel::binaryDump(std::ofstream& stream, const std::vector<arma::imat>& container){
+template<typename T>
+void Metamodel::binaryDump(std::ofstream& stream, const std::vector<arma::Mat<T>>& container){
     for(size_t MCCycle = 0; MCCycle < M; MCCycle++){
         stream.write((char*)&container[MCCycle](0,0), N*N*sizeof(container[0](0,0)));
     }

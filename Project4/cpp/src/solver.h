@@ -1,6 +1,10 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 
-void solve_sys();
+#include "metamodel.h"
+
+void solveSystem(Metamodel&);
+void solveSystemParallel(Metamodel&);
+void solveSystemSerial(Metamodel&);
 
 #endif /* SOLVER_H */

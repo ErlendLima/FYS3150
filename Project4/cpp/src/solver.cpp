@@ -5,10 +5,25 @@
 #include "metamodel.h"
 #include "ising.h"
 
-void solve_sys(){
+void solveSystem(Metamodel& model){
+    // Simple wrapper that runs the serial or parallelized version
+    if (model.parallel){
+        std::cout << "Running parallel." << std::endl;
+        solveSystemParallel(model);
+    }
+    else{
+        std::cout << "Running serial." << std::endl;
+        solveSystemSerial(model);
+    }
+}
+
+void solveSystemSerial(Metamodel& model){
+    model.setTemperature(model.Tstart);
+    ising(model);
+}
+
+void solveSystemParallel(Metamodel& model){
     // Sets up paralellization and repeatedly calls the ising - metropolis algorithm
-    Metamodel model = Metamodel(); // Fetch model struct with parameters
-    model.parallel = true;
     std::ofstream outstream;
 
     // Fetch from model because writing model.N everywhere looks ugly
@@ -35,6 +50,9 @@ void solve_sys(){
         // Write the header
         outstream << "Temperature E ESquared varE Cv M MSquared Mabs varM sus\n";
     }
+
+    // The seed must be different for each rank.
+    model.seed += RankProcess;
 
     // Run MC Sampling by looping over temperatures
     for(double T = model.Tstart; T <= model.Tstop; T += model.Tstep){
