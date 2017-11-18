@@ -73,7 +73,7 @@ int totalEnergy(const arma::imat& A){
 }
 
 std::map<int,double> makeProbabilities(double beta){
-  std::array<int, 5> dEStates{-4, -2, 0, 2, 4};
+  std::array<int, 5> dEStates{-8, -4, 0, 4, 8};
   std::map<int,double> probabilities;
   for(const auto& dE: dEStates){
     probabilities[dE] = exp(-beta*dE);
@@ -94,7 +94,7 @@ void ising(const Metamodel& model){
   int m, n, dE;
 
   // Create probability map for possible energy changes
-  auto probabilities = makeProbabilities(model.beta);
+  const auto probabilities = makeProbabilities(model.beta);
 
   // Initialize arrays and initial values
   arma::imat state = setInitialStateRandom(N);
@@ -120,7 +120,7 @@ void ising(const Metamodel& model){
         // Calculate consequent change of energy
         dE = 2*state(m,n)*sumNeighbors(m,n,state);
         // Metropolis algorithm
-        if(dE < 0 || random(gen) <= probabilities[dE]){
+        if(dE < 0 || random(gen) <= probabilities.at(dE)){
         // if(random(gen) <= probabilities[dE]){
           state(m,n) *= -1;
           energy += dE;
@@ -151,7 +151,7 @@ void isingParallel(std::vector<double>& expectationValues, const Metamodel& mode
     int m, n, dE;
 
     // Create probability map for possible energy changes
-    auto probabilities = makeProbabilities(model.beta);
+    const auto probabilities = makeProbabilities(model.beta);
 
     // Initialize values
     arma::imat state = setInitialStateRandom(N);
@@ -159,7 +159,7 @@ void isingParallel(std::vector<double>& expectationValues, const Metamodel& mode
     int magMoment    = magnetization(state);
 
     // Loop through MC-cycles
-    unsigned int numSpinsTot = N*N;
+    const unsigned int numSpinsTot = N*N;
     for(unsigned int i = 1; i < M; i++){
         // Loop over the number of nodes in the lattice
         for(unsigned int j = 0; j < numSpinsTot; j++){
@@ -171,7 +171,7 @@ void isingParallel(std::vector<double>& expectationValues, const Metamodel& mode
             dE = 2*state(m,n)*sumNeighbors(m,n,state);
 
             // Metropolis algorithm
-            if(dE < 0 || random(gen) <= probabilities[dE]){
+            if(dE < 0 || random(gen) <= probabilities.at(dE)){
                 state(m,n) *= -1;
                 energy     += dE;
                 magMoment  += 2*state(m,n);
