@@ -41,7 +41,7 @@ void solveSystemParallel(Metamodel& model){
     if(RankProcess == 0){
       outstream.open(model.basepath + model.solverpath);
       // Write the header
-      outstream << "T E ESquared varE Cv M MSquared Mabs varM sus\n";
+      outstream << "T E ESquared varE Cv M MSquared Mabs varM sus nFlips\n";
     }
 
     // Broadcast parameters to processes.
