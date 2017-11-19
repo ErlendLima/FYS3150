@@ -26,7 +26,8 @@ class Analyzer:
                        'MSquared' : r'$\langle M^2 \rangle$',
                        'M'        : r'Magnetic Moment $\langle M \rangle$',
                        'varE'     : r'$V(E)$',
-                       'varM'     : r'$V(M)$'}
+                       'varM'     : r'$V(M)$',
+                       'nFlips'   : r'Number of flips'}
 
     def load(self, base_path: str, meta_path: str) -> None:
         with open(os.path.join(base_path, meta_path)) as fp:
@@ -79,8 +80,13 @@ class Analyzer:
     def plot_expectations(self, key):
         fig = plt.figure()
         ax = fig.subplots()
-        ax.plot(self.expectation_values['T'],
-        self.expectation_values[key], label = "Numeric")
+        if key == 'nFlips':
+            ax.plot(self.expectation_values['T'],
+            self.expectation_values[key]/np.max(self.expectation_values[key]),
+            label = "Numeric")
+        else:
+            ax.plot(self.expectation_values['T'],
+            self.expectation_values[key], label = "Numeric")
 
         if self.lattice_size == 2:
             try:
