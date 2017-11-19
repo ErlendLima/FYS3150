@@ -41,6 +41,7 @@ class Analyzer:
             self.energy = self.load_block(base_path, meta["energy"])
             self.magnetic = self.load_block(base_path, meta["magnetic moment"])
             self.evolution = self.load_block(base_path, meta["evolution"])
+            self.accepted_flips = self.load_block(base_path, meta['flips'])
 
     @staticmethod
     def load_block(base_path: str, block: dict) -> np.ndarray:
@@ -100,11 +101,13 @@ class Analyzer:
 
     def plot_energy_magnetic_moment(self):
         fig = plt.figure(figsize=(9, 7))
-        ax_energy, ax_magnetic = fig.subplots(2, 1, sharex=True)
-        ax_energy.plot(self.energy)
+        ax_energy, ax_magnetic, ax_flips = fig.subplots(3, 1, sharex=True)
+        ax_energy.plot(self.energy/self.lattice_size**2)
         ax_energy.set_title("Energy")
-        ax_magnetic.plot(self.magnetic)
-        ax_magnetic.set_title("Magnetic moment")
+        ax_magnetic.plot(self.magnetic/self.lattice_size**2)
+        ax_magnetic.set_title("Absolute magnetic moment")
+        ax_flips.plot(self.accepted_flips)
+        ax_flips.set_title("Accepted flips for each cycle")
         plt.show()
 
     def update_lines(self, num, plot, text):
