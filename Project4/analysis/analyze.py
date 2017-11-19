@@ -31,6 +31,7 @@ class Analyzer:
     def load(self, base_path: str, meta_path: str) -> None:
         with open(os.path.join(base_path, meta_path)) as fp:
             meta = json.load(fp)
+            self.lattice_size = meta['lattice size']
 
         if meta['parallel']:
             self.parallel = True
@@ -63,10 +64,8 @@ class Analyzer:
 
     def plot(self):
         if self.parallel:
-            self.plot_expectations('Cv')
-            self.plot_expectations('E')
-            self.plot_expectations('Mabs')
-            self.plot_expectations('sus')
+            # self.plot_expectations('Cv')
+            self.plot_expectations('varE')
         else:
             self.plot_energy_magnetic_moment()
 
@@ -79,14 +78,18 @@ class Analyzer:
         fig = plt.figure()
         ax = fig.subplots()
         ax.plot(self.expectation_values['T'],
-                self.expectation_values[key], label = "Numeric")
+        self.expectation_values[key], label = "Numeric")
 
-        if key == 'Cv':
-            T_arr = np.linspace(self.expectation_values['T'][0],
-                                self.expectation_values['T'].tail(1),
-                                1001)
-            inst = Analytic2x2(T_arr)
-            ax.plot(T_arr, inst.CV_hyp()/4, label = "Analytic")
+        if self.lattice_size == 2:
+            try:
+                T_arr = np.linspace(self.expectation_values['T'][0],
+                self.expectation_values['T'].tail(1),
+                1001)
+                inst = Analytic2x2(T_arr, key)
+                ax.plot(T_arr, inst.key_function()/4, label="Analytic", ls="--")
+            except:
+                print(f"Analytic expression not available for {key}")
+                pass
 
         ax.set_xlabel(self.labels['T'])
         ax.set_ylabel(self.labels[key])
@@ -126,16 +129,27 @@ class Analyzer:
             plt.show()
 
 class Analytic2x2:
-    def __init__(self, T):
+    def __init__(self, T, key):
         self.T = T
         self.beta = 1/T
         self.arg = 8*self.beta
+
+        self.analytic_labels = {'Cv'       : self.heat_capacity(),
+                                'E'        : self.energy,
+                                'Mabs'     : self.abs_magnetization,
+                                'sus'      : self.susceptibility,
+                                'ESquared' : self.energy_squared,
+                                'MSquared' : self.magnetization_squared,
+                                'varE'     : "Problem",
+                                'varM'     : "Problem"}
+
+        self.key_function = self.analytic_labels[key]
 
     def partition_function(self):
         return 4*np.cosh(self.arg) + 12
 
     def energy(self):
-        numer = 8*np.sinh(8*beta)
+        numer = 8*np.sinh(8*self.beta)
         div   = 4*np.cosh(self.arg) + 12
         return -numer/div
 
