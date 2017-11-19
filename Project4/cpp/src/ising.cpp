@@ -148,7 +148,7 @@ void ising(const Metamodel& model){
   model.write();
 }
 
-void isingParallel(std::vector<double>& expectationValues, const Metamodel& model, unsigned int waitNSteps){
+void isingParallel(std::vector<double>& expectationValues, const Metamodel& model){
     // Setup RNG generator
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -169,7 +169,7 @@ void isingParallel(std::vector<double>& expectationValues, const Metamodel& mode
 
     // Loop through MC-cycles
     const unsigned int numSpinsTot = N*N;
-    for(unsigned int i = 1; i < M; i++){
+    for(unsigned int i = 1; i <= M; i++){
         // Loop over the number of nodes in the lattice
         for(unsigned int j = 0; j < numSpinsTot; j++){
             // Choose row (m) and column (n) index to perturb/flip given acceptance
@@ -186,12 +186,10 @@ void isingParallel(std::vector<double>& expectationValues, const Metamodel& mode
                 magMoment  += 2*state(m,n);
             }
         }
-        if(i > waitNSteps){
-          expectationValues[0] += energy;
-          expectationValues[1] += energy*energy;
-          expectationValues[2] += magMoment;
-          expectationValues[3] += magMoment*magMoment;
-          expectationValues[4] += fabs(magMoment);
-        }
+        expectationValues[0] += energy;
+        expectationValues[1] += energy*energy;
+        expectationValues[2] += magMoment;
+        expectationValues[3] += magMoment*magMoment;
+        expectationValues[4] += fabs(magMoment);
     }
 }

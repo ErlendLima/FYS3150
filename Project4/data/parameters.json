@@ -1,6 +1,6 @@
 {
     "Tstart": 1,
-    "Tstop": 2.4,
+    "Tstop": 5,
     "Tnumber": 10,
     "parallel": true,
     "seed": 2,

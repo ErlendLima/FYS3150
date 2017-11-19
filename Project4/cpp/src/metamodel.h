@@ -16,7 +16,7 @@ public:
     void save(std::vector<arma::imat>& states,
               std::vector<double>& energies, std::vector<int>& magmoments) const;
     void saveExpectationValues(std::ofstream& file, std::vector<double>&, double T,
-                               int numProcessors, int waitNSteps) const;
+                               int numProcessors) const;
     template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
     void binaryDump(std::ofstream&, const std::vector<T>&) const;
     template<typename T>

@@ -25,7 +25,6 @@ void solveSystemSerial(Metamodel& model){
 void solveSystemParallel(Metamodel& model){
     // Sets up paralellization and repeatedly calls the ising - metropolis algorithm
     std::ofstream outstream;
-    int waitNSteps;
 
     // Fetch from model because writing model.N everywhere looks ugly
     unsigned int N = model.N;
@@ -54,7 +53,6 @@ void solveSystemParallel(Metamodel& model){
 
     // The seed must be different for each rank.
     model.seed += RankProcess;
-    waitNSteps = 5000;
 
     double timeStart = MPI_Wtime();
     double timeSinceLast = timeStart;
@@ -63,7 +61,7 @@ void solveSystemParallel(Metamodel& model){
     for(double T = model.Tstart; T <= model.Tstop; T += model.Tstep){
         std::vector<double> LocalExpectationValues = {0.0, 0.0, 0.0, 0.0, 0.0};
         model.setTemperature(T);
-        isingParallel(LocalExpectationValues, model, waitNSteps);
+        isingParallel(LocalExpectationValues, model);
         std::vector<double>TotExpectationValues = {0.0, 0.0, 0.0, 0.0, 0.0};
         for(int i = 0; i < 5; i++){
             MPI_Reduce(&LocalExpectationValues[i], &TotExpectationValues[i],
@@ -74,7 +72,7 @@ void solveSystemParallel(Metamodel& model){
                       << TotExpectationValues[1] << ", "
                       << TotExpectationValues[2] << ", "
                       << TotExpectationValues[3] << "]" << std::endl;
-            model.saveExpectationValues(outstream, TotExpectationValues, T, NProcesses, waitNSteps);
+            model.saveExpectationValues(outstream, TotExpectationValues, T, NProcesses);
             std::cout << "Done for T = " << T << " in " << double(MPI_Wtime() - timeSinceLast) << " s" << std::endl;
             timeSinceLast = MPI_Wtime();
         }
