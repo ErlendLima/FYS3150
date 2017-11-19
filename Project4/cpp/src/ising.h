@@ -15,6 +15,6 @@ int                  totalEnergy(const arma::imat& A);
 std::map<int,double> makeProbabilities(double beta);
 void                 ising(const Metamodel& model);
 void                 isingParallel(std::vector<double>& expectationValues,
-                                   const Metamodel& model, unsigned int waitNSteps);
+                                   const Metamodel& model);
 
 #endif /* ISING_H */

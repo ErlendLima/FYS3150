@@ -84,11 +84,11 @@ void Metamodel::binaryDump(std::ofstream& stream, const std::vector<arma::Mat<T>
 }
 
 void Metamodel::saveExpectationValues(std::ofstream& stream, std::vector<double>& expVals,
-                                      double T, int numProcessors, int waitNSteps) const{
+                                      double T, int numProcessors) const{
   // Dumps values for a given temperature to stream.
   unsigned int Mprime   = M*numProcessors;
-  double       factor   = 1.0/(Mprime - waitNSteps);
-  double       spinNorm = 1.0/(N*N);
+  double       factor   = 1.0/static_cast<double>(Mprime);
+  double       spinNorm = 1.0/static_cast<double>(N*N);
 
   double expectE        = expVals[0]*factor;
   double expectESquared = expVals[1]*factor;
@@ -99,8 +99,8 @@ void Metamodel::saveExpectationValues(std::ofstream& stream, std::vector<double>
   double varE = (expectESquared - expectE*expectE)*spinNorm;
   double varM = (expectMSquared - expectM*expectM)*spinNorm;
 
-  double Cv  = (expectESquared - expectE*expectE)/T/T*spinNorm;
-  double sus = (expectMSquared - expectMFabs*expectMFabs)/T*spinNorm;
+  double Cv  = varE/T/T;
+  double sus = varM/T;
 
   stream << T << " "
          << expectE*spinNorm << " "
