@@ -87,8 +87,10 @@ class Analyzer:
                                     1001)
                 inst = Analytic2x2(T_arr, key)
                 ax.plot(T_arr, inst.key_function()/4, label="Analytic", ls="--")
-            except:
+            except KeyError:
                 print(f"Analytic expression not available for {key}")
+            except Exception as e:
+                print(f"Somehting went wrong with {key}. Error:\n{e}")
 
         ax.set_xlabel(self.labels['T'])
         ax.set_ylabel(self.labels[key])
@@ -140,23 +142,31 @@ class Analytic2x2:
                                 'sus'      : self.susceptibility,
                                 'ESquared' : self.energy_squared,
                                 'MSquared' : self.magnetization_squared,
-                                'varE'     : "Problem",
-                                'varM'     : "Problem"}
+                                'varE'     : self.energy_variance,
+                                'varM'     : self.magnetization_variance,
+                                'M'        : self.magnetization,
+                                'T'        : self.temperature}
 
         self.key_function = self.analytic_labels[key]
 
     def partition_function(self):
         return 4*np.cosh(self.arg) + 12
 
+    def temperature(self):
+        return self.T
+
     def energy(self):
         numer = 8*np.sinh(8*self.beta)
-        div   = self.partition_function()
+        div   = np.cosh(self.arg) + 3
         return -numer/div
 
     def energy_squared(self):
         numer = 256*np.cosh(self.arg)
-        div   = 4*np.cosh(self.arg) + 12
+        div   = self.partition_function()
         return numer/div
+
+    def magnetization(self):
+        return 0*self.T
 
     def abs_magnetization(self):
         numer = 2*np.exp(self.arg) + 4
@@ -164,11 +174,12 @@ class Analytic2x2:
         return numer/div
 
     def magnetization_squared(self):
-        numer = 8*np.exp(self.arg) + 4
+        numer = 8*np.exp(self.arg) + 8
         div   = np.cosh(self.arg) + 3
         return numer/div
 
     def heat_capacity(self):
+<<<<<<< HEAD
         fac1 = 128*(np.exp(self.arg) + np.exp(-self.arg))
         fac2 = -16*np.exp(self.arg) + 16*np.exp(-self.arg)
         div  = 2*np.exp(self.arg) + 2*np.exp(-self.arg) + 12
@@ -179,11 +190,18 @@ class Analytic2x2:
         fac2 = -32*np.sinh(self.arg)
         denom = 4*np.cosh(self.arg) + 12
         return self.beta**2 * ((fac1/denom) - (fac2/denom)**2)
+=======
+        return self.energy_variance()/(self.T**2)
+>>>>>>> 798de76937eebc7176df50bb3044b07addb68b9c
 
     def susceptibility(self):
-        num = 32*np.exp(self.arg) + 32
-        div = 2*np.exp(self.arg) + 2*np.exp(-self.arg) + 12
-        return self.beta*num/div
+        return self.magnetization_variance()/self.T
+
+    def energy_variance(self):
+        return self.energy_squared() - self.energy()**2
+
+    def magnetization_variance(self):
+        return self.magnetization_squared() - self.magnetization()**2
 
 
 if __name__ == '__main__':

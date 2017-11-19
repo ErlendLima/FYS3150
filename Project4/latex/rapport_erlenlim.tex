@@ -112,13 +112,34 @@ equations than govern the universe.
 \subsection{The Ising Model}
 \label{sec:isingmodel}
 
-In his 1924 PhD thesis, Ernt Ising introduced 
-solved the one dimensional Ising model devised by his adviser, Wilhelm Lenz . The
-model describes a lattice of discrete spins taking binary values. modeling real
-world phenomena such as ferromagnetism and phase transitions. Analytical
-solutions exists for one and two dimensional Ising models, but it also lends
-itself to numerical solutions through Monte Carlo simulations. 
+In his 1924 PhD thesis, Ernt Ising 
+solved the one dimensional Ising model devised by his adviser, Wilhelm Lenz~\cite{weicai}. The
+model describes a lattice of discrete spins taking binary values, where each
+spin interacts with its neighbors. Although simple, the Ising model is capable of modeling real
+world phenomena such as ferromagnetism and phase transitions.
 
+A lattice \(\Lambda\) is a \(d\)-dimensional graph with the nodes \(k\in\Lambda\) being spins
+taking a discrete binary value, \(s_{k}\in\{-1, 1\}\). For a lattice of \(N\)
+nodes, its energy is
+
+\begin{equation}
+  \label{eq:2}
+ E = \sum_{<kl>}^{N}J_{k,l}s_{k}s_{l} - \sum_{k}^{N}\mathcal{B}_{k}s_{k}
+\end{equation}
+
+where \(<kl>\) denotes that the sum is taken over the neighboring spins.
+Between any two spins \(k, l \in \Lambda\) there is an interaction \(J_{k,l}\),
+and for any spin there is the possibility of an external magnetic field with
+interaction \(\mathcal{B}_{k}\). Assuming that the spin interactions are equal
+for all spins and the absence of an external magnetic field, the energy
+simplifies to
+
+\begin{equation}
+  \label{eq:3}
+  E = J\sum_{<kl>}^{N}s_{k}s_{l}
+\end{equation}
+
+For \(J>0\)
 
 
 \section{Method}
@@ -142,5 +163,4 @@ itself to numerical solutions through Monte Carlo simulations.
 
 % Local Variables:
 % TeX-engine: luatex
-% BIBINPUTS: .
 % End:
