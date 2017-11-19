@@ -30,10 +30,10 @@ class Analyzer:
 
     def load(self, base_path: str, meta_path: str) -> None:
         with open(os.path.join(base_path, meta_path)) as fp:
-            meta = json.load(fp)
-            self.lattice_size = meta['lattice size']
+            self.meta = json.load(fp)
+            self.lattice_size = self.meta['lattice size']
 
-        if meta['parallel']:
+        if self.meta['parallel']:
             self.parallel = True
             self.expectation_values = pd.read_csv("../data/data.txt", sep=" ")
         else:
@@ -77,22 +77,33 @@ class Analyzer:
         plt.show()
 
     def plot_expectations(self, key):
+        T = self.expectation_values['T']
+        quantity = self.expectation_values[key]
         fig = plt.figure()
         ax = fig.subplots()
-        ax.plot(self.expectation_values['T'],
-        self.expectation_values[key], label = "Numeric")
+        ax.plot(T, quantity, label="Numeric")
 
         if self.lattice_size == 2:
             try:
-                T_arr = np.linspace(self.expectation_values['T'][0],
-                                    self.expectation_values['T'].tail(1),
-                                    1001)
+                T_arr = np.linspace(T[0], T.tail(1), 1001)
                 inst = Analytic2x2(T_arr, key)
                 ax.plot(T_arr, inst.key_function()/4, label="Analytic", ls="--")
             except KeyError:
                 print(f"Analytic expression not available for {key}")
             except Exception as e:
                 print(f"Somehting went wrong with {key}. Error:\n{e}")
+        elif (min(T) == 2.0 and max(T) == 2.3
+              and key in ['Cv', 'sus']):
+            argmax = np.argmax(quantity)
+            Tc, Qc = T[argmax], quantity[argmax]
+            ax.scatter(Tc, Qc)
+            ax.annotate(rf"$T_C = {Tc}$", xy=(Tc, Qc), xytext=(Tc, Qc))
+            ax.set_xlabel(self.labels['T'])
+            ax.set_ylabel(self.labels[key])
+            ax.legend()
+            L = self.meta['lattice size']
+            fig.savefig(f"../latex/figures/L{L}{key}.eps", bbox_inches='tight')
+
 
         ax.set_xlabel(self.labels['T'])
         ax.set_ylabel(self.labels[key])

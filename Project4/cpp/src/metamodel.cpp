@@ -111,7 +111,7 @@ void Metamodel::saveExpectationValues(std::ofstream& stream, std::vector<double>
   double n_flips        = expVals[5]*factor;
 
   double varE = (expectESquared - expectE*expectE)*spinNorm;
-  double varM = (expectMSquared - expectM*expectM)*spinNorm;
+  double varM = (expectMSquared - expectMFabs*expectMFabs)*spinNorm;
 
   double Cv  = varE/T/T;
   double sus = varM/T;

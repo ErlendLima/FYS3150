@@ -1,10 +1,10 @@
 {
-    "Tstart": 1.0,
-    "Tstop": 2.4,
-    "Tnumber": 10,
-    "parallel": false,
+    "Tstart": 2.0,
+    "Tstop": 2.3,
+    "Tnumber": 6,
+    "parallel": true,
     "seed": 2,
-    "lattice size": 20,
-    "monte carlo cycles": 1e6,
+    "lattice size": 100,
+    "monte carlo cycles": 1e5,
     "initial orientation": "random"
 }
