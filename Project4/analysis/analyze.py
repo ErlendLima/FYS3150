@@ -65,7 +65,9 @@ class Analyzer:
     def plot(self):
         if self.parallel:
             # self.plot_expectations('Cv')
-            self.plot_expectations('varE')
+            for quantity in self.labels:
+                self.plot_expectations(quantity)
+            # self.plot_expectations('varE')
         else:
             self.plot_energy_magnetic_moment()
 
@@ -128,6 +130,7 @@ class Analyzer:
         else:
             plt.show()
 
+
 class Analytic2x2:
     def __init__(self, T, key):
         self.T = T
@@ -178,12 +181,13 @@ class Analytic2x2:
         fac1 = 256*np.cosh(self.arg)
         fac2 = -32*np.sinh(self.arg)
         denom = 4*np.cosh(self.arg) + 12
-        return self.beta**2 * ( (fac1/denom) - (fac2/denom)**2)
+        return self.beta**2 * ((fac1/denom) - (fac2/denom)**2)
 
     def susceptibility(self):
         num = 32*np.exp(self.arg) + 32
         div = 2*np.exp(self.arg) + 2*np.exp(-self.arg) + 12
         return self.beta*num/div
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Analyzes data for project 3')
