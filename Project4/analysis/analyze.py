@@ -179,20 +179,7 @@ class Analytic2x2:
         return numer/div
 
     def heat_capacity(self):
-<<<<<<< HEAD
-        fac1 = 128*(np.exp(self.arg) + np.exp(-self.arg))
-        fac2 = -16*np.exp(self.arg) + 16*np.exp(-self.arg)
-        div  = 2*np.exp(self.arg) + 2*np.exp(-self.arg) + 12
-        return self.beta**2 * ((fac1/div) - (fac2/div)**2)
-
-    def CV_hyp(self):
-        fac1 = 256*np.cosh(self.arg)
-        fac2 = -32*np.sinh(self.arg)
-        denom = 4*np.cosh(self.arg) + 12
-        return self.beta**2 * ((fac1/denom) - (fac2/denom)**2)
-=======
         return self.energy_variance()/(self.T**2)
->>>>>>> 798de76937eebc7176df50bb3044b07addb68b9c
 
     def susceptibility(self):
         return self.magnetization_variance()/self.T
