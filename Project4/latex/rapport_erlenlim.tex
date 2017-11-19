@@ -339,9 +339,27 @@ GitHub repository.
 \subsection{Boundary Conditions}
 \label{sec:boundary-conditions}
 
-The boundary conditions 
+The fact that the C++ indexation starts at \(0\) was exploited to implement the
+periodic boundary conditions of the lattice. Crossing a boundary is the same as
+trying to access either a row or a column which is outside of bounds. For an
+\(L\times L\) lattice, attempting to access element \((0, L)\) should return
+\((0,0)\), and trying to access \(0, -1\) should return \((0, L-1)\). This is
+achieved by rewriting the index \(i\) using modular arithmetic as \((i+L) \%
+L\). This makes the index wrap around and satisfies the boundary conditions.
+
+\subsection{Reaching for Equilibrium}
+\label{sec:reaching-equilibrium-1}
+
+
 \section{Results}
 \label{sec:results}
+
+Running the code and solving the Ising model using a multitude of different
+parameters produced results which are presented here. Their interpretation is
+discussed in the next section.
+
+\subsection{Numerical Solution to $2\times 2$ Lattice}
+\label{sec:numer-solut-2tim}
 
 \begin{figure}[H]
   \centering
@@ -361,6 +379,18 @@ The boundary conditions
   \caption{$2 \times 2$ lattice with $M = 10^6$ MC iterations.}
   \label{fig:L2Ne6}
 \end{figure}
+
+\subsection{Reaching for Equilibrium}
+\label{sec:reaching-equilibrium}
+
+
+\subsection{Distribution of Energy States}
+\label{sec:distr-energy-stat}
+
+\subsection{The Appearance of the Phase Transition}
+\label{sec:appe-phase-trans}
+
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/4da.eps}
@@ -386,8 +416,21 @@ The boundary conditions
   \includegraphics[width=\columnwidth]{figures/L100sus.eps}
   \caption{\label{fig:100CVTc} Magnetic susceptibility for \(L=100\).}
 \end{figure}
+
 \section{Discussion}
 \label{sec:discussion}
+
+\subsection{Numerical Solution to $2\times 2$ Lattice}
+
+\subsection{Reaching for Equilibrium}
+\label{sec:reaching-equilibrium-2}
+
+
+\subsection{Distribution of Energy States}
+\label{sec:distr-energy-stat-2}
+
+\subsection{The Appearance of the Phase Transition}
+\label{sec:appe-phase-trans-2}
 
 \section{Conclusion}
 \label{sec:conclusion}

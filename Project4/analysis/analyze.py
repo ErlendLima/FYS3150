@@ -92,11 +92,11 @@ class Analyzer:
                 print(f"Analytic expression not available for {key}")
             except Exception as e:
                 print(f"Somehting went wrong with {key}. Error:\n{e}")
-        elif (min(T) == 2.0 and max(T) == 2.3
+        elif (self.meta['lattice size'] >= 100
               and key in ['Cv', 'sus']):
             argmax = np.argmax(quantity)
             Tc, Qc = T[argmax], quantity[argmax]
-            ax.scatter(Tc, Qc)
+            ax.scatter(Tc, Qc, color='k')
             ax.annotate(rf"$T_C = {Tc}$", xy=(Tc, Qc), xytext=(Tc, Qc))
             ax.set_xlabel(self.labels['T'])
             ax.set_ylabel(self.labels[key])
