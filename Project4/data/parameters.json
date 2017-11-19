@@ -4,7 +4,7 @@
     "Tnumber": 10,
     "parallel": true,
     "seed": 2,
-    "lattice size": 2,
-    "monte carlo cycles": 1e6,
+    "lattice size": 1000,
+    "monte carlo cycles": 2e2,
     "initial orientation": "random"
 }
