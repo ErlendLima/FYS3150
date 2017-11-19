@@ -64,8 +64,8 @@ class Analyzer:
 
     def plot(self):
         if self.parallel:
-            for key in self.labels:
-                self.plot_expectations(key)
+            for quantity in self.labels:
+                self.plot_expectations(quantity)
         else:
             self.plot_energy_magnetic_moment()
 
@@ -129,6 +129,7 @@ class Analyzer:
         else:
             plt.show()
 
+
 class Analytic2x2:
     def __init__(self, T, key):
         self.T = T
@@ -188,6 +189,7 @@ class Analytic2x2:
 
     def magnetization_variance(self):
         return self.magnetization_squared() - self.magnetization()**2
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Analyzes data for project 3')
