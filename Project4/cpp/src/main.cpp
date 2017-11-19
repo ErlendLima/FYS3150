@@ -8,6 +8,10 @@ int main(int argc, char const *argv[]) {
     std::string parameterPath = "parameters.json";
     if (argc == 2)
         parameterPath = argv[1];
+    else if(argc > 2){
+        std::cerr << "Usage: ./solve [path to parameters]" << std::endl;
+        return -1;
+    }
     parameterPath = "../data/" + parameterPath;
 
     try{

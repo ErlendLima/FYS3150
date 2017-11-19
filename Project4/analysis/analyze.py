@@ -40,7 +40,7 @@ class Analyzer:
             self.parallel = False
             self.energy = self.load_block(base_path, meta["energy"])
             self.magnetic = self.load_block(base_path, meta["magnetic moment"])
-            self.evolution = self.load_block(base_path, meta["evolution"])
+            # self.evolution = self.load_block(base_path, meta["evolution"])
 
     @staticmethod
     def load_block(base_path: str, block: dict) -> np.ndarray:
@@ -68,6 +68,7 @@ class Analyzer:
                 self.plot_expectations(quantity)
         else:
             self.plot_energy_magnetic_moment()
+            self.count_energies()
 
     def plot_inital(self):
         initial = self.evolution[0, :, :]
@@ -129,6 +130,20 @@ class Analyzer:
                                   writer='imagemagick', fps=30)
         else:
             plt.show()
+
+    def count_energies(self):
+        """ Creates a histogram over the energy states after steady state
+
+        For 4d)
+        """
+        energies = self.energy[5000:]/self.lattice_size**2
+        print(f"σ² = {energies.var()}")
+        bins = len(set(energies)) + 4
+        fig, ax = plt.subplots()
+        ax.hist(energies, bins=bins, density=True)
+        ax.set_ylabel("Occurrences of energy states, normalized")
+        ax.set_xlabel("E")
+        plt.show()
 
 
 class Analytic2x2:

@@ -68,10 +68,6 @@ void solveSystemParallel(Metamodel& model){
                        1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
         }
         if(RankProcess == 0){
-            std::cout << "T: " << T << " [" << TotExpectationValues[0] << ", "
-                      << TotExpectationValues[1] << ", "
-                      << TotExpectationValues[2] << ", "
-                      << TotExpectationValues[3] << "]" << std::endl;
             model.saveExpectationValues(outstream, TotExpectationValues, T, NProcesses);
             std::cout << "Done for T = " << T << " in " << double(MPI_Wtime() - timeSinceLast) << " s" << std::endl;
             timeSinceLast = MPI_Wtime();
