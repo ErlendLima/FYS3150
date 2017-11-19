@@ -114,9 +114,10 @@ class Analyzer:
 
     def animate(self, save=False):
         fig = plt.figure()
-        # Ax fucks up with fignum. Bug in matplotlib?
         plot = plt.matshow(self.evolution[0, :, :], fignum=0)
-        text = plt.text(0.05, 0.9, '0', bbox={'facecolor':'white', 'alpha': 0.5, 'pad': 5})
+        text = plt.text(0.05, 0.9, '0', bbox={'facecolor': 'white',
+                                              'alpha': 0.5,
+                                              'pad': 5})
         plt.grid(False)
 
         system_animation = animation.FuncAnimation(fig, self.update_lines,
