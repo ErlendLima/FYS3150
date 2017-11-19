@@ -87,7 +87,7 @@ void Metamodel::saveExpectationValues(std::ofstream& stream, std::vector<double>
                                       double T, int numProcessors, int waitNSteps) const{
   // Dumps values for a given temperature to stream.
   unsigned int Mprime   = M*numProcessors;
-  double       factor   = 1.0/(M - waitNSteps);
+  double       factor   = 1.0/(Mprime - waitNSteps);
   double       spinNorm = 1.0/(N*N);
 
   double expectE        = expVals[0]*factor;

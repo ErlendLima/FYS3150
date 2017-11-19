@@ -39,18 +39,18 @@ void solveSystemParallel(Metamodel& model){
     MPI_Comm_size (MPI_COMM_WORLD, &NProcesses);
     MPI_Comm_rank (MPI_COMM_WORLD, &RankProcess);
 
+    if(RankProcess == 0){
+      outstream.open(model.basepath + model.solverpath);
+      // Write the header
+      outstream << "T E ESquared varE Cv M MSquared Mabs varM sus\n";
+    }
+
     // Broadcast parameters to processes.
-    MPI_Bcast (&M, 1, MPI_INT, 0, MPI_COMM_WORLD);
-    MPI_Bcast (&N, 1, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast (&M,            1, MPI_INT,    0, MPI_COMM_WORLD);
+    MPI_Bcast (&N,            1, MPI_INT,    0, MPI_COMM_WORLD);
     MPI_Bcast (&model.Tstart, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast (&model.Tstop,  1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast (&model.Tstep,  1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-    if(RankProcess == 0){
-        outstream.open(model.basepath + model.solverpath);
-        // Write the header
-        outstream << "T E ESquared varE Cv M MSquared Mabs varM sus\n";
-    }
 
     // The seed must be different for each rank.
     model.seed += RankProcess;

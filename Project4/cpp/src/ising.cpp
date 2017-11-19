@@ -12,7 +12,13 @@
 int magnetization(const arma::imat& A){
   // Return the magnetization of a state described by A, which is simply the sum
   // of the spins/elements. This function is somewhat redundant.
-  return arma::accu(A);
+  int M = 0;
+  for(unsigned int i = 0; i < A.n_cols; i++){
+    for(unsigned int j = 0; j < A.n_rows; j++){
+      M += A(i,j);
+    }
+  }
+  return M;
 }
 
 arma::imat setInitialStateRandom(unsigned int N){
@@ -52,6 +58,10 @@ unsigned int period(int x, unsigned int N){
   }
 }
 
+int PeriodicBoundary(int i, int limit, int add){
+  return (i+limit+add) % limit;
+}
+
 int sumNeighbors(unsigned int i, unsigned int j, const arma::imat& A){
   unsigned int N = A.n_cols;
   int s = 0;
@@ -64,9 +74,11 @@ int sumNeighbors(unsigned int i, unsigned int j, const arma::imat& A){
 
 int totalEnergy(const arma::imat& A){
   int E = 0;
+  int N = A.n_cols;
   for(unsigned int i = 0; i < A.n_cols; i++){
     for(unsigned int j = 0; j < A.n_rows; j++){
-      E -= A(i,j)*sumNeighbors(i,j,A);
+      E -= A(i,j)*(A(PeriodicBoundary(i, N, -1)) +
+                   A(PeriodicBoundary(j, N, -1)));
     }
   }
   return E;
@@ -137,10 +149,9 @@ void ising(const Metamodel& model){
 }
 
 void isingParallel(std::vector<double>& expectationValues, const Metamodel& model, unsigned int waitNSteps){
-    const int seed = model.seed;
     // Setup RNG generator
-    std::mt19937 gen;
-    gen.seed(seed);
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
     std::uniform_real_distribution<double> random(0.0,1.0);
 
     // Setup and run simulation of the Ising model. Unpack some vals from model.
