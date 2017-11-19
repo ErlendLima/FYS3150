@@ -1,5 +1,5 @@
 {
-    "Tstart": 1,
+    "Tstart": 1.0,
     "Tstop": 2.4,
     "Tnumber": 10,
     "parallel": false,

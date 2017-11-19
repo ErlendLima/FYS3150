@@ -40,7 +40,7 @@ class Analyzer:
             self.parallel = False
             self.energy = self.load_block(base_path, meta["energy"])
             self.magnetic = self.load_block(base_path, meta["magnetic moment"])
-            self.evolution = self.load_block(base_path, meta["evolution"])
+            # self.evolution = self.load_block(base_path, meta["evolution"])
             self.accepted_flips = self.load_block(base_path, meta['flips'])
 
     @staticmethod
@@ -146,6 +146,7 @@ class Analyzer:
         ax.hist(energies, bins=bins, density=True)
         ax.set_ylabel("Occurrences of energy states, normalized")
         ax.set_xlabel("E")
+        fig.savefig("../latex/figures/4da.eps", bbox_inches='tight')
         plt.show()
 
 

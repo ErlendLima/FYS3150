@@ -20,6 +20,15 @@
 		"path" : "evolution.bin",
 		"type" : "int64"
 	},
+	"flips" : 
+	{
+		"dim" : 
+		[
+			1000000
+		],
+		"path" : "flips.bin",
+		"type" : "int32"
+	},
 	"lattice size" : 20,
 	"magnetic moment" : 
 	{

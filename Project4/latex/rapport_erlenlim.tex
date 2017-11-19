@@ -66,7 +66,8 @@
   \thispagestyle{empty}%
   \addtocounter{page}{-1}%
   \newpage}
-\mean{E} = - \pdv{\ln{Z}}{\beta}
+
+\newcommand{\mean}[1]{\langle #1 \rangle}
 
 % Default fixed font does not support bold face
 \DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{7} % for bold
@@ -168,7 +169,6 @@ The magnetism of the system is simply is sum over the spins,
   \mathcal{M} = \sum_{k} s_{k}
 \end{equation}
 
-
 Being microcanonical, the Ising model can be described by Boltzmann statistics.
 Using this fact, it can be shown~\cite{physicslectures} that the heat capacity is
 \begin{equation}
@@ -191,6 +191,20 @@ In addition, the first moment of energy can be written as
 
 \section{Results}
 \label{sec:results}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/4da.eps}
+  \caption{\label{fig:4da} Histogram over the energy states with \(T=1.0\) kT/J.
+  The variance is \(\sigma^{2} \approx 5.845\cdot 10^{-5}\)}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/4db.eps}
+  \caption{\label{fig:4db} Histogram over the energy states with \(T=2.4\) kT/J.
+  The variance is \(\sigma^{2} \approx 0.0203\)}
+\end{figure}
 
 \section{Discussion}
 \label{sec:discussion}
