@@ -6,6 +6,7 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <stdexcept>
 #include "ising.h"
 #include "metamodel.h"
 
@@ -46,6 +47,22 @@ arma::imat setInitialStateOrdered(unsigned int N, int fill){
   arma::imat state = arma::ones<arma::imat>(N, N);
   state.fill(fill);
   return state;
+}
+
+arma::imat setInitialState(const Metamodel& model){
+  std::string initOrient = model.initialOrientation;
+  if(initOrient == "random"){
+    return setInitialStateRandom(model.N);
+  }
+  else if(initOrient == "up"){
+    return setInitialStateOrdered(model.N, 1);
+  }
+  else if(initOrient == "down"){
+    return setInitialStateOrdered(model.N, -1);
+  }
+  else{
+    throw std::invalid_argument("Invalid initial state input. Valid inputs are 'random', 'up' and 'down'.");
+  }
 }
 
 unsigned int period(int x, unsigned int N){
@@ -95,6 +112,7 @@ std::map<int,double> makeProbabilities(double beta){
 
 void ising(const Metamodel& model){
   int seed = model.seed;
+  std::cout << "Temperature is " << model.temperature << std::endl;
   // Setup RNG generator
   std::mt19937 gen;
   gen.seed(seed);
@@ -109,7 +127,7 @@ void ising(const Metamodel& model){
   const auto probabilities = makeProbabilities(model.beta);
 
   // Initialize arrays and initial values
-  arma::imat state = setInitialStateRandom(N);
+  arma::imat state = setInitialState(model);
   std::vector<arma::imat> states (model.M);
   states[0] = state; // Saves every state
 
@@ -121,9 +139,13 @@ void ising(const Metamodel& model){
   int magmoment = magnetization(state);
   magmoments[0] = magmoment;
 
-  // Loop through MC-cycles
+  std::vector<int> nFlippedVec (model.M-1);
+  int nFlipped;
+
   unsigned int nSpinsTot = N*N;
+  // Loop through MC-cycles
   for(unsigned int i = 1; i < M; i++){
+    nFlipped = 0;
     for(unsigned int j = 0; j < nSpinsTot; j++){
         // Choose row (m) and column (n) index to perturb/flip given acceptance
         m = static_cast<int>(random(gen)*N);
@@ -133,17 +155,19 @@ void ising(const Metamodel& model){
         // Metropolis algorithm
         if(dE < 0 || random(gen) <= probabilities.at(dE)){
           state(m,n) *= -1;
-          energy += dE;
-          magmoment += 2*state(m,n);
+          energy     += dE;
+          magmoment  += 2*state(m,n);
+          nFlipped   += 1;
         }
       }
       // Update states
-      states[i] = state;
-      energies[i] = energy;
-      magmoments[i] = magmoment;
+      states[i]        = state;
+      energies[i]      = energy;
+      magmoments[i]    = fabs(magmoment);
+      nFlippedVec[i-1] = nFlipped;
   }
   // Save all data to binary files
-  model.save(states, energies, magmoments);
+  model.save(states, energies, magmoments, nFlippedVec);
   // Write metadata to be read by Python before reading binary files
   model.write();
 }
@@ -163,7 +187,7 @@ void isingParallel(std::vector<double>& expectationValues, const Metamodel& mode
     const auto probabilities = makeProbabilities(model.beta);
 
     // Initialize values
-    arma::imat state = setInitialStateRandom(N);
+    arma::imat state = setInitialState(model);
     double energy    = totalEnergy(state);
     int magMoment    = magnetization(state);
 

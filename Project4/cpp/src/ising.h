@@ -8,6 +8,7 @@
 int                  magnetization(const arma::imat& A);
 arma::imat           setInitialStateRandom(unsigned int N);
 arma::imat           setInitialStateOrdered(unsigned int N, int fill);
+arma::imat           setInitialState(const Metamodel&);
 unsigned int         period(int x, unsigned int N);
 int                  PeriodicBoundary(int, int, int);
 int                  sumNeighbors(unsigned int i, unsigned int j, const arma::imat& A);

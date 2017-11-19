@@ -20,6 +20,11 @@ void Metamodel::write() const{
   root["magnetic moment"]["path"] = "magneticmoment.bin";
   root["magnetic moment"]["dim"].append(M);
 
+  root["flips"]["dim"]  = Json::arrayValue;
+  root["flips"]["type"] = "int32";
+  root["flips"]["path"] = flippath;
+  root["flips"]["dim"].append(M);
+
   root["energy"]["dim"]  = Json::arrayValue;
   root["energy"]["type"] = "float64";
   root["energy"]["path"] = "energies.bin";
@@ -52,7 +57,8 @@ void Metamodel::read(const std::string& filename) {
     initialOrientation = root["initial orientation"].asString();
 }
 
-void Metamodel::save(std::vector<arma::imat>& states, std::vector<double>& energies, std::vector<int>& magmoments) const{
+void Metamodel::save(std::vector<arma::imat>& states, std::vector<double>& energies,
+                     std::vector<int>& magmoments, std::vector<int>& nFlips) const{
   // Write energy to file
   std::ofstream energyStream;
   energyStream.open(basepath + energypath, std::ios::out | std::ios::binary);
@@ -65,10 +71,17 @@ void Metamodel::save(std::vector<arma::imat>& states, std::vector<double>& energ
   binaryDump(magmom, magmoments);
   magmom.close();
 
+  // Write system states to file
   std::ofstream evoStream;
   evoStream.open(basepath + evolutionpath, std::ios::out | std::ios::binary);
   binaryDump(evoStream, states);
   evoStream.close();
+
+  // Write number of accepted flips each MC cycle to file
+  std::ofstream flips;
+  flips.open(basepath + flippath, std::ios::out | std::ios::binary);
+  binaryDump(flips, nFlips);
+  flips.close();
 }
 
 template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
@@ -95,6 +108,7 @@ void Metamodel::saveExpectationValues(std::ofstream& stream, std::vector<double>
   double expectM        = expVals[2]*factor;
   double expectMSquared = expVals[3]*factor;
   double expectMFabs    = expVals[4]*factor;
+  double n_flips        = expVals[5]*factor;
 
   double varE = (expectESquared - expectE*expectE)*spinNorm;
   double varM = (expectMSquared - expectM*expectM)*spinNorm;
@@ -111,5 +125,6 @@ void Metamodel::saveExpectationValues(std::ofstream& stream, std::vector<double>
          << expectMSquared*spinNorm << " "
          << expectMFabs*spinNorm << " "
          << varM << " "
-         << sus << "\n";
+         << sus << " "
+         << n_flips << "\n";
 }

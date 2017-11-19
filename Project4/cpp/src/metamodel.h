@@ -14,7 +14,9 @@ public:
     void read(const std::string& filename);
     void write() const;
     void save(std::vector<arma::imat>& states,
-              std::vector<double>& energies, std::vector<int>& magmoments) const;
+              std::vector<double>& energies,
+              std::vector<int>& magmoments,
+              std::vector<int>& nFlips) const;
     void saveExpectationValues(std::ofstream& file, std::vector<double>&, double T,
                                int numProcessors) const;
     template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
@@ -36,6 +38,7 @@ public:
     std::string  basepath           = "../data/";
     std::string  energypath         = "energies.bin";
     std::string  magneticmomentpath = "magneticmoment.bin";
+    std::string  flippath           = "flips.bin";
     std::string  metadatapath       = "metacpp.json";
     std::string  evolutionpath      = "evolution.bin";
     std::string  solverpath         = "data.txt";
