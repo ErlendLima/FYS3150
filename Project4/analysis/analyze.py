@@ -69,13 +69,19 @@ class Analyzer:
             for quantity in self.labels:
                 self.plot_expectations(quantity)
         else:
-            self.plot_energy_magnetic_moment()
+            self.plot_initial()
+            # self.plot_energy_magnetic_moment()
             # self.count_energies()
 
-    def plot_inital(self):
+    def plot_initial(self):
         initial = self.evolution[0, :, :]
         plt.matshow(initial)
-        plt.show()
+        plt.grid(0)
+        plt.savefig("../latex/figures/initial.eps")
+        initial = self.evolution[-1, :, :]
+        plt.matshow(initial)
+        plt.grid(0)
+        plt.savefig("../latex/figures/final.eps")
 
     def plot_expectations(self, key):
         T = self.expectation_values['T']
