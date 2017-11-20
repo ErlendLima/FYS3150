@@ -1,10 +1,10 @@
 {
-	"MC iterations" : 100000,
+	"MC iterations" : 1000000,
 	"energy" : 
 	{
 		"dim" : 
 		[
-			100000
+			1000000
 		],
 		"path" : "energies.bin",
 		"type" : "float64"
@@ -13,9 +13,9 @@
 	{
 		"dim" : 
 		[
-			100000,
-			40,
-			40
+			1000000,
+			20,
+			20
 		],
 		"path" : "evolution.bin",
 		"type" : "int64"
@@ -24,17 +24,17 @@
 	{
 		"dim" : 
 		[
-			100000
+			1000000
 		],
 		"path" : "flips.bin",
 		"type" : "int32"
 	},
-	"lattice size" : 40,
+	"lattice size" : 20,
 	"magnetic moment" : 
 	{
 		"dim" : 
 		[
-			100000
+			1000000
 		],
 		"path" : "magneticmoment.bin",
 		"type" : "int32"

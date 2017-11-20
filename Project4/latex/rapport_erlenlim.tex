@@ -363,34 +363,8 @@ discussed in the next section.
 \subsection{Numerical Solution to $2\times 2$ Lattice}
 \label{sec:numer-solut-2tim}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/4bEnergy.eps}
-  \caption{The energy as a function of temperature.}
-  \label{fig:4be}
-\end{figure}
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/4bHeatCapacity.eps}
-  \caption{The heat capacity as a function of temperature.}
-  \label{fig:4bcv}
-\end{figure}
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/4bMagnetization.eps}
-  \caption{The magnetization as a function of temperature.}
-  \label{fig:4bmag}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/4bSusceptibility.eps}
-  \caption{The magnetic susceptibility as a function of temperature.}
-  \label{fig:4bsusceptibility}
-\end{figure}
-
-\subsection{Reaching for Equilibrium}
-\label{sec:reaching-equilibrium}
+The figures~\ref{fig:L2Ne4} through~\ref{fig:L2Ne6} illustrates how the heat
+capacity changes as a function of Monte Carlo cycles for \(T = 1\).
 
 \begin{figure}[H]
   \centering
@@ -411,10 +385,77 @@ discussed in the next section.
   \label{fig:L2Ne6}
 \end{figure}
 
+Figures~\ref{fig:4be} to~\ref{fig:4bsusceptibility} show the expectation
+values of several
+thermodynamic quantities as function of temperature. The number of Monte Carlo
+cycles was adapted so as to get sufficiently good results. 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/4bEnergy.eps}
+  \caption{The energy as a function of temperature.}
+  \label{fig:4be}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/4bHeatCapacity.eps}
+  \caption{The heat capacity as a function of temperature.}
+  \label{fig:4bcv}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/4bMagnetization.eps}
+  \caption{The magnetization as a function of temperature.}
+  \label{fig:4bmag}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/4bSusceptibility.eps}
+  \caption{The magnetic susceptibility as a function of temperature.}
+  \label{fig:4bsusceptibility}
+\end{figure}
+
+\subsection{Reaching for Equilibrium}
+\label{sec:reaching-equilibrium}
+
+The figures~\ref{fig:L20T1Random} and~\ref{fig:L20T24Random} shows the energy,
+magnetization and the number of spin flips as functions of temperature.
+Figure~\ref{fig:4cFlips} shows how the number of flips changes as temperature increases.
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/L20T1_random.eps}
+  \caption{Energy, absolute magnetization and number of flips as a function of
+  Monte Carlo cycles. The lattice size is $N = 20$, and the temperature $T = 1$ kT/J.}
+  \label{fig:L20T1Random}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/L20T2_4_random.eps}
+  \caption{Energy, absolute magnetization and number of flips as a function of
+  Monte Carlo cycles. The lattice size is $N = 20$, and the temperature $T = 2.4$ kT/J.}
+  \label{fig:L20T24Random}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/4c_number_of_flips.eps}
+  \caption{Total number of accepted spin flips. The values are scaled with the
+  maximum number to ease readability, and because only the temperature at which the
+  slope changes is of interest. This was run with $10^5$ MC
+  cycles for each temperature. Notice that the slope changes sign at around
+  $T \approx 2.6$.}
+  \label{fig:4cFlips}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/4c.eps}
+  \caption{Energy, absolute magnetization and number of flips as a function of
+  Monte Carlo cycles. The lattice size is $N = 20$, and the temperature $T = 2.4$ kT/J.}
+  \label{fig:L20T24Random}
+\end{figure}
 
 \subsection{Distribution of Energy States}
 \label{sec:distr-energy-stat}
 
+As there is only a finite number of discrete energy states, the number of
+times a certain state occurs can be counted and represented as a histogram. This
+is done for \(T=1.0\) and \(T=2.4\), shown in figures~\ref{fig:4da}
+and~\ref{fig:4db}.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/4da.eps}
@@ -432,7 +473,11 @@ discussed in the next section.
 \subsection{The Appearance of the Phase Transition}
 \label{sec:appe-phase-trans}
 
-
+The phase transition is heralded by abrupt changes in the thermodynamic
+quantities. For the Ising model, it is the quantities that depend on the second
+derivative of the Hermholtz free energy, namely the heat capacity and magnetic
+susceptibility. Figures~\ref{fig:100CVTc} to~\ref{fig:100CVTc} shows these
+quantities as the lattice size changes.
 
 \begin{figure}[H]
   \centering
@@ -443,17 +488,38 @@ discussed in the next section.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\columnwidth]{figures/L100sus.eps}
-  \caption{\label{fig:100CVTc} Magnetic susceptibility for \(L=100\).}
+  \caption{\label{fig:100sus} Magnetic susceptibility for \(L=100\).}
 \end{figure}
 
 \section{Discussion}
 \label{sec:discussion}
 
 \subsection{Numerical Solution to $2\times 2$ Lattice}
+As a Monte Carlo simulation samples the space of possible values, running more
+Monte Carlo cycles in each simulation samples more of the space, and hence gives
+more accurate results. Indeed, the figures~\ref{fig:L2Ne4} to~\ref{fig:L2Ne6}
+show that the numerical simulation approaches the analytical solution as the
+number of Monte Carlo cycles increases. The same is true for the other
+thermodynamical quantities measured, except for the energy.
+
+The numerical solution to the energy, as shown in figure~\ref{fig:4be}, exhibit
+the same shape as the analytical solution, but is linearly shifted downwards. It
+is unknown why this occurs, even after scrutinizing the code.
+
+As these results show, using about \(10^{6}\) Monte Carlo cycles is sufficient
+to get results which are close enough to the analytical values. It is not
+unreasonable to assume that this also holds for larger lattice sizes, and was
+therefore used for the rest of the simulations. The were exceptions to this, as
+if the lattice was too large, running \(10^{6}\) was infeasible.
 
 \subsection{Reaching for Equilibrium}
 \label{sec:reaching-equilibrium-2}
 
+The studied lattice is ferromagnetic, reaching the lowest energy state when all
+spins are pointing in the same direction. As a consequence, one would assume
+that the systems which begin with all spins in the same state reach equilibrium
+faster than when the initial spin states are random. Looking at figures REF,
+this is exactly what happens. k
 
 \subsection{Distribution of Energy States}
 \label{sec:distr-energy-stat-2}

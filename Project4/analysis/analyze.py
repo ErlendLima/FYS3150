@@ -105,17 +105,14 @@ class Analyzer:
             Tc, Qc = T[argmax], quantity[argmax]
             ax.scatter(Tc, Qc, color='k')
             ax.annotate(rf"$T_C = {Tc}$", xy=(Tc, Qc), xytext=(Tc, Qc))
-            ax.set_xlabel(self.labels['T'])
-            ax.set_ylabel(self.labels[key])
-            ax.legend()
-            L = self.meta['lattice size']
-            fig.savefig(f"../latex/figures/L{L}{key}.eps", bbox_inches='tight')
 
 
+        L = self.meta['lattice size']
         ax.set_xlabel(self.labels['T'])
         ax.set_ylabel(self.labels[key])
         ax.legend()
         plt.tight_layout()
+        fig.savefig(f"../latex/figures/L{L}{key}.eps", bbox_inches='tight')
         plt.show()
 
     def plot_energy_magnetic_moment(self):
