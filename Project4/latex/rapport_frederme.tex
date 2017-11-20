@@ -120,7 +120,7 @@ were discussed and developed together.
 
 \section{Introduction} \label{sec:introduction}
 The Ising model, named after physicist Ernst Ising, is a widely used model for
-ferromagnetism in statistical mechanics. The model is widely used in a wide range
+ferromagnetism in statistical mechanics. The model is widely used in a range
 of applications because it is the simplest model to exhibit phase transitions
 in two dimensions. An analytic solution for the transition critical temperature
 is available, as shown by Lars Onsager. Analytic solutions are also avalilable
@@ -186,13 +186,13 @@ method needs to be used. For the intents and purposes of this paper, an ideal
 method is to have so-called periodic boundaries. This involves treating the
 spins on the oppsite side of the lattice as the neighbors of the boundary spins.
 This is a much better approximation to an infinitely large lattice, because
-each spin has access to four neighbors.
+each spin has access to four neighbors, an attribute of an infinitely large lattice.
 
 \subsection{Metropolis algorithm} \label{sec:theory_metro}
 Monte-Carlo simulations are used to model the time development of the system.
 With some initial configuration, an algorithm that over time modifies the system
 to an equilibrium state needs to be employed. A method which has been shown to
-do this is the famous Metropolis algorithm. See chapter .. in CITE for a detailed explaination
+do this is the famous Metropolis algorithm. See chapters 12 and 13 in \cite{mortenjensen} for a detailed explaination
 of the algorithm, the main steps are as follows:
 \begin{enumerate}
   \item Select randomly $N^2$ spins in the lattice.
@@ -206,7 +206,7 @@ of the algorithm, the main steps are as follows:
   the spin. If $\Delta E < 0$ the spin is flipped regardless, to model that physical
   systems usually tend to lower energy configurations.
 \end{enumerate}
-When this is repeated multiple times the system will converge to the equilibrium
+When this is repeated multiple times the system will transform towards the equilibrium
 state. In this model, the system development with Monte-Carlo cycles can therefore be
 considered the system development with time. The comparison of the random number
 is with boltzmann factors, which therefore completely shape the system behaviour.
@@ -388,19 +388,20 @@ the expression returns $N - 1$, exactly what is expected of the function.
 The square lattice is extended to have $N = 20$ spins in each direction. By simply
 plotting some expectation values against the number of Monte Carlo cycles (which
 is equivalent with time in our model) it is possible to make a rough estimate
-for the equilibrium time of the system. This analysis is done with ordered
+for the equilibrium time of the system. Although there might be large variances,
+a somewhat constant mean value indicates that equlibrium is reached. This analysis is done with ordered
 (all spins pointing in the same direction) initial states, and random
-spin orientations, and repeated for different temperatures.
+spin orientations, and repeated for temperatures of $T = 1$ and $T = 2.4$.
 
 Another interesting quantity to investigate is the number of accepted flips as
 a function of Monte Carlo cycles for different temperatures. Lower amounts of
 accepted flips indicates that the system is not changing much, which is a strong
 indication for whether the system is in equilibrium.
 \subsection{Phase transitions} \label{sec:phase transitions}
-To find the critical temperature for the Phase transition in the Ising model
+To find the critical temperature for the phase transition in the Ising model
 the lattice size is increased gradually to $N = 100$. The analytic result in
 \cite{onsager} states that $T_C \approx 2.269$, so the investigation is done
-for temperatures close to this value. It is expected that the as the lattice size
+for temperatures close to this value. It is expected that as the lattice size
 increases the approximation should improve, and the critical temperature should
 therefore approach the analytical value by Onsager.
 
@@ -602,6 +603,10 @@ because the spins are much more likely to flip given some d$E$ and a random
 number because of the boltzmann distribution temperature dependence. The equlibrium
 time for the high energy case is around the same as the low energy case, any difference
 is difficult to observe from the figures.
+
+Because of the small equilibrium times every point from the simulation is included
+in the calculations of the statistical values, because when some $10^6$ MC-cycles
+are run the unstable beginning has a negligible impact on the results.
 
 \subsection{Probability distribution}
 Figure~\ref{fig:4da} shows that only a small amount of the possible system energies occur.

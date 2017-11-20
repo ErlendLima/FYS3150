@@ -34,20 +34,21 @@ is to implemented the Metropolis-Hastings algorithm for solving the Ising model.
 The result of running the algorithm on a 2D lattice is shown in the above gif.
 
 The report itself and associated LaTeX files are available in the `latex` directory.
+is to find numerical solutions to the Ising model in two dimensions.
+The reports and associated LaTeX files are available in the `latex` directory.
 
 All of the code is only built and tested on the rolling release of Arch Linux. Correct builds on other systems is not guaranteed. 
 
 ## Analysis Scripts
 
-There are several Python scripts which do the analysis of the output from the C++ program. Here is a
-table explaining the function to each script. Python 3.6 is required.
-
-| Script                  | Function                                                                                                          |
-| ------                  | --------                                                                                                          |
-| `analyze.py`            | A very versatile script which chooses the correct methods to analyze the output of the solver by reading the file `meta.json`. Can animate the lattice using the option `--animate` |
-## Usage (C++)
+There is one python script which analyzes the results from the C++ simulations. Python 3.6 is required.
 
 Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1, JSONcpp and MPI. On Ubuntu these can be installed with
+| `analyze.py`            | A general script which plots numerous results from the simulations. This includes energy and magnetization as functions of Monte Carlo cycles, expectation values as a function of temperature and a full animation of the spin time development (as seen above).|
+
+## Usage (C++)
+
+Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1, MPI and JSONcpp. On Ubuntu these can be installed with
 ```console
 sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev libjsoncpp-1 libjsoncpp-dev libopenmpi-dev openmpi-bin
 ```
