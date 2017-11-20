@@ -183,7 +183,9 @@ In addition, the first moment of energy can be written as
 \label{sec:phase-trans-two}
 The Ising model in two dimensions without an external magnetic field was first
 solved by Lars Onsager. He showed that there exists a phase transition for some
-critical temperature \(T_{C}\), in contrast to the one dimensional case. Ad this
+critical temperature \(T_{C}\), in contrast to the one dimensional case.
+
+At this
 temperature, the spins rapidly flip, causing spikes in thermodynamic quantities such as
 heat capacity. The quantities can be modeled as~\cite{project3}
 
@@ -363,6 +365,35 @@ discussed in the next section.
 
 \begin{figure}[H]
   \centering
+  \includegraphics[width=\columnwidth]{figures/4bEnergy.eps}
+  \caption{The energy as a function of temperature.}
+  \label{fig:4be}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/4bHeatCapacity.eps}
+  \caption{The heat capacity as a function of temperature.}
+  \label{fig:4bcv}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/4bMagnetization.eps}
+  \caption{The magnetization as a function of temperature.}
+  \label{fig:4bmag}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/4bSusceptibility.eps}
+  \caption{The magnetic susceptibility as a function of temperature.}
+  \label{fig:4bsusceptibility}
+\end{figure}
+
+\subsection{Reaching for Equilibrium}
+\label{sec:reaching-equilibrium}
+
+\begin{figure}[H]
+  \centering
   \includegraphics[width=\columnwidth]{figures/L2Ne4.png}
   \caption{$2 \times 2$ lattice with $M = 10^4$ MC iterations.}
   \label{fig:L2Ne4}
@@ -380,16 +411,9 @@ discussed in the next section.
   \label{fig:L2Ne6}
 \end{figure}
 
-\subsection{Reaching for Equilibrium}
-\label{sec:reaching-equilibrium}
-
 
 \subsection{Distribution of Energy States}
 \label{sec:distr-energy-stat}
-
-\subsection{The Appearance of the Phase Transition}
-\label{sec:appe-phase-trans}
-
 
 \begin{figure}[H]
   \centering
@@ -404,6 +428,11 @@ discussed in the next section.
   \caption{\label{fig:4db} Histogram over the energy states with \(T=2.4\) kT/J.
   The variance is \(\sigma^{2} \approx 0.0203\)}
 \end{figure}
+
+\subsection{The Appearance of the Phase Transition}
+\label{sec:appe-phase-trans}
+
+
 
 \begin{figure}[H]
   \centering

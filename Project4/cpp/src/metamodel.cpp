@@ -115,7 +115,7 @@ void Metamodel::saveExpectationValues(std::ofstream& stream, std::vector<double>
   double varMFabs = (expectMSquared - expectMFabs*expectMFabs)*spinNorm;
 
   double Cv  = varE/T/T;
-  double sus = varMFabs/T;
+  double sus = varM/T;
 
   stream << T << " "
          << expectE*spinNorm << " "

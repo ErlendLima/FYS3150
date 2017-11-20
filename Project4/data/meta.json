@@ -14,8 +14,8 @@
 		"dim" : 
 		[
 			100000,
-			100,
-			100
+			40,
+			40
 		],
 		"path" : "evolution.bin",
 		"type" : "int64"
@@ -29,7 +29,7 @@
 		"path" : "flips.bin",
 		"type" : "int32"
 	},
-	"lattice size" : 100,
+	"lattice size" : 40,
 	"magnetic moment" : 
 	{
 		"dim" : 
@@ -41,5 +41,5 @@
 	},
 	"parallel" : true,
 	"saveperiod" : 1000,
-	"seed" : 4
+	"seed" : 2
 }
