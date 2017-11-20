@@ -31,7 +31,7 @@
 ## Overview
 The aim of [Project 4](https://compphysics.github.io/ComputationalPhysics/doc/Projects/2017/Project4/pdf/Project4.pdf) in FYS3150
 is to find numerical solutions to the Ising model in two dimensions.
-The report itself and associated LaTeX files are available in the `latex` directory.
+The reports and associated LaTeX files are available in the `latex` directory.
 
 ## Analysis Scripts
 
