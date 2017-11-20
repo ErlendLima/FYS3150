@@ -42,7 +42,7 @@
 \usepackage{gensymb}
 \usepackage{algorithm}
 \usepackage{microtype}
-\usepackage[noend]{algpseudocode}
+\usepackage{algpseudocode}
 \usepackage{xcolor,colortbl}
 \usepackage{microtype}
 \usepackage{geometry}
@@ -91,8 +91,12 @@
 \date{\today}
 
 \begin{abstract}\noindent
-Once again the abstract abstractifies the abstractness of the abstract mathematical
-equations than govern the universe.
+The Ising model is investigated with a numerical implementation, and phase transitions
+are found. Around $10^6$ Monte Carlo cycles are ran with the Metropolis
+algorithm to perturb the spins for multiple lattice sizes, ranging from
+2 to 100. For the $N = 2$ lattice size the method is shown to reproduce analytic
+expectation values. The phase transition is found to occur at a critical temperature
+$T_C \approx 2.25$, which corresponds well with the analytical value $\approx 2.269$ by Onsanger.
 
 \bigskip
 \noindent \textbf{Disclaimer}:
@@ -100,7 +104,7 @@ equations than govern the universe.
 For this project I collaborated with Erlend Lima with regards to the
 analytic solutions presented, the code and therefore results and figures.
 The text in this paper is written entirely by F. Mellbye, however there may be
-several similarities with the Lima's paper, because the ideas and solutions
+several similarities with Lima's paper because the ideas and solutions
 were discussed and developed together.
 \end{abstract}
 \maketitle
@@ -115,6 +119,11 @@ were discussed and developed together.
 \section{Introduction} \label{sec:introduction}
 The Ising model is a widely used model, because of a wide range of applications,
 for instance in studies of phase transitions to simulations in statistics.
+
+In order to generalize the results the equations in this paper are scaled.
+When no units are presented, energies and temperatures are scaled with $J$ and
+$kT/J$, respectively. Because of the dimensionality of these quantities, the spins
+and thus the system magnetic moment is dimensionless.
 \section{Theory} \label{sec:theory}
 \subsection{The Ising model}
 A square lattice of $N \times N$ binary magnetic dipoles (quantified atomic spins)
@@ -166,7 +175,7 @@ spins on the oppsite side of the lattice as the neighbors of the boundary spins.
 This is a much better approximation to an infinitely large lattice, because
 each spin has access to four neighbors.
 
-\subsection{Metropolis algorithm}
+\subsection{Metropolis algorithm} \label{sec:theory_metro}
 Monte-Carlo simulations are used to model the time development of the system.
 With some initial configuration, an algorithm that over time modifies the system
 to an equilibrium state needs to be employed. A method which has been shown to
@@ -187,7 +196,7 @@ of the algorithm, the main steps are as follows:
 When this is repeated multiple times the system will converge to the equilibrium
 state. In this model, the system development with Monte-Carlo cycles can therefore be
 considered the system development with time.
-\subsection{Phase transitions in the Ising model}
+\subsection{Phase transitions in the Ising model} \label{sec:phase transitions analytic}
 One of the properties of the Ising model is that phase transitions can be
 observed. The transition occurs at a critical temperature $T = T_C$, where
 the spins fluctuate at a maximum rate. The rapid fluctuations result in high
@@ -200,12 +209,27 @@ modelled as
   \chi (T) &\sim |T_C - T|^{-\alpha}
 \end{align*}
 where $\alpha = 0$, $\beta = 1/8$ and $\gamma = 7/4$ are critical exponents.
+The critical temperature is ideally computed for an infinite lattice size. Therefore
+our finite sized lattice will only be an approximation, however, luckily there is
+a connection between the finite and infinite lattice values. According to
+\cite{project4}:
+\begin{align}\label{eq:crit_relation}
+  T_C(L) - T_C(L = \infty) = a L^{-1/\nu}
+\end{align}
+where $\nu$ is found using equation 2 in \cite{project4}. The exact result for
+this value is $\nu = 1$. $a$ is a constant, which can be determined by comparing
+the critical temperatures for two different lattice sizes:
+\begin{align}\label{eq:scalingfactor}
+  a = \frac{T_C(L_1) - T_C(L_2)}{L_1^{-1/\nu} - L_2{-1/\nu}}
+\end{align}
+When the scaling factor $a$ is found, this can be inserted in equation ~\ref{eq:crit_relation}
+to find the infinite lattice value.
 \subsection{Analytic solution in the 2 x 2 lattice case}
 For the simple case of a $2 \times 2$ periodic boundary lattice analytic
 expressions can be computed, which will be used to check that the numerical
 implementation produces acceptable results. The four spins are enumerated as in
 figure ~\ref{fig:22lattice}.
-\begin{figure}[H]
+\begin{figure}
   \centering
   \begin{tikzpicture}[thick]
     \draw[->] (0,0) -- (0,.3)  node [label=left:{$s_1$}] {};
@@ -255,7 +279,7 @@ one finds
   Z = 2 e^{8\beta J} + 2 e^{- 8\beta J} + 12 = 4 \cosh{(8\beta J)} + 12
 \end{align*}
 When the partition function is known, the statistical thermodynamical quantities
-of interest can be computed. To save space the alebra is pushed to the appendix,
+of interest can be computed. To save space the algebra steps are omitted,
 and the relevant expressions are listed here:
 
 The mean energy (energy expectation value) is given by
@@ -279,10 +303,43 @@ Similarly, the magnetization properties are given by
 \end{align*}
 which can be used to find the susceptibility using equation ~\ref{eq:sus}.
 
+The general method to find the $n$-th moment of some quantity $A$ that was
+used is:
+\begin{align*}
+  \mean{A^n} = \frac{1}{Z} \sum_i^{16} A_i^n e^{-\beta E_i}
+\end{align*}
+
 \section{Method} \label{sec:method}
 All of the numerical calculations were done in C++, and the results were analyzed
 with Python. See the attatched Github repository for more information about code workflow.
-The project has extensive unit testing using the library Google Test.
+The project has extensive unit testing using the library Google Test. The lattice time
+development was also animated, an example of this is also available on GitHub.
+\subsection{Implementing the Metropolis algorithm}
+The entire code is outlined in algorithm ~\ref{algo:Metropolis}.
+\begin{algorithm}[H]
+  \caption{Monte Carlo and Metropolis algos outline.}
+  \label{algo:Metropolis}
+   \begin{algorithmic}[1]
+     \For{$T$ in Selected Temperatures}
+        \State Reset expectation value variables
+        \State Initialize $E = -\sum_{\mean{k,l}}s_k s_l$, $M = \sum_i s_i$
+        \For{$i = 1,2,\hdots, M$ (MC cycles)}
+          \For{$j = 1,2,\hdots, N$ (Lattice)}
+            \State Draw random $s_{m,n}$, calculate d$E$.
+            \State Metropolis: Accept/reject (~\ref{sec:theory_metro})
+            \State Update $s_i$'s, $E$ and $\mathcal M$ if accepted
+          \EndFor
+        \EndFor
+        \State Calculate expectation values. Save.
+     \EndFor
+   \end{algorithmic}
+\end{algorithm}
+The algorithm essentialy simulates a battle between the tendency of physical systems
+to fall to lower energy states and other physical effects such as thermal
+effects which randomly add energy. This rather simple model surprisingly
+reproduces several effects such as phase transitions. This is presented further in
+~\ref{sec:phase transitions}.
+
 \subsection{Energy calculations}
 Calculating the total energy of the system is a quite time consuming task, having
 to sum all four neighbors of each member of the lattice for each MC cycle. Fortunately,
@@ -312,48 +369,259 @@ periodic boundaries. Also, if the lower boundary is crossed, i.e $i = -1$, then
 the expression returns $N - 1$, exactly what is expected of the function.
 
 \subsection{Time taken to reach equilibrium}
+The square lattice is extended to have $N = 20$ spins in each direction. By simply
+plotting some expectation values against the number of Monte Carlo cycles (which
+is equivalent with time in our model) it is possible to make a rough estimate
+for the equilibrium time of the system. This analysis is done with ordered
+(all spins pointing in the same direction) initial states, and random
+spin orientations, and repeated for different temperatures.
 
-\subsection{Phase transitions}
+Another interesting quantity to investigate is the number of accepted flips as
+a function of Monte Carlo cycles for different temperatures. Lower amounts of
+accepted flips indicates that the system is not changing much, which is a strong
+indication for whether the system is in equilibrium.
+\subsection{Phase transitions} \label{sec:phase transitions}
+To find the critical temperature for the Phase transition in the Ising model
+the lattice size is increased gradually to $N = 100$. The analytic result in
+\cite{onsager} states that $T_C \approx 2.269$, so the investigation is done
+for temperatures close to this value. It is expected that the as the lattice size
+increases the approximation should improve, and the critical temperature should
+therefore approach the analytical value by Onsager.
+
+The heat capacity is plotted against temperature for temperatures around the
+analytical value, and the temperature for which the heat capacity (proportional
+to the energy variance) is at a maximum is the critical temperature. This result
+is compared to the equations in section ~\ref{sec:phase transitions theory}.
+
+\subsection{Probability distribution}
+The probability of the system having a certain energy $P(E)$ is conputed
+for a system with a lattice size $N = 20$ at temperatures $T = 1$ and $T = 2.4$.
+The method is simple, the amount of times a certain energy appears is counted
+and stored in bins. This is compared with the computed variance in energy.
 
 \subsection{Parallelization}
+The code was also parallelized with MPI. This simply increases the amount of
+data produced by approximately a factor of the number of processors available,
+which yields higher quality results in the same time.
 
 \subsection{Random number generator}
 The famous Mersenne Twister PRNG was used for all the random number generation
 in the code. The very long period of $2^{19937} - 1$ and fast number generation
 compared to other RNGs were the main reasons for this choice.
 \section{Results} \label{sec:results}
+All of the values and figures presented in the results are per spin and Monte Carlo
+iteration, in order to have as general results as possible.
 \subsection{$2 \times 2$ lattice. Comparison of numerical and analytical values.}
-\begin{figure}[H]
+Figures ~\ref{fig:fig:L2Ne4}, ~\ref{fig:fig:L2Ne5} and ~\ref{fig:fig:L2Ne6} show
+the heat capacity for $T = 1$ and different amounts of MC cycles.
+\begin{figure}
   \centering
   \includegraphics[width=\columnwidth]{figures/L2Ne4.png}
   \caption{$2 \times 2$ lattice with $M = 10^4$ MC iterations.}
   \label{fig:L2Ne4}
 \end{figure}
-\begin{figure}[H]
+\begin{figure}
   \centering
   \includegraphics[width=\columnwidth]{figures/L2Ne5.png}
   \caption{$2 \times 2$ lattice with $M = 10^5$ MC iterations.}
   \label{fig:L2Ne5}
 \end{figure}
-\begin{figure}[H]
+\begin{figure}
   \centering
   \includegraphics[width=\columnwidth]{figures/L2Ne6.png}
   \caption{$2 \times 2$ lattice with $M = 10^6$ MC iterations.}
   \label{fig:L2Ne6}
 \end{figure}
+Figure ~\ref{fig:animals} shows several thermodynamic expectation values
+as a function of temperature for a sufficient amount of Monte Carlo iterations.
+\begin{figure}
+  \begin{tabular}{cc}
+    \centering
+    \begin{subfigure}[b]{0.5\columnwidth}
+        \includegraphics[width=\columnwidth]{figures/4bHeatCapacity.eps}
+        \caption{Heat Capacity}
+        \label{fix1}
+    \end{subfigure}&
+    \begin{subfigure}[b]{0.5\columnwidth}
+        \includegraphics[width=\columnwidth]{figures/4bEnergy.eps}
+        \caption{Energy}
+        \label{free1}
+    \end{subfigure}\\
+    \begin{subfigure}[b]{0.5\columnwidth}
+      \includegraphics[width=\columnwidth]{figures/4bMagnetization.eps}
+        \caption{Magnetization}
+        \label{fix10}
+    \end{subfigure}&
+    \begin{subfigure}[b]{0.5\columnwidth}
+        \includegraphics[width=\columnwidth]{figures/4bSusceptibility.eps}
+        \caption{Susceptibility}
+        \label{free10}
+    \end{subfigure}\\
+    \end{tabular}
+    \caption{$2 \times 2$ lattice simulation results with $M = 10^6$ MC cycles
+    for each temperature.}
+    \label{fig:animals}
+\end{figure}
 
+\subsection{Time taken to reach equilibrium}
+Figures ~\ref{fig:L20T1Random} and ~\ref{fig:L20T24Random} show the energy,
+magnetization and spin flip time development for different temperatures.
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/L20T1_random.eps}
+  \caption{Energy, absolute magnetization and number of flips as a function of
+  Monte Carlo cycles. The lattice size is $N = 20$, and the temperature $T = 1$ kT/J.}
+  \label{fig:L20T1Random}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/L20T2_4_random.eps}
+  \caption{Energy, absolute magnetization and number of flips as a function of
+  Monte Carlo cycles. The lattice size is $N = 20$, and the temperature $T = 2.4$ kT/J.}
+  \label{fig:L20T24Random}
+\end{figure}
+See figure ~\ref{fig:4cFlips} for the total number of flips as the temperature
+is increase.
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/4c_number_of_flips.eps}
+  \caption{Total number of accepted spin flips. The values are scaled with the
+  maximum number to ease readability, and because only the temperature at which the
+  slope changes is of interest. This was run with $10^5$ MC
+  cycles for each temperature. Notice that the slope changes sign at around
+  $T \approx 2.6$.}
+  \label{fig:4cFlips}
+\end{figure}
+
+\subsection{Probability distribution}
+Figures ~\ref{fig:4da} and ~\ref{fig:4db} show the number of occurances of energies
+in certain intervals for two different temperatures.
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/4da.eps}
+  \caption{Frequency of occurances of energies in several intervals. This is
+  for $T = 1$.}
+  \label{fig:4da}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/4db.eps}
+  \caption{Energy frequencies for $T = 2.4$.}
+  \label{fig:4db}
+\end{figure}
+% TODO: TA MED VARIANS AV ENERGI SOM FUNKSJON AV TEMPERATUR HER.
+
+\subsection{Phase transition}
+Figures ~\ref{fig:L100Cv} and ~\ref{fig:L100sus} show the heat capacity and
+magnetic susceptibility as a function of temperature in the area around the analytical
+value. The maximum value is found and the critical temperature is shown in the figure.
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/L100Cv.eps}
+  \caption{Heat capacity as a function of temperature around the critical value
+  for $N = 100$ as the lattice size.}
+  \label{fig:L100Cv}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=\columnwidth]{figures/L100sus.eps}
+  \caption{Magnetic susceptibility as a function of temperature, again around the
+  critical temperature.}
+  \label{fig:L100sus}
+\end{figure}
 \section{Discussion} \label{sec:discussion}
+\subsection{2 x 2 lattice and analytic solution}
+Figures ~\ref{fig:L2Ne4}, ~\ref{fig:L2Ne5} and ~\ref{fig:L2Ne6} show that as
+the number of Monte Carlo cycles increase, the numerical solution converges to
+the known analytic solution. In the latter the solutions are so similar they
+completely cover each other.
+
+As seen for the other thermodynamical quantities the Monte Carlo solution converges
+to the exact solutions, at least for the $2 \times 2$ case. It is therefore reasonable
+that the method should converge for larger lattice sizes, although likely slower for
+larger lattices.
+
+There is a strange linear discrepancy between the analytical and numerical
+values for the energy. A similar error was seen for the expected value of the
+square of the energy, which cancel out to produce correct analytical values
+for the heat capacity. The source of the error is unknown, and could be either
+from an incorrect analytical calculation or some error in the numerical values.
+However, since the heat capacity values are correct, and the shape of the energy
+expectation values are correct, the effect of the error is considered small
+in terms of what the goals of this paper are.
+
+From these results it is also possible to deduce that $M = 10^6$ should be a
+decent number of cycles, although this might need to be reduced for large lattice
+sizes because the simulations become very time-consuming.
+\subsection{Equilibrium time}
+Figures ~\ref{fig:L20T1Random} and ~\ref{fig:L20T24Random} show the system development
+with time (actually Monte Carlo cycles, but the consideration as time has already been
+explained). The first, and perhaps easy conclusion, is that an equilibrium state
+seems to have been reached after around $200$ Monte Carlo cycles, at least for the
+low temperature $T = 1$ and the random initial configuration. For the larger temperature of $T = 2.4$ the system has
+large fluctuations around an approximately constant value, and this state is also
+reached rather quickly. The higher fluctuations for larger temperature is expected,
+because the Boltzmann distribution makes energy increases more likely when the temperature
+is higher.
+
+The figure for the higher temperature also shows a very high rate and amplitude
+of fluctuations for the absolute magnetic moment. This shows that for $T = 2.4$
+the spins fluctuate rapidly and are aligned in the same directions for very short
+time periods compared to $T = 1$, where the spins quickly go to the same direction
+and remain almost constant in that configuration (almost no flips happen after
+$N \approx 200$).
+
+\subsection{Probability distribution}
+Figure ~\ref{fig:4da} shows that only a small amount of the possible system energies occur.
+This is perhaps a bit surprising, as all the states should occur statistically,
+and shows that the small simulation time did not allow those small probability events to
+happen. The energies at and around $-1.9$ is by far the most likely energies to be measured,
+which is the energy the system converged to in figure ~\ref{fig:L20T1Random}. The
+bar plot essentially confirmed what was argued before, at $T = 1$ the equilibrium state
+is very stable and has low variances.
+
+For the larger temperature $T = 2.4$ (figure ~\ref{fig:4db}) a much larger part of
+the possible energy domain has an observable amount of occurances. This also confirms
+what was argued above, the rapid fluctuations in states are naturally reflected in the
+energy, which has a large variance. The mean energy is also much larger than for the lower
+temperature, which also makes sense physically (A higher energy system is intuitively
+more likely to be in a higher energy state).
+
+The figure with the variance in energy further confirms the above analysis. For
+larger temperatures, the system spins fluctuate more rapidly and the variance in energy
+grows larger because a larger amount of energy configurations are accessed.
+
+\subsection{Phase transitions}
+The heat capacity shows a critical temperature that closely agrees with Onsagers
+value.
+
+The magnetic susceptibility critical value does not agree with the heat capacity
+or Onsager analytical values. The reason for this is unknown and rather surprising,
+as the magnetic susceptibility was coherent with analytical values for the $2 \times 2$.
+Although inaccurate, the value might converge to the analytical value for larger
+lattice sizes, however this was not possible at this time.
 
 \section{Conclusion} \label{sec:conclusion}
+The investigation of the Ising model and it's properties has shown to be a robust
+model for magnetism, despite the simple nature. The $2 \times 2$ lattice
+proved correct compared to analytical results and was extended to larger systems,
+where analytical solutions are unavailable.
 
+The equilibrium time was found to be lower than expected, less than $1000$ Monte Carlo cycles for the cases investigated.
+The impact of initial conditions was also investigated and shown to be impactful
+in terms of equilibrium time, although still quite low.
+
+The probability distribution
+of measuring a certain energy was also found and further showed that for larger
+temperatures there is a much higher fluctuation rate for the spins.
+
+The final part of the paper concerned phase transitions, which showed a good
+correspondance with the analytical value, especially when the low amount of MC cycles
+is considered. The maximum value of the heat capacity occured at $T = 2.25$, which
+agrees well with $2.269$.
+
+A further development to the solutions and results presented here would be to
+run the parallelized version on a large cluster. Although access to a cluster
+was available, up to date versions of \texttt{cmake} and \texttt{jsoncpp} were not possible to install
+which didn't allow for immediate runs of the program. A possible solution is to
+compile \texttt{jsoncpp} or the entire code to a static library, however severe
+time constraints didn't allow for this for this project. Future work on this
+project would therefore ideally include such a large scale run to obtain as much
+Monte-Carlo data as possible.
 \bibliography{references}
-\blankpage
-\appendix
-\section{Calculation of analytical expressions for the $2\times2$ lattice.} \label{sec:app}
-The mean energy is computed using ~\ref{eq:meanE}.
-\begin{align*}
-  \mean{E} =
-\end{align*}
 \blankpage
 \end{document}
 
