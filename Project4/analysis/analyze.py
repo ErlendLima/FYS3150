@@ -39,10 +39,10 @@ class Analyzer:
             self.expectation_values = pd.read_csv("../data/data.txt", sep=" ")
         else:
             self.parallel = False
-            self.energy = self.load_block(base_path, meta["energy"])
-            self.magnetic = self.load_block(base_path, meta["magnetic moment"])
-            # self.evolution = self.load_block(base_path, meta["evolution"])
-            self.accepted_flips = self.load_block(base_path, meta['flips'])
+            self.energy = self.load_block(base_path, self.meta["energy"])
+            self.magnetic = self.load_block(base_path, self.meta["magnetic moment"])
+            self.evolution = self.load_block(base_path, self.meta["evolution"])
+            self.accepted_flips = self.load_block(base_path, self.meta['flips'])
 
     @staticmethod
     def load_block(base_path: str, block: dict) -> np.ndarray:
@@ -70,7 +70,7 @@ class Analyzer:
                 self.plot_expectations(quantity)
         else:
             self.plot_energy_magnetic_moment()
-            self.count_energies()
+            # self.count_energies()
 
     def plot_inital(self):
         initial = self.evolution[0, :, :]
@@ -122,7 +122,7 @@ class Analyzer:
         ax_energy.set_title("Energy")
         ax_magnetic.plot(self.magnetic/self.lattice_size**2)
         ax_magnetic.set_title("Absolute magnetic moment")
-        ax_flips.plot(self.accepted_flips)
+        ax_flips.plot(self.accepted_flips[:-1])
         ax_flips.set_title("Accepted flips for each cycle")
         plt.show()
 
