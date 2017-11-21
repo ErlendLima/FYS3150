@@ -31,6 +31,7 @@
 \usepackage{amssymb}
 \usepackage{enumerate}
 \usepackage{tikz} \usepackage{float}
+\usetikzlibrary{patterns}
 \usepackage[procnames]{listings}
 \usepackage{pstool} \usepackage{pgfplots}
 \usepackage{wrapfig} \usepackage{graphicx} \usepackage{epstopdf}
@@ -75,6 +76,7 @@
 \DeclareCaptionFont{white}{\color{white}}
 \DeclareCaptionFormat{listing}{\colorbox{gray}{\parbox{\columnwidth}{#1#2#3}}}
 \pgfplotsset{compat=1.14} %TODO: Setting this removed several error messages, should it be here!?
+\def\axislength{.5}
 
 
 % Biber for references
@@ -101,9 +103,73 @@ Abstract.
 \newpage
 
 \section{Introduction} \label{sec:introduction}
-Diffusion something
+Diffusion something.
 \section{Theory} \label{sec:theory}
+\subsection{Deriving the diffusion equation for a Couette flow}
+A Couette flow is a drag-induced flow between either parallel plates or concentric
+rotating cylinders and therefore differs from pressure induced flows such as the
+Hagen-Poiseuille flow. It is assumed that the flow is laminar and of an incompressible
+Newtonian fluid of density $\rho$ and vicosity $\mu$ between infinite parallel
+plates located at $x = 0$ and $x = L$. The situation is illustrated in figure~\ref{fig:couette}.
+Initially, the plates and the fluid is at rest, but at some time $t = t_0$
+the upper plate is given a horizontal velocity $U$.
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    % \draw[help lines, thick, dashed, opacity=0.5] (0,0) grid (8,4);
+    \draw (0,0) -- (6,0) node[anchor=north] {$y = 0$};
+    \draw (0,3) -- (6,3) node[anchor=south] {$y = L$};
 
+    \draw[->, thick] (2,3.2) -- (4,3.2);
+    \node at (3,3.4) {$U$};
+    \node at (5,1.5) {$\rho, \mu$};
+
+    \draw[gray,dashed] (4,3) -- (2,0);
+    \draw[gray,dashed] (2,0) -- (2,3);
+    \foreach \y in {0.5,1,...,2.5} {%
+      \draw[->] (2,\y) -- (2 + 2*\y/3,\y);
+    }%
+
+    \coordinate (O) at (0,0.1);
+    \coordinate (x) at (\axislength,0.1);
+    \coordinate (y) at (0,\axislength+.1);
+    \draw[->] (O) -- (x) node[above] {$x$};
+    \draw[->] (O) -- (y) node[above] {$y$};
+
+    \fill[pattern=north west lines] (0,-.1) rectangle ++(6,.1);
+    \fill[pattern=north west lines] (0,3) rectangle ++(6,.1);
+  \end{tikzpicture}
+  \caption{Couette flow between two parallel plates. The horizontal distance
+  scale is $\gg L$, so the plates are considered infinite in the $x$ and $z$
+  directions. The flow is here at a fully developed stage.}
+  \label{fig:couette}
+\end{figure}
+The Navier-Stokes equations govern the time development of the fluid velocity field.
+The momentum equation reads
+\begin{align*}
+  \pdv{\vb{u}}{t} + (\vb{u} \cdot \nabla) \vb{u} = - \frac{1}{\rho} \nabla p + \nu \nabla^2 \vb{u}
+\end{align*}
+where $\nu = \mu/\rho$ is the kinematic viscosity, and the incompressibility
+condition is
+\begin{align*}
+  \nabla \cdot \vb{u} = 0
+\end{align*}
+The only force acting on the system is the tangential shear stress in the
+horizontal direction, and the velocity field is therefore assumed to be on the
+form $\vb{u} = (u,v = 0,w = 0)$. The pressure gradient term is eliminated because the
+pressure is constant, and the inertial term vanishes because of the incompressibility
+condition. The equations reduce to
+\begin{align}
+  \pdv{u}{t} = \nu \pdv[2]{u}{y}
+\end{align}
+which is the diffusion equation. The no-slip boundary condition applies to both
+surfaces, so
+\begin{align*}
+  u(y = L) &= U \\
+  u(y = 0) &= 0
+\end{align*}
+Other boundary conditions such as the no penetration condition (no velocity
+normal to the boundaries at the boundaries) yield no additional information.
 \section{Method} \label{sec:method}
 \section{Results} \label{sec:results}
 \section{Discussion} \label{sec:discussion}
