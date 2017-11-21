@@ -69,13 +69,19 @@ class Analyzer:
             for quantity in self.labels:
                 self.plot_expectations(quantity)
         else:
-            self.plot_energy_magnetic_moment()
+            self.plot_initial()
+            # self.plot_energy_magnetic_moment()
             # self.count_energies()
 
-    def plot_inital(self):
+    def plot_initial(self):
         initial = self.evolution[0, :, :]
         plt.matshow(initial)
-        plt.show()
+        plt.grid(0)
+        plt.savefig("../latex/figures/initial.eps")
+        initial = self.evolution[-1, :, :]
+        plt.matshow(initial)
+        plt.grid(0)
+        plt.savefig("../latex/figures/final.eps")
 
     def plot_expectations(self, key):
         T = self.expectation_values['T']
@@ -105,17 +111,14 @@ class Analyzer:
             Tc, Qc = T[argmax], quantity[argmax]
             ax.scatter(Tc, Qc, color='k')
             ax.annotate(rf"$T_C = {Tc}$", xy=(Tc, Qc), xytext=(Tc, Qc))
-            ax.set_xlabel(self.labels['T'])
-            ax.set_ylabel(self.labels[key])
-            ax.legend()
-            L = self.meta['lattice size']
-            fig.savefig(f"../latex/figures/L{L}{key}.eps", bbox_inches='tight')
 
 
+        L = self.meta['lattice size']
         ax.set_xlabel(self.labels['T'])
         ax.set_ylabel(self.labels[key])
         ax.legend()
         plt.tight_layout()
+        fig.savefig(f"../latex/figures/L{L}{key}.eps", bbox_inches='tight')
         plt.show()
 
     def plot_energy_magnetic_moment(self):

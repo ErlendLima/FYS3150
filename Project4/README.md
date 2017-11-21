@@ -30,23 +30,31 @@
 
 ## Overview
 The aim of [Project 4](https://compphysics.github.io/ComputationalPhysics/doc/Projects/2017/Project4/pdf/Project4.pdf) in FYS3150
-is something something.
+is to implemented the Metropolis-Hastings algorithm for solving the Ising model. The Ising model models the behavior of spins arranged in a lattice of any dimension.
+The result of running the algorithm on a 2D lattice is shown in the above gif.
+
 The report itself and associated LaTeX files are available in the `latex` directory.
+is to find numerical solutions to the Ising model in two dimensions.
+The reports and associated LaTeX files are available in the `latex` directory.
+
+All of the code is only built and tested on the rolling release of Arch Linux. Correct builds on other systems is not guaranteed. 
 
 ## Analysis Scripts
 
-There are several Python scripts which do the analysis of the output from the C++ program. Here is a
-table explaining the function to each script. Python 3.6 is required.
+There is one python script which analyzes the results from the C++ simulations. Python 3.6 is required.
 
-| Script                  | Function                                                                                                          |
-| ------                  | --------                                                                                                          |
-| `analyze.py`            | A general script which plots the position, energy and angular moment from the output. Can also animate the orbits.|
+Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1, JSONcpp and MPI. On Ubuntu these can be installed with
+| `analyze.py`            | A general script which plots numerous results from the simulations. This includes energy and magnetization as functions of Monte Carlo cycles, expectation values as a function of temperature and a full animation of the spin time development (as seen above).|
+
 ## Usage (C++)
 
-Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1 and JSONcpp. On Ubuntu these can be installed with
+Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1, MPI and JSONcpp. On Ubuntu these can be installed with
 ```console
-sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev
+sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev libjsoncpp-1 libjsoncpp-dev libopenmpi-dev openmpi-bin
 ```
+
+Note that the path to jsoncpp is not standardized. This program assumes it lies in `<include path>/jsoncpp/json/json.h`. 
+If you get a compilation error, create a symlink from the path to your `json.h` to `jsoncpp/json/json.h`.
 
 If the
 requirements are satisfied, the makefile can be created and run with
@@ -56,9 +64,9 @@ cmake . && make
 ```
 
 After initial compilation, typing `make` will make the program. To run the
-compiled program, type `./solve`. Optional flags exist, see `./solve -h`.
+compiled program, type `./solve`.
 The resulting data can then be analyzed
-by the python script in the analysis directory using `python analyze.py ../cpp/data`.
+by the python script in the analysis directory using `python analyze.py`.
 
 
 The rapport and all supporting material is located in the `latex` directory.
@@ -81,7 +89,7 @@ Better support for debugging and stricter compiler flags can be turned on using 
 
 ## Usage (Julia)
 The Julia version is not completed, and does not count as a part of this assignment. 
-This is left here to stand as a testament to the hubris of students.
+The code that exists implements the Ising model successfully, but does not lend itself to be easily modifiable by the user. 
 
 The version of Julia required is at least 0.6.0
 
