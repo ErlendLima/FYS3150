@@ -25,38 +25,33 @@ int Solver::solve(){
     // Wrapper for initializing, solving and saving the solution of the system.
     initSystem();
 
-    std::function<void(std::shared_ptr<Planet>)> stepOne;
-    std::function<void(std::shared_ptr<Planet>)> stepTwo;
+    std::function<void(double, arma::mat&)> solver;
 
     switch (method){
     case Method::FORWARD_EULER:
-      std::cout << "=== Using Forward Euler ===" << std::endl;
-      stepOne = std::bind(&Solver::nop, this, _1);
-      stepTwo = std::bind(&Solver::EulerStep, this, _1);
-      solveSystem(stepOne, stepTwo);
-      break;
+        std::cout << "=== Using Forward Euler ===" << std::endl;
+        solver = std::bind(&Solver::forwardEuler, this, _1);
+        solveSystem(solver);
+        break;
     case Method::BACKWARD_EULER:
-      std::cout << "=== Using Backward Euler ===" << std::endl;
-      stepOne = std::bind(&Solver::VerletStep1, this, _1);
-      stepTwo = std::bind(&Solver::VerletStep2, this, _1);
-      solveSystem(stepOne, stepTwo);
-      break;
+        std::cout << "=== Using Backward Euler ===" << std::endl;
+        solver = std::bind(&Solver::forwardEuler, this, _1);
+        solveSystem(solver);
+        break;
     case Method::CRANK_NICOLSON:
-      std::cout << "=== Using Crank-Nicolson Scheme ===" << std::endl;
-      stepOne = std::bind(&Solver::nop, this, _1);
-      stepTwo = std::bind(&Solver::ECStep, this, _1);
-      solveSystem(stepOne, stepTwo);
-      break;
+        std::cout << "=== Using Crank-Nicolson Scheme ===" << std::endl;
+        solver = std::bind(&Solver::forwardEuler, this, _1);
+        solveSystem(solver);
+        break;
     default:
-      std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
-      return -1;
+        std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
+        return -1;
     }
     saveToFile();
     return 0;
 }
 
-void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepOne,
-                         std::function<void(std::shared_ptr<Planet>)>& stepTwo){
+void Solver::solveSystem(std::function<void(double, arma::mat)>& method){
     // Solves the time development of the system. To generalize the code for
     // both algorithms, the forwarding functions are passed as args. The first
     // step is only used for the Verlet method because the acceleration is
@@ -76,24 +71,30 @@ void Solver::solveSystem(std::function<void(std::shared_ptr<Planet>)>& stepOne,
     endTiming();
 }
 
-void Solver::EulerStep(std::shared_ptr<Planet> planet){
-    planet->vel_tmp = planet->vel;   // Save velocity temporarily for Euler
-    planet->vel    += planet->acc*dt;
-    planet->pos    += planet->vel_tmp*dt;
+void Solver::forwardEuler(double alpha, arma::mat& u) const{
+    for (unsigned int t = 0; t < tsteps; t++)
+        forwardStep(alpha, u[t], u[t-1], xsteps);
 }
 
-void Solver::VerletStep1(std::shared_ptr<Planet> planet){
-    planet->pos += planet->vel*dt + 0.5*dt*dt*planet->acc;
+void Solver::forwardStep(double alpha, arma::mat& u, arma::mat& uPrev) const{
+    for (unsigned int x = 1; x < xsteps; x++)
+        u[x] = alpha*uPrev[x-1] + (1 - 2*alpha)*uPrev[x] + alpha*uPrev[x+1];
 }
 
-void Solver::VerletStep2(std::shared_ptr<Planet> planet){
-    planet->vel += 0.5*dt*(planet->acc + planet->acc_prev);
+void Solver::backwardEuler(double alpha, arma::mat& u) const{
+    for (unsigned int t = 1; t < tsteps; t++) {
+        u[t] = u[t-1];
+        tridiag(alpha, u[t], xsteps);
+    }
 }
 
-void Solver::ECStep(std::shared_ptr<Planet> planet){
-    planet->vel += planet->acc*dt;
-    planet->pos += planet->vel*dt;
+void Solver::crankNicolson(double alpha, arma::mat& u) const{
+    for (unsigned int t = 1; t < tsteps; t++) {
+        forwardStep(alpha/2, u[t], u[t-1], xsteps);
+        tridiag(alpha/2, u[t], N);
+    }
 }
+
 
 void Solver::startTiming(){
   // Start timing the algorithm (both wall time and cpu time)
