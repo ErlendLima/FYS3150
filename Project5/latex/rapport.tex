@@ -78,6 +78,16 @@
 \pgfplotsset{compat=1.14} %TODO: Setting this removed several error messages, should it be here!?
 \def\axislength{.5}
 
+% Colors
+\colorlet{MyColorOne}{blue!50}
+\newcommand{\lightercolor}[3]{% Reference Color, Percentage, New Color Name
+    \colorlet{#3}{#1!#2!white}
+}
+\newcommand{\darkercolor}[3]{% Reference Color, Percentage, New Color Name
+    \colorlet{#3}{#1!#2!black}
+}
+\lightercolor{MyColorOne}{50}{MyColorOneLight}
+\darkercolor{MyColorOne}{50}{MyColorOneDark}
 
 % Biber for references
 % \bibliographystyle{aipauth4-1}
@@ -124,17 +134,17 @@ the upper plate is given a horizontal velocity $U$.
     \node at (3,3.4) {$U$};
     \node at (5,1.5) {$\rho, \mu$};
 
-    \draw[gray,dashed] (4,3) -- (2,0);
-    \draw[gray,dashed] (2,0) -- (2,3);
+    \draw[MyColorOne,dashed] (4,3) -- (2,0);
+    \draw[MyColorOne,dashed] (2,0) -- (2,3);
     \foreach \y in {0.5,1,...,2.5} {%
-      \draw[->] (2,\y) -- (2 + 2*\y/3,\y);
+      \draw[->, MyColorOneDark, thick] (2,\y) -- (2 + 2*\y/3,\y);
     }%
 
     \coordinate (O) at (0,0.1);
     \coordinate (x) at (\axislength,0.1);
     \coordinate (y) at (0,\axislength+.1);
     \draw[->] (O) -- (x) node[above] {$x$};
-    \draw[->] (O) -- (y) node[above] {$y$};
+    \draw[->] (O) -- (y) node[right] {$y$};
 
     \fill[pattern=north west lines] (0,-.1) rectangle ++(6,.1);
     \fill[pattern=north west lines] (0,3) rectangle ++(6,.1);
@@ -170,6 +180,57 @@ surfaces, so
 \end{align*}
 Other boundary conditions such as the no penetration condition (no velocity
 normal to the boundaries at the boundaries) yield no additional information.
+\subsection{Developing the numerical algorithms}
+
+\subsection{Algorithm stability and trunctation errors}
+
+\subsection{Analytic solution for 1-D diffusion equation}
+Analytic solutions are available for the one-dimensional diffusion equation. Assume
+the differential equation is scaled and on the form
+\begin{align*}
+  \pdv[2]{u}{x} = \pdv{u}{t}
+\end{align*}
+with initial conditions
+\begin{align*}
+  u(x,0) = g(x) \qquad 0 < x < L
+\end{align*}
+and constant boundary conditions
+\begin{align*}
+  u(0,t) = 0 \qquad u(L,t) = 1 \qquad t \geq 0
+\end{align*}
+Using separation of variables, the solution is assumed to be on the form
+$u(x,t) = X(x)T(t)$. Inserting this in the diffusion equation yields
+\begin{align*}
+  \frac{1}{X} \pdv[2]{X}{x} = \frac{1}{T} \pdv{T}{t}
+\end{align*}
+The left hand side of the equation is only a function of $x$, and the right hand
+side similarly depends only on $t$. Thus both sides must be constant (set to $-\lambda^2$).
+The PDE is therefore transformed to two ODE's:
+\begin{align*}
+  \pdv[2]{X}{x} + \lambda^2 X &= 0 \\
+  \pdv{T}{t}    + \lambda^2 T &= 0
+\end{align*}
+which have general solutions
+\begin{align*}
+  X(x) &= A\sin{(\lambda x)} + B\cos{(\lambda x)} \\
+  T(t) &= Ce^{-\lambda^2 t}
+\end{align*}
+The boundary conditions demand $B = 0$ and $\lambda = n \pi /L$ for $n = 1,2,\hdots$.
+This yields solutions
+\begin{align*}
+  u(x,t) = A_n \sin{(n\pi x/L)}e^{-n^2 \pi^2 t/ L^2}
+\end{align*}
+Linear combinations of these solutions are also solutions because the diffusion
+equation is linear. Thus
+\begin{align}
+  u(x,t) = \sum_{n = 1}^{\infty} A_n \sin{(n\pi x/L)}e^{-n^2 \pi^2 t/ L^2}
+\end{align}
+is a solution to the equation. The Fourier coefficients $A_n$ are determined
+from the initial condition $u(x,0) = g(x)$. This is done by mapping the initial
+configuration to the Fourier series base, through the inner product
+\begin{align*}
+  A_n = \frac{2}{L}\int_0^L g(x) \sin{(n \pi x / L)} \dd{x}
+\end{align*}
 \section{Method} \label{sec:method}
 \section{Results} \label{sec:results}
 \section{Discussion} \label{sec:discussion}
