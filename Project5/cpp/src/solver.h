@@ -14,7 +14,7 @@ public:
     void forwardEuler(double alpha, arma::mat& u) const;
     void backwardEuler(double alpha, arma::mat& u) const;
     void crankNicolson(double alpha, arma::mat& u) const;
-    void tridiag(double alpha, arma::vec& u, unsigned int N);
+    void tridiag(double alpha, arma::mat& u, unsigned int N) const;
 
 private:
     unsigned int xsteps, ysteps, tsteps;
