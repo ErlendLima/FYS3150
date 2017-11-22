@@ -6,12 +6,14 @@
 #include <string>
 #include <fstream>
 
+#define pi 3.1415926535
 
 enum class Method{FORWARD_EULER, BACKWARD_EULER, CRANK_NICOLSON};
 class Metamodel
 {
 public:
-    Metamodel(const std::string& parameterPath){read(parameterPath);};
+    Metamodel(const std::string& basepath,
+              const std::string& parameterPath);
 
     void read(const std::string& filename);
     void write() const;
@@ -37,6 +39,7 @@ public:
     Method       getMethod() const {return method;};
     void         setDimension(unsigned int dim);
     void         setBoundaries(double lower, double upper);
+    std::tuple<double, double> getBoundaries() const {return std::make_tuple(m_xstart_bound, m_xend_bound);};
     arma::mat&   getU();
 
     std::function<double(double)> initialCondition;

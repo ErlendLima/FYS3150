@@ -12,10 +12,9 @@ int main(int argc, char const *argv[]) {
         std::cerr << "Usage: ./solve [path to parameters]" << std::endl;
         return -1;
     }
-    parameterPath = "../data/" + parameterPath;
 
     try{
-        Metamodel model = Metamodel(parameterPath);
+        Metamodel model = Metamodel("../data/", parameterPath);
 
         Solver solver(model);
         solver.solve();

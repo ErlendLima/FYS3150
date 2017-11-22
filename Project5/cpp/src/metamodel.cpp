@@ -6,8 +6,12 @@
 #include "math.h"
 #include "metamodel.h"
 
-#define pi 3.1415926535
 
+Metamodel::Metamodel(const std::string& basepath,
+                     const std::string& parameterPath){
+    m_basepath = basepath;
+    read(parameterPath);
+}
 void Metamodel::write() const{
   std::ofstream metafile(m_basepath+m_metapath);
   Json::Value root;
@@ -24,7 +28,7 @@ void Metamodel::write() const{
 }
 
 void Metamodel::read(const std::string& filename) {
-    std::ifstream parameters(filename);
+    std::ifstream parameters(m_basepath + filename);
     if (!parameters.good())
         throw std::runtime_error("Could not find parameters");
 
@@ -72,7 +76,7 @@ void Metamodel::setDimension(unsigned int dim) {
 
 void Metamodel::setBoundaries(double lower, double upper){
     m_xstart_bound = lower;
-    m_xstart_bound = upper;
+    m_xend_bound = upper;
 }
 
 arma::mat& Metamodel::getU(){
