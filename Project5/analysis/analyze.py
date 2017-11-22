@@ -17,13 +17,12 @@ sns.set(context="poster", style='white')
 
 
 class Analyzer:
-    def __init__(self, path):
-        pass
+    def __init__(self, base_path, meta_path):
+        self.load(base_path, meta_path)
 
     def load(self, base_path: str, meta_path: str) -> None:
         with open(os.path.join(base_path, meta_path)) as fp:
             self.meta = json.load(fp)
-
             self.solution = self.load_block(base_path, self.meta["solution"])
 
     @staticmethod
@@ -47,7 +46,12 @@ class Analyzer:
         return data.reshape(*block["dim"])
 
     def plot(self):
-        self.plot_analytic_solution()
+        # self.plot_analytic_solution()
+        self.plot_numerical_solution()
+
+    def plot_numerical_solution(self):
+        plt.matshow(self.solution)
+        plt.show()
 
     def plot_analytic_solution(self):
         U = 1
@@ -115,16 +119,12 @@ class Analyzer:
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Analyzes data for project 3')
+    parser = argparse.ArgumentParser(description='Analyzes data for project 5')
     parser.add_argument('--search_path', type=os.path.abspath,
                         default='../data/',
                         help="Directory to search for input files")
-    parser.add_argument('--position', type=str, default="position.txt",
-                        help="The file containing the positions")
-    parser.add_argument('--energy', type=str, default="energy.txt",
-                        help="The file containing the energies")
-    parser.add_argument('--angular', type=str, default="angmom.txt",
-                        help="The file containing the angular momenta")
+    parser.add_argument('--meta', type=str, default="meta.json",
+                        help="The file containing the metadata")
     parser.add_argument('--plot2d', help="Plot as 2D",
                         action="store_true")
     parser.add_argument('--animate', help="Animate the orbits",
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     parser.add_argument('--save', help="Save the (animation) plots",
                         action="store_true")
     args = parser.parse_args()
-    analyzer = Analyzer(args.search_path)
+    analyzer = Analyzer(args.search_path, args.meta)
     if args.animate:
         analyzer.animate(args.save)
     else:
