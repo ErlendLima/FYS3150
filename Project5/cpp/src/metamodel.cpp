@@ -29,7 +29,7 @@ void Metamodel::read(const std::string& filename) {
     m_xsteps    = root["number of x points"].asDouble();
     m_tsteps    = root["number of t points"].asDouble();
     setDimension(root["dimensions"].asInt());
-    setBoundaries(root["lower bound"].asDouble(), root["upper bound".asDouble()]);
+    setBoundaries(root["lower bound"].asDouble(), root["upper bound"].asDouble());
 
     // Set the initial condition
     std::string initial = root["initial condition"].asString();
