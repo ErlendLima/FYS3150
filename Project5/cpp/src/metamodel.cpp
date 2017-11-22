@@ -3,7 +3,10 @@
 #include <iostream>
 #include <fstream>
 #include <type_traits>
+#include "math.h"
 #include "metamodel.h"
+
+#define pi 3.1415926535
 
 void Metamodel::write() const{
   std::ofstream metafile(m_basepath+m_metapath);
@@ -14,6 +17,8 @@ void Metamodel::write() const{
   root["solution"]["dim"].append(m_tsteps);
   root["solution"]["dim"].append(m_xsteps);
   root["parallel"]      = m_parallel;
+  root["t steps"]      = m_tsteps;
+  root["x steps"]      = m_xsteps;
   metafile << root << std::endl;
   metafile.close();
 }
@@ -26,26 +31,34 @@ void Metamodel::read(const std::string& filename) {
     Json::Value root;
     parameters >> root;
     m_parallel  = root["parallel"].asBool();
-    m_xsteps    = root["number of x points"].asDouble();
-    m_tsteps    = root["number of t points"].asDouble();
+    m_xsteps    = root["number of x points"].asInt();
+    m_tsteps    = root["number of t points"].asInt();
     setDimension(root["dimensions"].asInt());
+    std::cout << "There are " << m_xsteps << " integration points along the x-axis\n"
+              << "and " << m_tsteps << " integration points along the t-axis\n";
 
     // Set the initial condition
     std::string initial = root["initial condition"].asString();
-    if (initial == "zero")
+    if (initial == "zero"){
         initialCondition = [](double x){return 0;};
-    else
+        std::cout << "The initial condition are all 0\n";
+    } else if (initial == "sin") {
+        initialCondition = [](double x){return sin(pi*x);};
+    } else
         throw std::runtime_error("Initial condition not supported.");
 
     // Use the correct method
     std::string smethod = root["method"].asString();
-    if (smethod == "forward")
+    if (smethod == "forward"){
         method = Method::FORWARD_EULER;
-    else if (smethod == "backward")
+        std::cout << "Using Forward Euler\n";
+    } else if (smethod == "backward"){
         method = Method::BACKWARD_EULER;
-    else if (smethod == "crank-nicolson")
+        std::cout << "Using Backward Euler\n";
+    } else if (smethod == "crank-nicolson"){
         method = Method::CRANK_NICOLSON;
-    else
+        std::cout << "Using Crank-Nicolson scheme\n";
+    } else
         throw std::runtime_error("Method is not supported");
 }
 

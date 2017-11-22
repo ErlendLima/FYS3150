@@ -50,7 +50,12 @@ class Analyzer:
         self.plot_numerical_solution()
 
     def plot_numerical_solution(self):
-        plt.matshow(self.solution)
+        # plt.matshow(self.solution)
+        # plt.show()
+        x = np.linspace(0, 1, self.meta['x steps'])
+        for t in [0, -1]:
+            plt.plot(x, self.solution[t], label=rf'{t}')
+        plt.legend()
         plt.show()
 
     def plot_analytic_solution(self):

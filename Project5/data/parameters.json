@@ -2,7 +2,7 @@
     "parallel": false,
     "dimensions": 1,
     "number of x points": 100,
-    "number of t points": 100,
-    "initial condition": "zero",
-    "method": "forward"
+    "number of t points": 10000,
+    "initial condition": "sin",
+    "method": "crank-nicolson"
 }
