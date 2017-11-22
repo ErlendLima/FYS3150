@@ -36,6 +36,17 @@ void Metamodel::read(const std::string& filename) {
         initialCondition = [](double x){return 0;};
     else
         throw std::runtime_error("Initial condition not supported.");
+
+    // Use the correct method
+    std::string smethod = root["method"].asString();
+    if (smethod == "forward")
+        method = Method::FORWARD_EULER;
+    else if (smethod == "backward")
+        method = Method::BACKWARD_EULER;
+    else if (smethod == "crank-nicolson")
+        method = Method::CRANK_NICOLSON;
+    else
+        throw std::runtime_error("Method is not supported");
 }
 
 void Metamodel::setDimension(unsigned int dim) {
@@ -53,12 +64,13 @@ arma::mat& Metamodel::getU(){
     m_hasCreatedU = true;
 
     // Set the initial condition
-    for(unsigned int x = 0; x < m_xsteps; x++)
-        m_u(0, x) = initialCondition(x);
+    arma::vec X = arma::linspace(m_xstart, m_xend, m_xsteps+2);
+    for(unsigned int x = 0; x < m_xsteps+2; x++)
+        m_u(0, x) = initialCondition(X[x]);
 
     // Set boundary conditions
-    m_u(0, 0) = 0;
-    m_u(0, m_xsteps+1) = 0;
+    m_u(0, 0) = m_xstart_bound;
+    m_u(0, m_xsteps+1) = m_xend_bound;
     return m_u;
 }
 
