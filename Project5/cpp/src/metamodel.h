@@ -11,7 +11,7 @@ enum class Method{FORWARD_EULER, BACKWARD_EULER, CRANK_NICOLSON};
 class Metamodel
 {
 public:
-    Metamodel(const std::string& parameterPath){read(parameterPath)};
+    Metamodel(const std::string& parameterPath){read(parameterPath);};
 
     void read(const std::string& filename);
     void write() const;
@@ -36,7 +36,7 @@ public:
     unsigned int getDim()    const {return m_dim;};
     Method       getMethod() const {return method;};
     void         setDimension(unsigned int dim);
-    void         setBounadries(double lower, double upper);
+    void         setBoundaries(double lower, double upper);
     arma::mat&   getU();
 
     std::function<double(double)> initialCondition;
