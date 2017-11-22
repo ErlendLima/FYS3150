@@ -16,7 +16,7 @@ void Timer::print(){
             << "CPU time: " << CPUTime << "s" << std::endl;
 }
 
-std::chrono::high_resolution_clock::duration Timer::wallTime(){
+duration Timer::wallTime(){
   return (std::chrono::high_resolution_clock::now() - startWallTime);
 }
 
