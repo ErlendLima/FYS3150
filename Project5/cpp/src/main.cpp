@@ -6,15 +6,21 @@ int main(int argc, char const *argv[]) {
     // Read the parameter path from commandline
     // Default to "parameters.json"
     std::string parameterPath = "parameters.json";
-    if (argc == 2)
-        parameterPath = argv[1];
-    else if(argc > 2){
-        std::cerr << "Usage: ./solve [path to parameters]" << std::endl;
+    std::string basepath = "../data/";
+
+    if (argc == 3){
+        basepath = argv[1];
+        parameterPath = argv[2];
+    } else if (argc == 2){
+        basepath = argv[1];
+    }
+    else if(argc > 3){
+        std::cerr << "Usage: ./solve [basepath] [relative path to parameters]" << std::endl;
         return -1;
     }
 
     try{
-        Metamodel model = Metamodel("../data/", parameterPath);
+        Metamodel model = Metamodel(basepath, parameterPath);
 
         Solver solver(model);
         solver.solve();
