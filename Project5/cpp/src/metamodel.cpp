@@ -8,44 +8,34 @@
 void Metamodel::write() const{
   std::ofstream metafile(m_basepath+m_metapath);
   Json::Value root;
-  root["evolution"]["dim"]  = Json::arrayValue;
-  root["evolution"]["type"] = "int64";
-  root["evolution"]["path"] = "evolution.bin";
-  root["evolution"]["dim"].append(M);
-  root["evolution"]["dim"].append(N);
-  root["evolution"]["dim"].append(N);
-
-  root["magnetic moment"]["dim"]  = Json::arrayValue;
-  root["magnetic moment"]["type"] = "int32";
-  root["magnetic moment"]["path"] = "magneticmoment.bin";
-  root["magnetic moment"]["dim"].append(M);
-
-  root["flips"]["dim"]  = Json::arrayValue;
-  root["flips"]["type"] = "int32";
-  root["flips"]["path"] = flippath;
-  root["flips"]["dim"].append(M);
-
-  root["energy"]["dim"]  = Json::arrayValue;
-  root["energy"]["type"] = "float64";
-  root["energy"]["path"] = "energies.bin";
-  root["energy"]["dim"].append(M);
-
+  root["solution"]["dim"]  = Json::arrayValue;
+  root["solution"]["type"] = "float64";
+  root["solution"]["path"] = "solution.bin";
+  root["solution"]["dim"].append(m_tsteps);
+  root["solution"]["dim"].append(m_xsteps);
   root["parallel"]      = m_parallel;
   metafile << root << std::endl;
   metafile.close();
-  //TODO: ENDRE SAVEPERIOD TIL NUMBER OF SAVES
 }
 
 void Metamodel::read(const std::string& filename) {
     std::ifstream parameters(filename);
     if (!parameters.good())
         throw std::runtime_error("Could not find parameters");
+
     Json::Value root;
     parameters >> root;
     m_parallel  = root["parallel"].asBool();
-    m_dx        = root["x step"].asDouble();
-    m_dt        = root["t step"].asDouble();
+    m_xsteps    = root["number of x points"].asDouble();
+    m_tsteps    = root["number of t points"].asDouble();
     setDimension(root["dimensions"].asInt());
+
+    // Set the initial condition
+    std::string initial = root["initial condition"].asString();
+    if (initial == "zero")
+        initialCondition = [](double x){return 0;};
+    else
+        throw std::runtime_error("Initial condition not supported.");
 }
 
 void Metamodel::setDimension(unsigned int dim) {
@@ -55,40 +45,46 @@ void Metamodel::setDimension(unsigned int dim) {
         throw std::runtime_error("Dimension must be either 1 or 2");
 }
 
+arma::mat& Metamodel::getU(){
+    if(m_hasCreatedU)
+        return m_u;
+
+    m_u = arma::zeros<arma::mat>(m_tsteps, m_xsteps+2);
+    m_hasCreatedU = true;
+
+    // Set the initial condition
+    for(unsigned int x = 0; x < m_xsteps; x++)
+        m_u(0, x) = initialCondition(x);
+
+    // Set boundary conditions
+    m_u(0, 0) = 0;
+    m_u(0, m_xsteps+1) = 0;
+    return m_u;
+}
+
 void Metamodel::save() const{
-  // Write energy to file
-  std::ofstream energyStream;
-  energyStream.open(basepath + energypath, std::ios::out | std::ios::binary);
-  binaryDump(energyStream, energies);
-  energyStream.close();
-
-  // Write magnetic moment to file
-  std::ofstream magmom;
-  magmom.open(basepath + magneticmomentpath, std::ios::out | std::ios::binary);
-  binaryDump(magmom, magmoments);
-  magmom.close();
-
-  // Write system states to file
-  std::ofstream evoStream;
-  evoStream.open(basepath + evolutionpath, std::ios::out | std::ios::binary);
-  binaryDump(evoStream, states);
-  evoStream.close();
-
-  // Write number of accepted flips each MC cycle to file
-  std::ofstream flips;
-  flips.open(basepath + flippath, std::ios::out | std::ios::binary);
-  binaryDump(flips, nFlips);
-  flips.close();
+    // Write the metainformation
+    write();
+    // Write solution u(x, t) to file
+    std::ofstream output;
+    output.open(m_basepath + m_solutionpath, std::ios::out | std::ios::binary);
+    binaryDump(output, m_u);
+    output.close();
 }
 
 template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>
 void Metamodel::binaryDump(std::ofstream& stream, const std::vector<T>& container) const{
-    stream.write((char*)&container[0], M*sizeof(container[0]));
+    stream.write((char*)&container[0], container.size()*sizeof(container[0]));
+}
+
+template<typename T>
+void Metamodel::binaryDump(std::ofstream& stream, const arma::Mat<T>& matrix) const{
+    stream.write((char*)&matrix(0,0), m_tsteps*m_xsteps*sizeof(matrix(0,0)));
 }
 
 template<typename T>
 void Metamodel::binaryDump(std::ofstream& stream, const std::vector<arma::Mat<T>>& container) const{
     for(const auto& matrix: container){
-        stream.write((char*)&matrix(0,0), N*N*sizeof(matrix(0,0)));
+        stream.write((char*)&matrix(0,0), m_tsteps*m_xsteps*sizeof(matrix(0,0)));
     }
 }

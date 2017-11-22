@@ -3,7 +3,6 @@
 #include <chrono>
 #include "metamodel.h"
 
-enum class Method{FORWARD_EULER, BACKWARD_EULER, CRANK_NICOLSON};
 class Solver
 {
 public:
