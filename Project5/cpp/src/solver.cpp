@@ -7,6 +7,7 @@
 #include <armadillo>
 #include "solver.h"
 #include "metamodel.h"
+#include "timer.h"
 
 using std::placeholders::_1;
 
@@ -20,6 +21,8 @@ int Solver::solve(){
     // Wrapper for initializing, solving and saving the solution of the system.
     double alpha = model.getAlpha();
     arma::mat u = model.getU();
+    Timer timer;
+    timer.start();
 
     switch (model.getMethod()){
     case Method::FORWARD_EULER:
@@ -38,6 +41,8 @@ int Solver::solve(){
         std::cout << "=== NO METHOD CHOSEN ===" << std::endl;
         return -1;
     }
+    
+    timer.print();
     model.save();
     return 0;
 }
@@ -87,6 +92,5 @@ void Solver::tridiag(double alpha, arma::mat& u, unsigned int t) const{
   // Backward substitute
   for(unsigned int i = xsteps; i > 0; i--){
     u(t,i) -= u(t,i+1)*b[i-2];
-    //b[i-2]    = 0.0 // This is never read, why bother >:(
   }
 }
