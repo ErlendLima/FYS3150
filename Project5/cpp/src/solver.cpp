@@ -46,25 +46,25 @@ int Solver::solve(){
 
 void Solver::forwardEuler(double alpha, arma::mat& u) const{
     for (unsigned int t = 0; t < tsteps; t++)
-        forwardStep(alpha, u[t], u[t-1]);
+        forwardStep(alpha, u, t);
 }
 
-void Solver::forwardStep(double alpha, arma::mat& u, arma::mat& uPrev) const{
+void Solver::forwardStep(double alpha, arma::mat& u, unsigned int t) const{
     for (unsigned int x = 1; x < xsteps; x++)
-        u[x] = alpha*uPrev[x-1] + (1 - 2*alpha)*uPrev[x] + alpha*uPrev[x+1];
+        u(t, x) = alpha*u(t-1, x-1) + (1 - 2*alpha)*u(t-1, x) + alpha*u(t-1, x);
 }
 
 void Solver::backwardEuler(double alpha, arma::mat& u) const{
     for (unsigned int t = 1; t < tsteps; t++) {
-        u[t] = u[t-1];
-        tridiag(alpha, u[t], xsteps);
+        u(t) = u(t-1);
+        tridiag(alpha, u);
     }
 }
 
 void Solver::crankNicolson(double alpha, arma::mat& u) const{
     for (unsigned int t = 1; t < tsteps; t++) {
-        forwardStep(alpha/2, u[t], u[t-1]);
-        tridiag(alpha/2, u[t], N);
+        forwardStep(alpha/2, u, t);
+        tridiag(alpha/2, u(t), N);
     }
 }
 
