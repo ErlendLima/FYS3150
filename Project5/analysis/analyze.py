@@ -10,6 +10,8 @@ import matplotlib as mpl
 import argparse
 import os
 from numpy import pi, sin, exp
+import json
+import pandas as pd
 
 sns.set(context="poster", style='white')
 
@@ -18,10 +20,31 @@ class Analyzer:
     def __init__(self, path):
         pass
 
-    def load(self, path, name):
-        path = os.path.join(path, name)
-        data = np.loadtxt(path)
-        return data
+    def load(self, base_path: str, meta_path: str) -> None:
+        with open(os.path.join(base_path, meta_path)) as fp:
+            self.meta = json.load(fp)
+
+            self.solution = self.load_block(base_path, self.meta["solution"])
+
+    @staticmethod
+    def load_block(base_path: str, block: dict) -> np.ndarray:
+        if block["type"] == "float64":
+            type = np.float64
+        elif block["type"] == "int8":
+            type = np.int8
+        elif block["type"] == "int16":
+            type = np.int16
+        elif block["type"] == "int32":
+            type = np.int32
+        elif block["type"] == "int64":
+            type = np.int64
+        elif block["type"] == "uint64":
+            type = np.uint64
+        else:
+            raise(RuntimeError(f"{block['type']} from {block['path']} is not supported"))
+
+        data = np.fromfile(os.path.join(base_path, block["path"]), dtype=type)
+        return data.reshape(*block["dim"])
 
     def plot(self):
         self.plot_analytic_solution()

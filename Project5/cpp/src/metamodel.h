@@ -57,6 +57,9 @@ private:
     double m_ystart = 0;
     double m_yend   = 1;
 
+    double m_xstart_bound = 0.0;
+    double m_xend_bound = 0.0;
+
     bool m_hasCreatedU = false;
     arma::mat m_u;
 
