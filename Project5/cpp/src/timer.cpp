@@ -1,19 +1,18 @@
+#include <iostream>
 #include <ctime>
 #include <chrono>
+#include "timer.h"
 
 void Timer::start(){
   // Save time points at startup (both wall time and cpu time)
-  startWallTime = std::chrono::high_resolution_clock::now();
-  startCPUTime  = std::clock();
+    startWallTime = std::chrono::high_resolution_clock::now();
+    startCPUTime  = std::clock();
 }
 
 void Timer::print(){
-  // Print wall time and cpu time when called
-  auto                          CPUTime  = CPUTime();
-  std::chrono::duration<double> wallTime = wallTime();
-
-  std::cout << "Wall time: " << wallTime.count() << "s\n"
-            << "CPU time: " << CPUTime << "s" << std::endl;
+    // Print wall time and cpu time when called
+    std::cout << "Wall time: " << wallTime().count() << "s\n"
+              << "CPU time: " << CPUTime() << "s" << std::endl;
 }
 
 duration Timer::wallTime(){

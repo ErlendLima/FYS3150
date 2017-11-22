@@ -56,21 +56,22 @@ void Solver::forwardStep(double alpha, arma::mat& u, unsigned int t) const{
 
 void Solver::backwardEuler(double alpha, arma::mat& u) const{
     for (unsigned int t = 1; t < tsteps; t++) {
-        u(t) = u(t-1);
-        tridiag(alpha, u);
+        for (unsigned int x = 0; x < xsteps; x++)
+            u(t, x) = u(t-1, x);
+        tridiag(alpha, u, t);
     }
 }
 
 void Solver::crankNicolson(double alpha, arma::mat& u) const{
     for (unsigned int t = 1; t < tsteps; t++) {
         forwardStep(alpha/2, u, t);
-        tridiag(alpha/2, u(t), N);
+        tridiag(alpha/2, u, t);
     }
 }
 
-void Solver::tridiag(double alpha, arma::mat& u, unsigned int t){
-  arma::vec d = arma::zeros<arma::vec>(xsteps) + (1 + 2*alpha) // Diagonal elements
-  arma::vec b = arma::zeros<arma::vec>(xsteps) - alpha         // Offdiagonal elements
+void Solver::tridiag(double alpha, arma::mat& u, unsigned int t) const{
+    arma::vec d = arma::zeros<arma::vec>(xsteps) + (1 + 2*alpha); // Diagonal elements
+    arma::vec b = arma::zeros<arma::vec>(xsteps) - alpha;         // Offdiagonal elements
 
   for(unsigned int i = 1; i < xsteps; i++){
     // Normalize row i
@@ -86,8 +87,8 @@ void Solver::tridiag(double alpha, arma::mat& u, unsigned int t){
   d[xsteps-1]  = 1.0;
 
   // Backward substitute
-  for(unsigned int i = xsteps, i > 1; i--){
+  for(unsigned int i = xsteps; i > 1; i--){
     u(t,i-1) -= u(t,i)*b[i-2];
-    b[i-2]    = 0.0 // This is never read, why bother >:(
+    //b[i-2]    = 0.0 // This is never read, why bother >:(
   }
 }
