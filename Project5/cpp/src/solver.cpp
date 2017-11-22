@@ -1,7 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <ctime>
-#include <chrono>
 #include <cmath>
 #include <iomanip>
 #include <memory>
@@ -22,7 +20,6 @@ Solver::Solver(Metamodel& metamodel)
 
 int Solver::solve(){
     // Wrapper for initializing, solving and saving the solution of the system.
-    initSystem();
     double alpha = model.getAlpha();
     arma::mat u = model.getU();
 
@@ -71,17 +68,26 @@ void Solver::crankNicolson(double alpha, arma::mat& u) const{
     }
 }
 
+void Solver::tridiag(double alpha, arma::vec& u, unsigned int N){
+  arma::vec d = arma::zeros<arma::vec>(N) + (1 + 2*alpha) // Diagonal elements
+  arma::vec b = arma::zeros<arma::vec>(N) - alpha         // Offdiagonal elements
 
-void Solver::startTiming(){
-  // Start timing the algorithm (both wall time and cpu time)
-  startWallTime = std::chrono::high_resolution_clock::now();
-  startCPUTime  = std::clock();
-}
+  for(unsigned int i = 1; i < N; i++){
+    // Normalize row i
+    b[i-1] /= d[i-1];
+    u[i]   /= d[i-1];
+    d[i-1]  = 1.0;
+    // Eliminate
+    u[i+1] += u[i]*alpha;
+    d[i]   += b[i-1]*alpha;
+  }
+  // Normalize bottom row
+  u[N]   /= d[N-1];
+  d[N-1]  = 1.0;
 
-void Solver::endTiming(){
-  // Print wall time and cpu time when called
-  auto CPUTime = (std::clock() - startCPUTime)/static_cast<double>(CLOCKS_PER_SEC);
-  std::chrono::duration<double> wallTime = (std::chrono::high_resolution_clock::now() - startWallTime);
-  std::cout << "Wall time: " << wallTime.count() << "s\n"
-            << "CPU time: " << CPUTime << "s" << std::endl;
+  // Backward substitute
+  for(unsigned int i = N, i > 1; i--){
+    u[i-1] -= u[i]*b[i-2];
+    b[i-2] = 0.0 // This is never read, why bother >:(
+  }
 }
