@@ -17,7 +17,9 @@ int main(int argc, char const *argv[]) {
     try{
         Metamodel model = Metamodel();
         model.read(parameterPath);
-        solve(model);
+
+        Solver solver(model);
+        solver.solve();
     } catch (std::exception& ex) {
         std::cerr << "Error: " << ex.what() << std::endl;
     }

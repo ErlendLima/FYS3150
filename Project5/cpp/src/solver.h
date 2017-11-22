@@ -10,7 +10,7 @@ public:
     virtual ~Solver(){};
 
     int solve();
-    void forwardStep(double alpha, arma::mat& u, arma::mat& uPrev) const;
+    void forwardStep(double alpha, arma::mat& u, unsigned int t) const;
     void forwardEuler(double alpha, arma::mat& u) const;
     void backwardEuler(double alpha, arma::mat& u) const;
     void crankNicolson(double alpha, arma::mat& u) const;
