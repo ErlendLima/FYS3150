@@ -42,7 +42,6 @@ void Metamodel::read(const std::string& filename) {
         throw std::runtime_error("Could not find parameters");
     Json::Value root;
     parameters >> root;
-    m_parallel  = root["parallel"].asBool();
     m_dx        = root["x step"].asDouble();
     m_dt        = root["t step"].asDouble();
     setDimension(root["dimensions"].asInt());

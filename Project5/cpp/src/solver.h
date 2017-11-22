@@ -15,6 +15,7 @@ public:
     void forwardEuler(double alpha, arma::mat& u) const;
     void backwardEuler(double alpha, arma::mat& u) const;
     void crankNicolson(double alpha, arma::mat& u) const;
+    void tridiag(double alpha, arma::vec& u, unsigned int N);
 
     void solveSystem(std::function<void(double, arma::mat)>&);
     void initSystem();
@@ -23,12 +24,6 @@ public:
 private:
     unsigned int xsteps, ysteps, tsteps;
     Metamodel model;
-    void startTiming();
-    void endTiming();
-
-
-    std::chrono::high_resolution_clock::time_point startWallTime;
-    clock_t startCPUTime;
 };
 
 #endif /* SOLVER_H */
