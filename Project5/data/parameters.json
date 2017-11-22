@@ -4,5 +4,7 @@
     "number of x points": 100,
     "number of t points": 100,
     "initial condition": "zero",
+    "lower bound": 0.0,
+    "upper bound": 1.0,
     "method": "forward"
 }
