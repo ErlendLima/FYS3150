@@ -1,6 +1,7 @@
 {
     "parallel": false,
     "dimensions": 1,
-    "x size": 0.1,
-    "t size": 0.1
+    "number of x points": 100,
+    "number of t points": 100,
+    "initial condition": "zero"
 }

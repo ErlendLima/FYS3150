@@ -6,6 +6,8 @@
 #include <string>
 #include <fstream>
 
+
+enum class Method{FORWARD_EULER, BACKWARD_EULER, CRANK_NICOLSON};
 class Metamodel
 {
 public:
@@ -20,35 +22,50 @@ public:
     void binaryDump(std::ofstream&, const std::vector<T>&) const;
     template<typename T>
     void binaryDump(std::ofstream&, const std::vector<arma::Mat<T>>&) const;
+    template<typename T>
+    void binaryDump(std::ofstream& stream, const arma::Mat<T>&) const;
 
     // Setters and getters
-    double       getDt() const {return m_dt;};
-    double       getDx() const {return m_dx;};
-    double       getDy() const {return m_dx;};
+    double       getDt()     const {return (m_tend-m_tstart)/static_cast<double>(m_tsteps);};
+    // The number of x-points are increased by 2 to include the boundary conditions
+    double       getDx()     const {return (m_xend-m_xstart)/static_cast<double>(m_xsteps+2);};
+    double       getDy()     const {return getDx();};
+    double       getXsteps() const {return m_xsteps;};
+    double       getTsteps() const {return m_tsteps;};
+    double       getAlpha()  const {return getDt()/(getDx()*getDx());};
+    unsigned int getDim()    const {return m_dim;};
+    Method       getMethod() const {return method;};
     void         setDimension(unsigned int dim);
-    unsigned int getDim() const {return m_dim;};
+    arma::mat&   getU();
+
+    std::function<double(double)> initialCondition;
+
 
 private:
 
     unsigned int m_dim   = 1;      // Number of dimensions
-    double       m_dx    = 0.1;    // Step size for x and y
-    double       m_dt    = 0.1;    // Step size for t
+    unsigned int m_xsteps; // Number of integration points along the X-axis
+    unsigned int m_tsteps; // Number of integration points along the Y-axis
 
     /* Initial and boundary conditions. Unnecessary? */
-    double t_start = 0;
-    double t_end   = 1;
+    double m_tstart = 0;
+    double m_tend   = 1;
 
-    double x_start = 0;
-    double x_end   = 1;
+    double m_xstart = 0;
+    double m_xend   = 1;
 
-    double y_start = 0;
-    double y_end   = 1;
+    double m_ystart = 0;
+    double m_yend   = 1;
 
+    bool m_hasCreatedU = false;
+    arma::mat m_u;
 
-    std::string  m_basepath   = "../data/";
-    std::string  m_solverpath = "data.txt";
-    std::string  m_metapath   = "meta.json";
-    bool         m_parallel   = false;
+    Method method = Method::FORWARD_EULER;
+
+    std::string  m_basepath     = "../data/";
+    std::string  m_metapath     = "meta.json";
+    std::string  m_solutionpath = "solution.json";
+    bool         m_parallel     = false;
 };
 
 #endif /* METAMODEL_H */
