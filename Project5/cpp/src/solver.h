@@ -1,6 +1,5 @@
 #ifndef SOLVER_H
 #define SOLVER_H
-#include <chrono>
 #include "metamodel.h"
 
 class Solver
