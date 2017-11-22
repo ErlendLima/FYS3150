@@ -87,8 +87,8 @@ void Solver::tridiag(double alpha, arma::mat& u, unsigned int t) const{
   d[xsteps-1]  = 1.0;
 
   // Backward substitute
-  for(unsigned int i = xsteps, i > 1; i--){
+  for(unsigned int i = xsteps; i > 1; i--){
     u(t,i-1) -= u(t,i)*b[i-2];
-    b[i-2]    = 0.0 // This is never read, why bother >:(
+    //b[i-2]    = 0.0 // This is never read, why bother >:(
   }
 }

@@ -20,6 +20,7 @@ int main(int argc, char const *argv[]) {
 
         Solver solver(model);
         solver.solve();
+        std::cout << "Completed" << std::endl;
     } catch (std::exception& ex) {
         std::cerr << "Error: " << ex.what() << std::endl;
     }
