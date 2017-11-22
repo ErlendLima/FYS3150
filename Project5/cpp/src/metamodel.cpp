@@ -36,6 +36,7 @@ void Metamodel::read(const std::string& filename) {
     setDimension(root["dimensions"].asInt());
     std::cout << "There are " << m_xsteps << " integration points along the x-axis\n"
               << "and " << m_tsteps << " integration points along the t-axis\n";
+    setBoundaries(root["lower bound"].asDouble(), root["upper bound"].asDouble());
 
     // Set the initial condition
     std::string initial = root["initial condition"].asString();
@@ -67,6 +68,11 @@ void Metamodel::setDimension(unsigned int dim) {
         m_dim = dim;
     else
         throw std::runtime_error("Dimension must be either 1 or 2");
+}
+
+void Metamodel::setBoundaries(double lower, double upper){
+    m_xstart_bound = lower;
+    m_xstart_bound = upper;
 }
 
 arma::mat& Metamodel::getU(){

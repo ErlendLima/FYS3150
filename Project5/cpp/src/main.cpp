@@ -15,8 +15,7 @@ int main(int argc, char const *argv[]) {
     parameterPath = "../data/" + parameterPath;
 
     try{
-        Metamodel model = Metamodel();
-        model.read(parameterPath);
+        Metamodel model = Metamodel(parameterPath);
 
         Solver solver(model);
         solver.solve();
