@@ -16,10 +16,6 @@ public:
     void crankNicolson(double alpha, arma::mat& u) const;
     void tridiag(double alpha, arma::vec& u, unsigned int N);
 
-    void solveSystem(std::function<void(double, arma::mat)>&);
-    void initSystem();
-    void saveToFile();
-
 private:
     unsigned int xsteps, ysteps, tsteps;
     Metamodel model;
