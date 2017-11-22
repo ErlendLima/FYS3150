@@ -1,18 +1,9 @@
 #include <gtest/gtest.h>
+#include <armadillo>
 #include "../src/metamodel.h"
 // Include headers of files to test
 
 #define TOLERANCE 1.0e-9
-
-
-// TEST(Ising, MagnetizationIsCorrect){
-//   // Check magnetization for some state
-//   arma::imat A;
-//   A << -1 << 1 << -1 << arma::endr
-//     <<  1 << 1 << -1 << arma::endr
-//     << -1 << 1 << -1;
-//   ASSERT_EQ(magnetization(A),-1);
-// }
 
 TEST(MetamodelTest, parameters){
     /* The Metamodel is a black box which inner workings we
@@ -60,4 +51,28 @@ TEST(MetamodelTest, parameters){
     std::tie(lower, upper) = model_crack.getBoundaries();
     ASSERT_FLOAT_EQ(lower, -5);
     ASSERT_FLOAT_EQ(upper, 0.0);
+}
+
+TEST(MetamodelTest, U){
+    Metamodel model_oil("mock_data/", "mock_parameters_1.json");
+    auto u = model_oil.getU();
+    // Verify the size
+    arma::mat _u = arma::zeros<arma::mat>(model_oil.getTsteps(), model_oil.getXsteps()+2);
+    ASSERT_EQ(arma::size(u), arma::size(_u));
+    // Verify the initial condition
+    ASSERT_EQ(u(0, arma::size(u)[1]-1), 1.0);
+    for(unsigned int x = 0; x < model_oil.getXsteps()+1; x++)
+        ASSERT_FLOAT_EQ(u(0, x), 0.0);
+
+    Metamodel model_crack("mock_data/", "mock_parameters_2.json");
+    u = model_crack.getU();
+    // Verify the size
+    _u = arma::zeros<arma::mat>(model_crack.getTsteps(), model_crack.getXsteps()+2);
+    ASSERT_EQ(arma::size(u), arma::size(_u));
+    // Verify the initial condition
+    ASSERT_EQ(u(0,0), -5);
+    arma::vec X = arma::linspace(0.0, 1.0, 4);
+    // Do not iterate over the bounds
+    for(unsigned int x = 1; x < model_crack.getXsteps()+1; x++)
+        ASSERT_FLOAT_EQ(u(0, x), sin(pi*X[x]));
 }
