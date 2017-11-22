@@ -1,0 +1,10 @@
+{
+    "parallel": false,
+    "dimensions": 2,
+    "number of x points": 2,
+    "number of t points": 13242,
+    "initial condition": "sin",
+    "lower bound": -5,
+    "upper bound": 0.0,
+    "method": "crank-nicolson"
+}

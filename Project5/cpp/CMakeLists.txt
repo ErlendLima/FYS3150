@@ -90,5 +90,5 @@ if (test)
   # You can also omit NAME and COMMAND. The second argument could be some other
   # test executable.
   # add_test(that-other-test-I-made runUnitTests)
-  add_test(mag runUnitTests)
+  add_test(MetamodelTest runUnitTests)
 endif()
