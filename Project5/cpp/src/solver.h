@@ -11,21 +11,18 @@ public:
     virtual ~Solver(){};
 
     int solve();
-    void solveVerlet();
-    // void solveEuler();
-    void solveSystem(std::function<void(std::shared_ptr<Planet>)>&)
-    void updateForces();
+    void forwardStep(double alpha, arma::mat& u, arma::mat& uPrev) const;
+    void forwardEuler(double alpha, arma::mat& u) const;
+    void backwardEuler(double alpha, arma::mat& u) const;
+    void crankNicolson(double alpha, arma::mat& u) const;
+
+    void solveSystem(std::function<void(double, arma::mat)>&);
     void initSystem();
     void saveToFile();
 
 private:
-    unsigned int n; // Number of steps
-    double dt, dx, dy;
+    unsigned int xsteps, ysteps, tsteps;
     Metamodel model;
-    void EulerStep(std::shared_ptr<Planet>);
-    void VerletStep1(std::shared_ptr<Planet>);
-    void VerletStep2(std::shared_ptr<Planet>);
-    void ECStep(std::shared_ptr<Planet>);
     void startTiming();
     void endTiming();
 
