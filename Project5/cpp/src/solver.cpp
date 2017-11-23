@@ -62,7 +62,7 @@ void Solver::forwardStep(double alpha, arma::mat& u, unsigned int t) const{
 
 void Solver::backwardEuler(double alpha, arma::mat& u) const{
     for (unsigned int t = 1; t < tsteps; t++) {
-        for (unsigned int x = 0; x < xsteps; x++)
+        for (unsigned int x = 0; x < xsteps+2; x++)
             u(t, x) = u(t-1, x);
         tridiag(alpha, u, t);
     }

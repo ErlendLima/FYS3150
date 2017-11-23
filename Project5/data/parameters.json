@@ -10,5 +10,5 @@
     "t end": 1.0,
     "x start": 0.0,
     "x end": 1.0,
-    "method": "crank-nicolson"
+    "method": "backward"
 }

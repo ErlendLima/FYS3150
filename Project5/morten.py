@@ -50,9 +50,6 @@ def tridiag(alpha,u,N):
     #Normalize bottom row
     u[N] /= d[N-1]
     d[N-1] = 1.0
-    print(u)
-    print(d)
-    print(b)
 
     #Backward substitute
     for i in xrange(N,0,-1): #loop from i=N to i=2
