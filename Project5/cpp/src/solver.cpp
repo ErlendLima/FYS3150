@@ -70,18 +70,9 @@ void Solver::backwardEuler(double alpha, arma::mat& u) const{
 
 void Solver::crankNicolson(double alpha, arma::mat& u) const{
     for (unsigned int t = 1; t < tsteps; t++) {
-        u.row(t).print();
         forwardStep(alpha/2, u, t);
-        u.row(t).print();
         tridiag(alpha/2, u, t);
-        u.row(t).print();
-        std::cout << "+++++++++++++++++++++++\n";
     }
-    u.row(0).print();
-    u.row(tsteps-4).print();
-    u.row(tsteps-3).print();
-    u.row(tsteps-2).print();
-    u.row(tsteps-1).print();
 }
 
 void Solver::tridiag(double alpha, arma::mat& u, unsigned int t) const{
@@ -94,7 +85,7 @@ void Solver::tridiag(double alpha, arma::mat& u, unsigned int t) const{
     u(t, i) /= d(i-1);
     d(i-1)   = 1.0;
     // Eliminate
-    u(i+1)  += u(t, i)*alpha;
+    u(t, i+1)  += u(t, i)*alpha;
     d(i)    += b(i-1)*alpha;
   }
   // Normalize bottom row

@@ -50,6 +50,9 @@ def tridiag(alpha,u,N):
     #Normalize bottom row
     u[N] /= d[N-1]
     d[N-1] = 1.0
+    print(u)
+    print(d)
+    print(b)
 
     #Backward substitute
     for i in xrange(N,0,-1): #loop from i=N to i=2
@@ -74,12 +77,8 @@ def crank_nicolson(alpha,u,N,T):
     """
     for t in xrange(1,T):
         pdb.set_trace()
-        print(u[t])
         forward_step(alpha/2,u[t],u[t-1],N)
-        print(u[t])
-        # raw_input()
         tridiag(alpha/2,u[t],N)
-        print(u[t])
 
 def g(x):
     """Initial condition u(x,0) = g(x), x \in [0,1]"""
