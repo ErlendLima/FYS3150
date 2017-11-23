@@ -11,14 +11,15 @@ void Timer::start(){
 
 void Timer::print(){
     // Print wall time and cpu time when called
-    std::cout << "Wall time: " << wallTime().count() << "s\n"
-              << "CPU time: " << CPUTime() << "s" << std::endl;
+    std::cout << "Wall time: " << wallTime() << "s\n"
+              << "CPU time : " << CPUTime()  << "s"   << std::endl;
 }
 
-duration Timer::wallTime(){
-  return (std::chrono::high_resolution_clock::now() - startWallTime);
+double Timer::wallTime(){
+  std::chrono::duration<double> wTime = (std::chrono::high_resolution_clock::now() - startWallTime);
+  return wTime.count();
 }
 
-clock_t Timer::CPUTime(){
+double Timer::CPUTime(){
   return (std::clock() - startCPUTime)/static_cast<double>(CLOCKS_PER_SEC);
 }
