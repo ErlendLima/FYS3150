@@ -26,7 +26,7 @@
 
 
 <!-- <img height="700px" align="center" src="latex/figures/solarsys.png?raw=true"> -->
-<!-- ![Animation of the diffusion equation](https://github.com/Caronthir/FYS3150/blob/master/Project5/latex/figures/animation.gif) -->
+![Animation of the diffusion equation](https://github.com/Caronthir/FYS3150/blob/master/Project5/latex/figures/animation.gif)
 
 ## Overview
 The aim of [Project 5](https://github.com/CompPhysics/ComputationalPhysics/blob/master/doc/Projects/2017/Project5/DiffusionEquation/pdf/DiffusionEquation.pdf) in FYS3150
