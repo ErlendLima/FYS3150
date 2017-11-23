@@ -53,7 +53,7 @@ private:
 
     /* Initial and boundary conditions */
     double m_tstart = 0;
-    double m_tend   = 1;
+    double m_tend   = 10;
 
     double m_xstart = 0;
     double m_xend   = 1;

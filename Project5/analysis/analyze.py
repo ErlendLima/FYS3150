@@ -27,6 +27,9 @@ class Analyzer:
 
     @staticmethod
     def load_block(base_path: str, block: dict) -> np.ndarray:
+        if block["format"] == "arma_ascii":
+            return np.loadtxt(os.path.join(base_path, block["path"]))
+
         if block["type"] == "float64":
             type = np.float64
         elif block["type"] == "int8":
@@ -50,13 +53,11 @@ class Analyzer:
         self.plot_numerical_solution()
 
     def plot_numerical_solution(self):
-        # plt.matshow(self.solution)
-        # plt.show()
-        x = np.linspace(0, 1, self.meta['x steps'])
-        trange = range(0, self.meta['t steps'], 100)
+        x = np.linspace(0, 1, self.meta['x steps']+2)
+        trange = range(0, self.meta['t steps'], self.meta['t steps']//10)
         palette = sns.color_palette("GnBu_d", len(trange))
         for i, t in enumerate(trange):
-            plt.plot(x, self.solution[t], label=rf'{t}', c=palette[i])
+            plt.plot(x, self.solution[t, :], label=rf'{t*self.meta["dt"]}', c=palette[i])
         plt.legend()
         plt.show()
 

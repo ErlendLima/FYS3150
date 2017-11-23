@@ -15,14 +15,22 @@ Metamodel::Metamodel(const std::string& basepath,
 void Metamodel::write() const{
   std::ofstream metafile(m_basepath+m_metapath);
   Json::Value root;
-  root["solution"]["dim"]  = Json::arrayValue;
+  // root["solution"]["dim"]  = Json::arrayValue;
   root["solution"]["type"] = "float64";
+  root["solution"]["format"] = "arma_ascii";
   root["solution"]["path"] = "solution.bin";
-  root["solution"]["dim"].append(m_tsteps);
-  root["solution"]["dim"].append(m_xsteps);
+  // root["solution"]["dim"].append(m_tsteps);
+  // root["solution"]["dim"].append(m_xsteps);
   root["parallel"]      = m_parallel;
   root["t steps"]      = m_tsteps;
   root["x steps"]      = m_xsteps;
+  root["x start"] = m_xstart;
+  root["x end"] = m_xend;
+  root["t start"] = m_tstart;
+  root["t end"] = m_tend;
+  root["alpha"] = getAlpha();
+  root["dx"] = getDx();
+  root["dt"] = getDt();
   metafile << root << std::endl;
   metafile.close();
 }
@@ -37,6 +45,10 @@ void Metamodel::read(const std::string& filename) {
     m_parallel  = root["parallel"].asBool();
     m_xsteps    = root["number of x points"].asInt();
     m_tsteps    = root["number of t points"].asInt();
+    m_tstart    = root["t start"].asDouble();
+    m_tend      = root["t end"].asDouble();
+    m_xstart    = root["x start"].asDouble();
+    m_xend      = root["x end"].asDouble();
     setDimension(root["dimensions"].asInt());
     std::cout << "There are " << m_xsteps << " integration points along the x-axis\n"
               << "and " << m_tsteps << " integration points along the t-axis\n";
@@ -103,10 +115,11 @@ void Metamodel::save() const{
     // Write the metainformation
     write();
     // Write solution u(x, t) to file
-    std::ofstream output;
-    output.open(m_basepath + m_solutionpath, std::ios::out | std::ios::binary);
-    binaryDump(output, m_u);
-    output.close();
+    // std::ofstream output;
+    m_u.save(m_basepath+m_solutionpath, arma::raw_ascii);
+    // output.open(m_basepath + m_solutionpath, std::ios::out | std::ios::binary);
+    // binaryDump(output, m_u);
+    // output.close();
 }
 
 template<typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type>

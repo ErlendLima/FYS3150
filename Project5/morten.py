@@ -73,11 +73,13 @@ def crank_nicolson(alpha,u,N,T):
     Implents crank-nicolson scheme, reusing code from forward- and backward euler
     """
     for t in xrange(1,T):
-        # print(u[t])
+        pdb.set_trace()
+        print(u[t])
         forward_step(alpha/2,u[t],u[t-1],N)
-        # print(u[t])
+        print(u[t])
         # raw_input()
         tridiag(alpha/2,u[t],N)
+        print(u[t])
 
 def g(x):
     """Initial condition u(x,0) = g(x), x \in [0,1]"""
@@ -112,11 +114,11 @@ u[:,0] =  0.0 #Implement boundaries rigidly
 u[:,N+1] = 1.0
 
 
-utestp =  numpy.array([0, -0.4, 0.5, 0.1, 2, 4, 0.5, -3, -2.3, 5.6, 10, 1])
-utest =  numpy.zeros_like(utestp)
-forward_step(1.0/4, utest, utestp, 10)
-print(utest)
-sys.exit(0)
+# utestp =  numpy.array([0, -0.4, 0.5, 0.1, 2, 4, 0.5, -3, -2.3, 5.6, 10, 1])
+# utest =  numpy.zeros_like(utestp)
+# forward_step(1.0/4, utest, utestp, 10)
+# print(utest)
+# sys.exit(0)
 
 if   method == 1:
     forward_euler(alpha,u,N,T)
