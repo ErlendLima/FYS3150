@@ -53,8 +53,10 @@ class Analyzer:
         # plt.matshow(self.solution)
         # plt.show()
         x = np.linspace(0, 1, self.meta['x steps'])
-        for t in range(0, self.meta['t steps'], 100):
-            plt.plot(x, self.solution[t], label=rf'{t}')
+        trange = range(0, self.meta['t steps'], 100)
+        palette = sns.color_palette("GnBu_d", len(trange))
+        for i, t in enumerate(trange):
+            plt.plot(x, self.solution[t], label=rf'{t}', c=palette[i])
         plt.legend()
         plt.show()
 

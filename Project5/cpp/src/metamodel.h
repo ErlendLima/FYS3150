@@ -30,7 +30,7 @@ public:
     // Setters and getters
     double       getDt()     const {return (m_tend-m_tstart)/static_cast<double>(m_tsteps);};
     // The number of x-points are increased by 2 to include the boundary conditions
-    double       getDx()     const {return (m_xend-m_xstart)/static_cast<double>(m_xsteps+2);};
+    double       getDx()     const {return (m_xend-m_xstart)/static_cast<double>(m_xsteps+1);};
     double       getDy()     const {return getDx();};
     double       getXsteps() const {return m_xsteps;};
     double       getTsteps() const {return m_tsteps;};
@@ -51,7 +51,7 @@ private:
     unsigned int m_xsteps; // Number of integration points along the X-axis
     unsigned int m_tsteps; // Number of integration points along the Y-axis
 
-    /* Initial and boundary conditions. Unnecessary? */
+    /* Initial and boundary conditions */
     double m_tstart = 0;
     double m_tend   = 1;
 

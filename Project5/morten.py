@@ -8,6 +8,7 @@ from __future__ import print_function
 import numpy,math
 import matplotlib.pyplot as plt
 import sys
+import pdb
 
 def forward_step(alpha,u,uPrev,N):
     """
@@ -50,10 +51,13 @@ def tridiag(alpha,u,N):
     u[N] /= d[N-1]
     d[N-1] = 1.0
 
-        #Backward substitute
+    #Backward substitute
     for i in xrange(N,0,-1): #loop from i=N to i=2
         u[i] -= u[i+1]*b[i-2]
         #b[i-2] = 0.0 #This is never read, why bother...
+    # print(u)
+    # print(u.shape)
+    # raw_input()
 
 def backward_euler(alpha,u,N,T):
     """
@@ -69,7 +73,10 @@ def crank_nicolson(alpha,u,N,T):
     Implents crank-nicolson scheme, reusing code from forward- and backward euler
     """
     for t in xrange(1,T):
+        # print(u[t])
         forward_step(alpha/2,u[t],u[t-1],N)
+        # print(u[t])
+        # raw_input()
         tridiag(alpha/2,u[t],N)
 
 def g(x):
@@ -78,11 +85,11 @@ def g(x):
     return 0*x
 
 #Initialize
-if len(sys.argv) == 5:
+if len(sys.argv) == 4:
     N       =   int(sys.argv[1])
-    dt      = float(sys.argv[2])
-    T       =   int(sys.argv[3])
-    method  =   int(sys.argv[4])
+    # dt      = float(sys.argv[2])
+    T       =   int(sys.argv[2])
+    method  =   int(sys.argv[3])
 else:
     print("Usage:", sys.argv[0], "N dt T method")
     print("\t N:       Number of inner meshpoints")
@@ -94,15 +101,22 @@ else:
     print("\t          3 => Crank-Nicolson")
     sys.exit(0)
 
-#dx = 1/float(N+1)
+dt = 1/float(T)
 u = numpy.zeros((T,N+2),numpy.double)
-(x,dx) = numpy.linspace (0,1,N+2, retstep=True)
+(x,dx) = numpy.linspace (0, 1, N+2, retstep=True)
 alpha = dt/(dx**2)
 
 #Initial codition
 u[0,:] = g(x)
 u[:,0] =  0.0 #Implement boundaries rigidly
 u[:,N+1] = 1.0
+
+
+utestp =  numpy.array([0, -0.4, 0.5, 0.1, 2, 4, 0.5, -3, -2.3, 5.6, 10, 1])
+utest =  numpy.zeros_like(utestp)
+forward_step(1.0/4, utest, utestp, 10)
+print(utest)
+sys.exit(0)
 
 if   method == 1:
     forward_euler(alpha,u,N,T)

@@ -77,7 +77,7 @@ void Solver::crankNicolson(double alpha, arma::mat& u) const{
 
 void Solver::tridiag(double alpha, arma::mat& u, unsigned int t) const{
     arma::vec d = arma::zeros<arma::vec>(xsteps) + (1 + 2*alpha); // Diagonal elements
-    arma::vec b = arma::zeros<arma::vec>(xsteps) - alpha;         // Offdiagonal elements
+    arma::vec b = arma::zeros<arma::vec>(xsteps-1) - alpha;       // Offdiagonal elements
 
   for(unsigned int i = 1; i < xsteps; i++){
     // Normalize row i
@@ -96,4 +96,5 @@ void Solver::tridiag(double alpha, arma::mat& u, unsigned int t) const{
   for(unsigned int i = xsteps; i >= 2; i--){
       u(t, i) -= u(t, i+1)*b(i-2);
   }
+  u(t, 1) -= u(t, 2)*b(xsteps-2);
 }

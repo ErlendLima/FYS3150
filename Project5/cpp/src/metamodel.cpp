@@ -92,8 +92,10 @@ arma::mat& Metamodel::getU(){
         m_u(0, x) = initialCondition(X[x]);
 
     // Set boundary conditions
-    m_u(0, 0) = m_xstart_bound;
-    m_u(0, m_xsteps+1) = m_xend_bound;
+    for(unsigned int t = 0; t < m_tsteps; t++){
+        m_u(t, 0) = m_xstart_bound;
+        m_u(t, m_xsteps+1) = m_xend_bound;
+    }
     return m_u;
 }
 
