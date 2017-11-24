@@ -50,7 +50,8 @@ class Analyzer:
 
     def plot(self):
         # self.plot_analytic_solution()
-        self.plot_numerical_solution()
+        # self.plot_numerical_solution()
+        self.plot_quiver()
 
     def plot_numerical_solution(self):
         x = np.linspace(0, 1, self.meta['x steps']+2)
@@ -60,6 +61,28 @@ class Analyzer:
             plt.plot(x, self.solution[t, :], label=rf'{t*self.meta["dt"]}', c=palette[i])
         plt.legend()
         plt.show()
+
+    def plot_quiver(self):
+        y = np.linspace(0,1,self.meta['x steps'] + 2)
+        fig, ax = plt.subplots(1,1)
+        U = self.solution[0,:]
+        zeros = np.zeros_like(U)
+        Q = ax.quiver(zeros, y, U, zeros)
+        ax.set_xlim(-0.1*U.max(), 1.1*U.max())
+        ax.set_ylim(-0.1, 1.1)
+        t = 0
+
+        anim = animation.FuncAnimation(fig, self.update_quiver,
+                                       fargs=(U,Q),
+                                       interval=10,
+                                       frames=range(0,len(self.solution)),
+                                       blit=False)
+        plt.show()
+
+    def update_quiver(self, num, U, Q):
+        U = self.solution[num,:]
+        Q.set_UVC(U, np.zeros_like(U))
+        return Q,
 
     def plot_analytic_solution(self):
         U = 1
