@@ -26,11 +26,12 @@
 
 
 <!-- <img height="700px" align="center" src="latex/figures/solarsys.png?raw=true"> -->
-<!-- ![Animation of a 2D Ising model](https://github.com/Caronthir/FYS3150/blob/master/Project4/latex/figures/animation.gif) -->
+![Animation of the diffusion equation](https://github.com/Caronthir/FYS3150/blob/master/Project5/latex/figures/animation.gif)
 
 ## Overview
 The aim of [Project 5](https://github.com/CompPhysics/ComputationalPhysics/blob/master/doc/Projects/2017/Project5/DiffusionEquation/pdf/DiffusionEquation.pdf) in FYS3150
-is something something.
+is to solve the diffusion equation PDE in both one and two dimensions. This can be 
+be applied to understand the temperature distribution in the lithosphere, for example.
 The report itself and associated LaTeX files are available in the `latex` directory.
 
 ## Analysis Scripts
@@ -40,13 +41,16 @@ table explaining the function to each script. Python 3.6 is required.
 
 | Script                  | Function                                                                                                          |
 | ------                  | --------                                                                                                          |
-| `analyze.py`            | This does nothing so far! |
+| `analyze.py`            | Analyzes the output from the simulation automagically |
 ## Usage (C++)
 
-Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1 and JSONcpp. On Ubuntu these can be installed with
+Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1, MPI and JSONcpp. On Ubuntu these can be installed with
 ```console
-sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev
+sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev libjsoncpp-1 libjsoncpp-dev libopenmpi-dev openmpi-bin
 ```
+
+Note that the path to jsoncpp is not standardized. This program assumes it lies in `<include path>/jsoncpp/json/json.h`. 
+If you get a compilation error, create a symlink from the path to your `json.h` to `jsoncpp/json/json.h`.
 
 If the
 requirements are satisfied, the makefile can be created and run with
@@ -78,15 +82,6 @@ to compile the tests, type `cmake -Dtest=ON`. For actually running the tests, ru
 `make test`.
 
 Better support for debugging and stricter compiler flags can be turned on using `cmake -DCMAKE_BUILD_TYPE=DEBUG`.
-
-## Usage (Julia)
-The Julia version is not completed, and does not count as a part of this assignment.
-This is left here to stand as a testament to the hubris of students.
-
-The version of Julia required is at least 0.6.0
-
-These can be tested by running
-`julia test.jl`.
 
 ## Credits
 The contributors of this project are Erlend Lima and Frederik Johan Mellbye.

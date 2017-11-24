@@ -48,17 +48,30 @@ class Analyzer:
         data = np.fromfile(os.path.join(base_path, block["path"]), dtype=type)
         return data.reshape(*block["dim"])
 
+    def get_xrange(self, memorize=[False]):
+        if not memorize[0]:
+            memorize[0] = True
+            self.xrange = np.linspace(self.meta['x start'], self.meta['x end'],
+                                      self.meta['x steps']+2)
+        return self.xrange
+
+    def get_trange(self, memorize=[False]):
+        if not memorize[0]:
+            memorize[0] = True
+            self.trange = np.linspace(self.meta['t start'], self.meta['t end'],
+                                      self.meta['t steps'])
+        return self.trange
+
     def plot(self):
         # self.plot_analytic_solution()
         # self.plot_numerical_solution()
         self.plot_quiver()
 
     def plot_numerical_solution(self):
-        x = np.linspace(0, 1, self.meta['x steps']+2)
         trange = range(0, self.meta['t steps'], self.meta['t steps']//10)
         palette = sns.color_palette("GnBu_d", len(trange))
         for i, t in enumerate(trange):
-            plt.plot(x, self.solution[t, :], label=rf'{t*self.meta["dt"]}', c=palette[i])
+            plt.plot(self.get_xrange(), self.solution[t, :], label=rf'{t*self.meta["dt"]}', c=palette[i])
         plt.legend()
         plt.show()
 
@@ -104,47 +117,90 @@ class Analyzer:
         ax.legend()
         plt.show()
 
-    def update_lines(self, num, lines, scatter):
-        start = 0 if num < 1000 else num-1000
-        for index, (line, scatt) in enumerate(zip(lines, scatter)):
-            line[0].set_data(*self.position[start:num+1, 0:2, index].T)
-            line[0].set_3d_properties(self.position[start:num+1, 2, index])
-            scatt[0].set_data(*self.position[num:num+1, 0:2, index].T)
-            scatt[0].set_3d_properties(self.position[num:num+1, 2, index])
+    def update_lines(self, num, lines, text):
+        lines[0][0].set_data(self.get_xrange(), self.solution[num, :])
+        text.set_text(f't = {self.get_trange()[num]:.3f}')
         return lines
 
     def animate(self, save=False):
         fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        # Set the limits of the axis to the greatest of all x-, y- and z-axes.
-        xmin = np.min(self.position[:, 0, :])
-        ymin = np.min(self.position[:, 1, :])
-        zmin = np.min(self.position[:, 2, :])
-        xmax = np.max(self.position[:, 0, :])
-        ymax = np.max(self.position[:, 1, :])
-        zmax = np.max(self.position[:, 2, :])
-        axmax = max([xmax, ymax, zmax])
-        axmin = min([xmin, ymin, zmin])
-        for axlim in [ax.set_xlim3d, ax.set_ylim3d, ax.set_zlim3d]:
-            axlim([axmin, axmax])
+        ax = fig.add_subplot(111)
+        xmin = np.min(self.get_xrange())
+        ymin = np.min(self.solution)
+        xmax = np.max(self.get_xrange())
+        ymax = np.max(self.solution)
+        ax.set_xlim([xmin, xmax])
+        ax.set_ylim([ymin, ymax])
 
-        ax.set_xlabel('X [AU]')
-        ax.set_ylabel('Y [AU]')
-        ax.set_zlabel('Z [AU]')
-        ax.grid(False)
+        ax.set_xlabel('x')
+        ax.set_ylabel('u(t, x)')
 
-        lines = [ax.plot(*self.position[:1, :, n].T, alpha=0.5)
-                 for n in range(self.position.shape[2])]
-        scatter = [ax.plot(*self.position[:1, :, n].T, linestyle='', marker='o')
-                   for n in range(self.position.shape[2])]
+        lines = [ax.plot(self.get_xrange(), self.solution[0, :])]
+        text = ax.text(0.05, 0.9, 't = 0.0', bbox={'facecolor': 'white',
+                                                   'alpha': 0.5,
+                                                   'pad': 5})
 
+        frames = range(0, self.meta['t steps']//4, self.meta['t steps']//1000),
         system_animation = animation.FuncAnimation(fig, self.update_lines,
-                                                   frames=range(0, self.position.shape[0], 500),
-                                                   fargs=(lines, scatter,),
+                                                   frames=frames,
+                                                   fargs=(lines, text),
                                                    interval=10, blit=False)
         if save:
             system_animation.save('../latex/figures/animation.gif',
                                   writer='imagemagick', fps=30)
+        else:
+            plt.show()
+
+    def update_quiver(self, num, Q, X, Y, text, indices, N):
+        U = np.repeat(self.solution[num, indices], N).reshape((N+1, N))
+        V = Y*0
+
+        # print(self.solution[num, indices])
+        # print(U)
+
+        Q.set_UVC(U, V)
+        # Q.set_offsets((X, Y))
+        # Q.set_offsets((X, Y))
+        text.set_text(f't = {self.get_trange()[num]:.3f}')
+        return Q,
+
+    def animate_fancy(self, save=False):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        xmin = np.min(self.get_xrange())
+        ymin = np.min(self.solution)
+        xmax = np.max(self.get_xrange())
+        ymax = np.max(self.solution)
+        ax.set_xlim([0, 1])
+        ax.set_ylim([xmin-0.2, xmax+0.2])
+
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.plot([0, 1], [xmax, xmax], 'k-', alpha=0.5)
+        ax.plot([0, 1], [xmin, xmin], 'k-', alpha=0.5)
+        ax.text((xmax-xmin)/2, xmax+0.1, r'$\vec{U}\longrightarrow$')
+
+        N = 20
+        yrange = self.get_xrange()
+        xrange = np.linspace(0, 1, N)
+        indices = range(0, len(yrange), len(yrange)//N)
+
+        X, Y = np.meshgrid(xrange, yrange[indices])
+        U = np.repeat(self.solution[0, indices], N).reshape(N+1, N)
+        V = Y*0
+        Q = ax.quiver(X, Y, U, V, units='inches', scale=2, width=0.02)
+        text = ax.text(0.05, 1.1, 't = 0.0', bbox={'facecolor': 'white',
+                                                   'alpha': 0.5,
+                                                   'pad': 5})
+
+
+        anim = animation.FuncAnimation(fig, self.update_quiver,
+                                       frames=range(0, self.meta['t steps'], self.meta['t steps']//1000),
+                                       fargs=(Q, X, Y, text, indices, N),
+                                       interval=10, blit=False)
+        if save:
+            anim.save('../latex/figures/animation.gif',
+                      writer='imagemagick', fps=30)
         else:
             plt.show()
 
@@ -158,7 +214,9 @@ if __name__ == '__main__':
                         help="The file containing the metadata")
     parser.add_argument('--plot2d', help="Plot as 2D",
                         action="store_true")
-    parser.add_argument('--animate', help="Animate the orbits",
+    parser.add_argument('--animate', help="Animate the lines",
+                        action="store_true")
+    parser.add_argument('--animatef', help="A fancy animation",
                         action="store_true")
     parser.add_argument('--save', help="Save the (animation) plots",
                         action="store_true")
@@ -166,5 +224,7 @@ if __name__ == '__main__':
     analyzer = Analyzer(args.search_path, args.meta)
     if args.animate:
         analyzer.animate(args.save)
+    elif args.animatef:
+        analyzer.animate_fancy(args.save)
     else:
         analyzer.plot()
