@@ -82,14 +82,12 @@ class Analyzer:
         zeros = np.zeros_like(U)
         ax.plot([0, 1], [1, 1], 'k-', alpha=0.5)
         ax.plot([0, 1], [0, 0], 'k-', alpha=0.5)
-        Q = ax.quiver(zeros, y, U, zeros)
+        Q = ax.quiver(zeros, y, U, zeros, scale=1)
         ax.set_xlim(0, 1.1*U.max())
         ax.set_ylim(0, 1.1)
-        t = 0
 
         anim = animation.FuncAnimation(fig, self.update_quiver_simple,
-                                       fargs=(U,Q),
-                                       interval=10,
+                                       fargs=(U,Q), interval=10,
                                        frames=range(0,len(self.solution)),
                                        blit=False)
         plt.show()
