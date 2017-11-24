@@ -119,7 +119,7 @@ class Analyzer:
 
     def update_lines(self, num, lines, text):
         lines[0][0].set_data(self.get_xrange(), self.solution[num, :])
-        text.set_text(f't = {self.get_trange()[num]:.3f}')
+        text.set_text(f't = {self.get_trange()[num]:1.3f}')
         return lines
 
     def animate(self, save=False):
@@ -151,18 +151,22 @@ class Analyzer:
         else:
             plt.show()
 
-    def update_quiver(self, num, Q, X, Y, text, indices, N):
-        U = np.repeat(self.solution[num, indices], N).reshape((N+1, N))
+    def update_quiver(self, num, Q, X, Y, text, indices, N, M):
+        U = np.repeat(self.solution[num, indices], M).reshape((N+1, M))
         V = Y*0
 
-        # print(self.solution[num, indices])
-        # print(U)
-
         Q.set_UVC(U, V)
-        # Q.set_offsets((X, Y))
-        # Q.set_offsets((X, Y))
+        self.X = self.X+U*0.01
+        Q.set_offsets(self.XY_to_offsets(self.X, Y))
         text.set_text(f't = {self.get_trange()[num]:.3f}')
         return Q,
+
+    def XY_to_offsets(self, X, Y):
+        Z = []
+        for i in range(len(X)):
+            for j in range(len(X[i])):
+                Z.append([X[i][j], Y[i][j]])
+        return np.array(Z)
 
     def animate_fancy(self, save=False):
         fig = plt.figure()
@@ -181,14 +185,17 @@ class Analyzer:
         ax.text((xmax-xmin)/2, xmax+0.1, r'$\vec{U}\longrightarrow$')
 
         N = 20
+        M = 150
         yrange = self.get_xrange()
-        xrange = np.linspace(0, 1, N)
+        xrange = np.linspace(-20, 1, M)
         indices = range(0, len(yrange), len(yrange)//N)
 
         X, Y = np.meshgrid(xrange, yrange[indices])
-        U = np.repeat(self.solution[0, indices], N).reshape(N+1, N)
+        self.X = X
+        # U = np.repeat(self.solution[0, indices], N).reshape(M+1, N)
+        U = np.ones_like(X)*0.3
         V = Y*0
-        Q = ax.quiver(X, Y, U, V, units='inches', scale=2, width=0.02)
+        Q = ax.quiver(X, Y, U, V, units='inches', scale=2, width=0.015)
         text = ax.text(0.05, 1.1, 't = 0.0', bbox={'facecolor': 'white',
                                                    'alpha': 0.5,
                                                    'pad': 5})
@@ -196,7 +203,7 @@ class Analyzer:
 
         anim = animation.FuncAnimation(fig, self.update_quiver,
                                        frames=range(0, self.meta['t steps'], self.meta['t steps']//1000),
-                                       fargs=(Q, X, Y, text, indices, N),
+                                       fargs=(Q, X, Y, text, indices, N, M),
                                        interval=10, blit=False)
         if save:
             anim.save('../latex/figures/animation.gif',
