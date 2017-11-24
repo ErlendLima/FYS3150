@@ -79,7 +79,7 @@
 \def\axislength{.5}
 
 % Colors
-\colorlet{MyColorOne}{blue!50}
+\colorlet{MyColorOne}{blue!35}
 \newcommand{\lightercolor}[3]{% Reference Color, Percentage, New Color Name
     \colorlet{#3}{#1!#2!white}
 }
@@ -88,6 +88,8 @@
 }
 \lightercolor{MyColorOne}{50}{MyColorOneLight}
 \darkercolor{MyColorOne}{50}{MyColorOneDark}
+
+\newcommand{\bigO}[1]{\ensuremath{\mathop{}\mathopen{}\mathcal{O}\mathopen{}\left(#1\right)}}
 
 % Biber for references
 % \bibliographystyle{aipauth4-1}
@@ -117,10 +119,10 @@ Diffusion something.
 \section{Theory} \label{sec:theory}
 \subsection{Deriving the diffusion equation for a Couette flow}
 A Couette flow is a drag-induced flow between either parallel plates or concentric
-rotating cylinders and therefore differs from pressure induced flows such as the
+rotating cylinders and therefore differs from pressure driven flows such as the
 Hagen-Poiseuille flow. It is assumed that the flow is laminar and of an incompressible
 Newtonian fluid of density $\rho$ and vicosity $\mu$ between infinite parallel
-plates located at $x = 0$ and $x = L$. The situation is illustrated in figure~\ref{fig:couette}.
+plates located at $y = 0$ and $y = L$. The situation is illustrated in figure~\ref{fig:couette}.
 Initially, the plates and the fluid is at rest, but at some time $t = t_0$
 the upper plate is given a horizontal velocity $U$.
 \begin{figure}[H]
@@ -178,13 +180,97 @@ surfaces, so
   u(y = L) &= U \\
   u(y = 0) &= 0
 \end{align*}
-Other boundary conditions such as the no penetration condition (no velocity
-normal to the boundaries at the boundaries) yield no additional information.
+To generalize the results the equations are scaled and written in terms of
+a spatial variable $x$ instead of $y$:
+\begin{align}
+  \pdv{\hat{u}}{\hat{t}} = \pdv[2]{\hat{u}}{\hat{x}}
+\end{align}
+where $\hat{x} = x / L$ and $\hat{u} = u / U$ and thus $\hat{t} = t / (L^2 / \nu)$.
+The initial conditions are converted to $\hat{u}(\hat{x},0) = 0$ for $0 < \hat{x} < 1$,
+and $\hat{u}(0,\hat{t}) = \hat{u}(1,\hat{t}) = 0$ at the boundaries for $\hat{t} > 0$.
+Only the dimensionless equation is considered hereafter, with the hats omitted.
 \subsection{Developing the numerical algorithms}
-
+In this project three numerical methods for solving partial differential equations (PDEs)
+are used. The methods are the explicit forward and implicit backward Euler
+algorithms, along with the implicit Crank-Nicolson scheme. For all three schemes
+position, time and thus velocity is discretized:
+\begin{align*}
+  t &\rightarrow t_j = t_0 + j \Delta{t} \\
+  x &\rightarrow x_i = x_0 + i \Delta{x} \\
+  u(x,t) &\rightarrow u(x_i, t_i)
+\end{align*}
+where $0 < i < n + 1$ and $j \geq 0$. The position step size is given by $\Delta{x} = 1 /(n+1)$.
+The notation $u(x_i,t_i) = u_{i,j}$ is used. The following derivations are based on
+section 10.2 in \cite{mortenjensen}, which has more detailed explanations.
+\subsubsection{Explicit forward Euler scheme}
+Perhaps the simplest method for forwarding the positions as a function of time
+is the forward Euler method. The derivatives are approximated using
+\begin{align*}
+  \pdv{u}{t} &= \frac{u_i,j+1 - u_i,j}{\Delta{t}} + \bigO{\Delta{t}} \\
+  \pdv[2]{u}{x} &= \frac{u_{i+1,j} - 2 u_{i,j} + u_{i-1, j}}{\Delta{x}^2} + \bigO{\Delta{x}^2}
+\end{align*}
+Inserting these expressions in the diffusion equation, omitting the error terms
+and setting $\alpha = \Delta{t} / \Delta{x}^2$ yields the explicit scheme
+\begin{align} \label{eq:explicitscheme}
+  u_{i,j+1} = \alpha u_{i_1,j} + (1-2\alpha) u_{i,j} + \alpha u_{i+1,j}
+\end{align}
+Given initial and boundary values, the succeding steps can be calculated using~\ref{eq:explicitscheme},
+all the terms on the right hand side are known and therefore explicitly give
+the solution in the next step. The above equation can be rewritten to a matrix-vector
+multiplication
+\begin{align*}
+  \vb{u}_{j+1} = A \vb{u}_j
+\end{align*}
+where the entries in $\vb{u}_j$ are the $u_i$'s at time $t_j$ and the matrix $A$ is
+given by
+\begin{align*}
+  A = \begin{bmatrix}
+        1 - 2\alpha & \alpha      & 0            & \hdots  & 0      \\
+        \alpha      & 1 - 2\alpha & \alpha       & 0       & \vdots \\
+        0           & \alpha      & 1 - 2\alpha  & \alpha  & \vdots \\
+        \vdots      & \ddots      & \ddots       & \ddots  & \vdots \\
+        0           & \hdots      & \hdots       & \alpha  & 1 - 2\alpha \\
+      \end{bmatrix}
+\end{align*}
+The discretized PDE can therefore be written as a chain of matrix multiplications
+\begin{align*}
+  \vb{u}_{j} = A^{j} \vb{u}_0
+\end{align*}
+where $\vb{u}_0 = g(x)$ is the initial state.
+\subsubsection{Implicit backward Euler}
+For the implicit backward Euler method the derivation is almost identical,
+the difference originates at the backward Euler time derivative expansion
+\begin{align*}
+  \pdv{u}{t} = \frac{u_{i,j} - u_{i,j-1}}{\Delta{t}} + \bigO{\Delta{t}}
+\end{align*}
+which yields the implicit steps
+\begin{align*}
+  u_{i,j-1} = -\alpha u_{i_1,j} + (1-2\alpha) u_{i,j} - \alpha u_{i+1,j}
+\end{align*}
+Note that $\alpha$ is the same as in the forward Euler scheme. As in the previous
+scheme, a time step is solved through a matrix equation
+\begin{align*}
+  A \vb{u}_{j} = \vb{u}_{j-1}
+\end{align*}
+where
+\begin{align*}
+  A = \begin{bmatrix}
+        1 + 2\alpha & -\alpha      & 0            & \hdots  & 0      \\
+        -\alpha      & 1 + 2\alpha & -\alpha       & 0       & \vdots \\
+        0           & -\alpha      & 1 + 2\alpha  & -\alpha  & \vdots \\
+        \vdots      & \ddots      & \ddots       & \ddots  & \vdots \\
+        0           & \hdots      & \hdots       & -\alpha  & 1 + 2\alpha \\
+      \end{bmatrix}
+\end{align*}
+Each step is a backwards step, however if the matrix is constant in time it only
+needs to be inverted once. The solution at time $t_j$ is therefore given by
+\begin{align*}
+  \vb{u}_j = A^{-j} \vb{u}_0
+\end{align*}
+\subsubsection{Crank-Nicolson scheme}
 \subsection{Algorithm stability and trunctation errors}
 
-\subsection{Analytic solution for 1-D diffusion equation}
+\subsection{Analytic solution for the 1-D diffusion equation}
 Analytic solutions are available for the one-dimensional diffusion equation. Assume
 the differential equation is scaled and on the form
 \begin{align*}
