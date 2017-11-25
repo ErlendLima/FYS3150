@@ -64,8 +64,8 @@ class Analyzer:
 
     def plot(self):
         # self.plot_analytic_solution()
-        # self.plot_numerical_solution()
-        self.animate_simple()
+        self.plot_numerical_solution()
+        # self.animate_simple()
 
     def plot_numerical_solution(self):
         trange = range(0, self.meta['t steps'], self.meta['t steps']//10)

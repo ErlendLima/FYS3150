@@ -28,17 +28,19 @@ public:
     void binaryDump(std::ofstream& stream, const arma::Mat<T>&) const;
 
     // Setters and getters
-    double       getDt()     const {return (m_tend-m_tstart)/static_cast<double>(m_tsteps);};
+    double       getDt()     const;
     // The number of x-points are increased by 2 to include the boundary conditions
-    double       getDx()     const {return (m_xend-m_xstart)/static_cast<double>(m_xsteps+1);};
+    double       getDx()     const;
     double       getDy()     const {return getDx();};
-    double       getXsteps() const {return m_xsteps;};
-    double       getTsteps() const {return m_tsteps;};
+    unsigned int getXsteps() const;
+    unsigned int getTsteps() const;
     double       getAlpha()  const {return getDt()/(getDx()*getDx());};
     unsigned int getDim()    const {return m_dim;};
-    Method       getMethod() const {return method;};
+    Method       getMethod() const {return m_method;};
     void         setDimension(unsigned int dim);
     void         setBoundaries(double lower, double upper);
+    double       getStableDt() const;
+    double       getTend()   const;
     std::tuple<double, double> getBoundaries() const {return std::make_tuple(m_xstart_bound, m_xend_bound);};
     arma::mat&   getU();
 
@@ -48,13 +50,15 @@ public:
 private:
 
     unsigned int m_dim   = 1;      // Number of dimensions
-    unsigned int m_xsteps; // Number of integration points along the X-axis
-    unsigned int m_tsteps; // Number of integration points along the Y-axis
+
+    /* Step sizes. Dt is deduced from stability condition if not specified */
+    double       m_dt = -1;     // The step size in time
+    double       m_dx = -1;     // The step size in the spacial dimension
+
+    /* Number of integration points in the t direction */
+    unsigned int m_tsteps;
 
     /* Initial and boundary conditions */
-    double m_tstart = 0;
-    double m_tend   = 10;
-
     double m_xstart = 0;
     double m_xend   = 1;
 
@@ -67,7 +71,8 @@ private:
     bool m_hasCreatedU = false;
     arma::mat m_u;
 
-    Method method = Method::FORWARD_EULER;
+    Method m_method = Method::FORWARD_EULER;
+    bool   m_deducedt = false;
 
     std::string  m_basepath     = "../data/";
     std::string  m_metapath     = "meta.json";

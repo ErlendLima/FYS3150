@@ -1,8 +1,7 @@
 {
     "parallel": false,
     "dimensions": 1,
-    "number of x points": 100,
-    "number of t points": 30000,
+    "number of t points": 300,
     "initial condition": "zero",
     "lower bound": 0.0,
     "upper bound": 1.0,
@@ -10,5 +9,7 @@
     "t end": 0.3,
     "x start": 0.0,
     "x end": 1.0,
+    "step size dx": 0.1,
+    "step size dt": 0.001,
     "method": "forward"
 }
