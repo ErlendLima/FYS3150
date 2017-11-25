@@ -11,7 +11,6 @@ import argparse
 import os
 from numpy import pi, sin, exp
 import json
-import pandas as pd
 
 sns.set(context="poster", style='white')
 
@@ -48,23 +47,21 @@ class Analyzer:
         data = np.fromfile(os.path.join(base_path, block["path"]), dtype=type)
         return data.reshape(*block["dim"])
 
-    def get_xrange(self, memorize=[False]):
-        if not memorize[0]:
-            memorize[0] = True
+    def get_xrange(self):
+        if not hasattr(self, 'xrange'):
             self.xrange = np.linspace(self.meta['x start'], self.meta['x end'],
                                       self.meta['x steps']+2)
         return self.xrange
 
-    def get_trange(self, memorize=[False]):
-        if not memorize[0]:
-            memorize[0] = True
+    def get_trange(self):
+        if not hasattr(self, 'trange'):
             self.trange = np.linspace(self.meta['t start'], self.meta['t end'],
                                       self.meta['t steps'])
         return self.trange
 
     def plot(self):
-        # self.plot_analytic_solution()
-        self.plot_numerical_solution()
+        self.plot_analytic_solution()
+        # self.plot_numerical_solution()
         # self.animate_simple()
 
     def plot_numerical_solution(self):
@@ -97,29 +94,29 @@ class Analyzer:
         Q.set_UVC(U, np.zeros_like(U))
         return Q,
 
-    def plot_analytic_solution(self):
+    def analytical_fn(self, y, t):
         U = 1
         h = 1
         nu = 1
+        S = 0
+        for n in range(1, 1000):
+            S += 1/n*exp(-n**2*pi**2*nu*t/h**2)*sin(n*pi*(1-y/h))
+        return U*y/h - 2*U/pi * S
 
-        def u(y, t):
-            S = 0
-            for n in range(1, 1000):
-                S += 1/n*exp(-n**2*pi**2*nu*t/h**2)*sin(n*pi*(1-y/h))
-            return U*y/h - 2*U/pi * S
-
+    def plot_analytic_solution(self):
         fig, ax = plt.subplots(1)
-        y = np.linspace(0, 1, 100)
-        ts = [0, 0.001, 0.01, 0.1, 0.2, 0.3, 0.5, 0.8, 0.9, 1.0]
+        y = self.get_xrange()
+        ts = self.get_trange()[::100]
         palette = sns.color_palette("GnBu_d", len(ts))
         for i, t in enumerate(ts):
-            ax.plot(y, u(y, t), label=rf'$u(y, {t})$', c=palette[i])
-        ax.legend()
+            ax.plot(y, self.analytical_fn(y, t), '--', label=rf'$u(y, {t})$', c=palette[i])
+            ax.plot(y, self.solution[i*100, :], c=palette[i])
+        # ax.legend()
         plt.show()
 
     def update_lines(self, num, lines, text):
         lines[0][0].set_data(self.get_xrange(), self.solution[num, :])
-        text.set_text(f't = {self.get_trange()[num]:1.3f}')
+        text.set_text(f't = {self.get_trange()[num]}')
         return lines
 
     def animate(self, save=False):
@@ -140,7 +137,7 @@ class Analyzer:
                                                    'alpha': 0.5,
                                                    'pad': 5})
 
-        frames = range(0, self.meta['t steps']//4, self.meta['t steps']//1000),
+        frames = range(0, self.meta['t steps']//4, self.meta['t steps']//100),
         system_animation = animation.FuncAnimation(fig, self.update_lines,
                                                    frames=frames,
                                                    fargs=(lines, text),
@@ -210,6 +207,15 @@ class Analyzer:
                       writer='imagemagick', fps=30)
         else:
             plt.show()
+
+    def calculate_error(self, indices: [int]) -> (int, np.array):
+        y = self.get_xrange()
+        errors = []
+        for index in indices:
+            t = self.get_trange()[index]
+            analytical = self.analytical_fn(y, t)
+            errors.append(abs(analytical - self.solution[index, :]))
+        return t, y, errors
 
 
 if __name__ == '__main__':
