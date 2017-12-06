@@ -96,7 +96,7 @@
 
 \begin{document}
 \sisetup{detect-all}
-\title{Diffusion of something}
+\title{Solving the diffusion equation in one and two dimensions with numerical methods}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
 \affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project3}}
@@ -115,7 +115,21 @@ Abstract.
 \newpage
 
 \section{Introduction} \label{sec:introduction}
-Diffusion something.
+The diffusion equation is a partial differential equation that appears frequently in
+multiple fields of science. Among others, heat transfer processes, Markov processes
+and applications in life science are examples of situations where the equation describes
+some phenomena. Furthermore, the numerical methods that are used to solve the diffusion
+equation are easily modified to solve similar equations, which demonstrates the relevance
+of investigating the methods and attributed stability conditions and errors.
+
+In this paper the diffusion equation is derived for a one-dimensional shear-stress
+driven Couette flow from the incompressible Navier-Stokes equations. The resulting
+equation along with the boundary and initial conditions are scaled and discretized.
+Three numerical methods are employed to solve the equation, namely the explicit Forward and
+implicit Backward Euler methods, and a combination of the two, the Crank-Nicolson scheme.
+The solutions from the numerical methods are compared to the analytical solution, which
+shows a close agreement. The solver is then extended to solve the two dimensional
+diffusion equation.
 \section{Theory} \label{sec:theory}
 \subsection{Deriving the diffusion equation for a Couette flow}
 A Couette flow is a drag-induced flow between either parallel plates or concentric
@@ -185,9 +199,9 @@ a spatial variable $x$ instead of $y$:
 \begin{align}
   \pdv{\hat{u}}{\hat{t}} = \pdv[2]{\hat{u}}{\hat{x}}
 \end{align}
-where $\hat{x} = x / L$ and $\hat{u} = u / U$ and thus $\hat{t} = t / (L^2 / \nu)$.
+where $\hat{x} = x / L$ and $\hat{u} = u / U$ and thus $\hat{t} = t / (L^2 / \nu)$ are dimensionless quantities.
 The initial conditions are converted to $\hat{u}(\hat{x},0) = 0$ for $0 < \hat{x} < 1$,
-and $\hat{u}(0,\hat{t}) = \hat{u}(1,\hat{t}) = 0$ at the boundaries for $\hat{t} > 0$.
+and $\hat{u}(0,\hat{t}) = 0$ and $\hat{u}(1,\hat{t}) = 1$ at the boundaries for $\hat{t} > 0$.
 Only the dimensionless equation is considered hereafter, with the hats omitted.
 \subsection{Developing the numerical algorithms}
 In this project three numerical methods for solving partial differential equations (PDEs)
@@ -268,8 +282,58 @@ needs to be inverted once. The solution at time $t_j$ is therefore given by
   \vb{u}_j = A^{-j} \vb{u}_0
 \end{align*}
 \subsubsection{Crank-Nicolson scheme}
+The Crank-Nicolson scheme combines the ideas from the above Euler methods and is
+a second-order implicit method in time. Using the Taylor expansions seen in
+\cite{mortenjensen}, the diffusion equation can be rewritten to
+\begin{align*}
+  -\alpha u_{i_1, j} &+ (2 + 2\alpha) u_{i,j} - \alpha u_{i+1,j}\\
+   &= \alpha u_{i-1,j-1} + (2 - 2\alpha) u_{i, j-1} + \alpha u_{i+1,j-1}
+\end{align*}
+where $\alpha$ is the same as in the other methods. In matrix-vector form this
+is equivalent to
+\begin{align*}
+  (2 I + \alpha B) \vb{u}_j = (2 I - \alpha B) \vb{u}_{j-1}
+\end{align*}
+where the solution vectors $\vb{u}$ are the same as before, $I$ is the identity
+matrix and $B$ is given by
+\begin{align*}
+  B = \begin{bmatrix}
+        2  & -1 & \hdots  & 0      \\
+        -1 & 2  & -1 & 0       & \vdots \\
+        0  & -1 & 2  & -1  & \vdots \\
+        \vdots       & \ddots      & \ddots       & \ddots  & \vdots \\
+        0  & \hdots  & \hdots       & -1  & 2 \\
+      \end{bmatrix}
+\end{align*}
+Rewriting the above equation, the Crank-Nicolson scheme is
+\begin{align*}
+  \vb{u}_j = (2 I + \alpha B)^{-1} (2 I - \alpha B) \vb{u}_{j-1}
+\end{align*}
 \subsection{Algorithm stability and trunctation errors}
+The algorithms have different accuracies and are limited by different stability
+conditions. The solution approaches definite values if the spectral radius $\rho(A)$ of
+the matrices satisfies
+\begin{align} \label{eq:spectralradius}
+  \rho(A) = \text{max}\{ |\lambda| : \text{det}(A - \lambda I) = 0 \} < 1
+\end{align}
+i.e. the maximum absolute eigenvalue can not exceed unity. From this is follows
+that positive definite matrices always satisfy~\ref{eq:spectralradius}.
 
+In addition to the stability requirement there will obviously be trunctation errors
+for each scheme. The requirements are summarized in table~\ref{table:errors} and derived in the
+appendix, see~\ref{sec:errors}.
+\begin{table}[H]
+\centering
+\caption{Summarized trunctation errors and stability requirements for the schemes.}
+\label{table:errors}
+\begin{tabular}{p{0.31\linewidth}|p{0.34\linewidth}|p{0.28\linewidth}}
+\hline
+Scheme         & Trunctation Error                          & Stability requirement                     \\ \hline
+Crank-Nicolson & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t^2}}$ & None                                      \\
+Forward Euler  & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t}}$   & None                                      \\
+Backward Euler & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t}}$   & $\Delta{t} \leq \frac{1}{2} \Delta{x^2}$  \\ \hline
+\end{tabular}
+\end{table}
 \subsection{Analytic solution for the 1-D diffusion equation}
 Analytic solutions are available for the one-dimensional diffusion equation. Assume
 the differential equation is scaled and on the form
@@ -317,15 +381,27 @@ configuration to the Fourier series base, through the inner product
 \begin{align*}
   A_n = \frac{2}{L}\int_0^L g(x) \sin{(n \pi x / L)} \dd{x}
 \end{align*}
+\subsection{Two dimensions}
+In to spatial dimensions, the diffusion equation is extended to
+\begin{align}
+  \nabla^2 u = \pdv[2]{u}{x} + \pdv[2]{u}{y} = \pdv{u}{t}
+\end{align}
+where the solution $u(x,y,t)$ is a function of time $t$ and two spatial coordinates $x$ and $y$,
+the problem is therefore $2 + 1$ dimensional. $\nabla^2$ is the Laplacian.
 \section{Method} \label{sec:method}
+\subsection{One-dimensional implementation}
+How are the matrix equations solved? Tridiag and so on.
+\subsection{Two-dimensional implementation}
+Same. Jacobi used..
+\subsection{Error calculations}
+How are the errors calculated in the code? Relative error?
 \section{Results} \label{sec:results}
 \section{Discussion} \label{sec:discussion}
 \section{Conclusion} \label{sec:conclusion}
 \bibliography{references}
 \blankpage
 \appendix
-\section{Appendix section} \label{sec:label}
-
+\section{Derivation of trunctation errors and stability conditions} \label{sec:errors}
 \blankpage
 \end{document}
 
