@@ -96,7 +96,7 @@
 
 \begin{document}
 \sisetup{detect-all}
-\title{Solving the diffusion equation in one and two dimensions with numerical methods}
+\title{Numerical solutions to the diffusion equation in one and two dimensions}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
 \affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project3}}
@@ -129,7 +129,8 @@ Three numerical methods are employed to solve the equation, namely the explicit 
 implicit Backward Euler methods, and a combination of the two, the Crank-Nicolson scheme.
 The solutions from the numerical methods are compared to the analytical solution, which
 shows a close agreement. The solver is then extended to solve the two dimensional
-diffusion equation.
+diffusion equation, which for instance can be used to describe heat flow in a
+plate with edges held at given temperatures.
 \section{Theory} \label{sec:theory}
 \subsection{Deriving the diffusion equation for a Couette flow}
 A Couette flow is a drag-induced flow between either parallel plates or concentric
@@ -330,8 +331,8 @@ appendix, see~\ref{sec:errors}.
 \hline
 Scheme         & Trunctation Error                          & Stability requirement                     \\ \hline
 Crank-Nicolson & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t^2}}$ & None                                      \\
-Forward Euler  & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t}}$   & None                                      \\
-Backward Euler & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t}}$   & $\Delta{t} \leq \frac{1}{2} \Delta{x^2}$  \\ \hline
+Forward Euler  & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t}}$   & $\Delta{t} \leq \frac{1}{2} \Delta{x^2}$  \\
+Backward Euler & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t}}$   & None                                      \\ \hline
 \end{tabular}
 \end{table}
 \subsection{Analytic solution for the 1-D diffusion equation}
@@ -382,17 +383,36 @@ configuration to the Fourier series base, through the inner product
   A_n = \frac{2}{L}\int_0^L g(x) \sin{(n \pi x / L)} \dd{x}
 \end{align*}
 \subsection{Two dimensions}
-In to spatial dimensions, the diffusion equation is extended to
-\begin{align}
+In two spatial dimensions, the diffusion equation is extended to
+\begin{align} \label{eq:diffusion2d}
   \nabla^2 u = \pdv[2]{u}{x} + \pdv[2]{u}{y} = \pdv{u}{t}
 \end{align}
 where the solution $u(x,y,t)$ is a function of time $t$ and two spatial coordinates $x$ and $y$,
-the problem is therefore $2 + 1$ dimensional. $\nabla^2$ is the Laplacian.
+the problem is therefore $2 + 1$ dimensional. $\nabla^2$ is the Laplacian. The solution at
+each time step is now a two-dimensional grid, which needs to be enclosed by boundary
+conditions in two dimensions.
+\subsubsection{Explicit scheme}
+The simplest method for approximating a solution to the two-dimensional diffusion
+equation is an explicit forward scheme. The derivatives are approximated as above:
+\begin{align*}
+  \pdv[2]{u}{x} &= \frac{u^l_{i+1,j} - 2u^l_{i,j} + 2u^l_{i-1,j}}{h^2} \\
+  \pdv[2]{u}{y} &= \frac{u^l_{i,j+1} - 2u^l_{i,j} + 2u^l_{i,j-1}}{h^2} \\
+  \pdv{u}{t} &= \frac{u^l_{i,j} - u^{l-1}_{i,j}}{\Delta{t}}
+\end{align*}
+where $i$ and $j$ are node indices in space and $l$ represents the time steps. It
+is here assumed that the lattice is a square so $h = \Delta{x} = \Delta{y}$. Inserting
+these expressions in~\ref{eq:diffusion2d} yields
+\begin{align*}
+  u_{i,j}^{l+1} = u_{i,j}^l + \alpha (u^l_{i+1,j} + u^l_{i-1,j} + u_{i,j+1}^l + u_{i,j-1}^l - 4 u^l_{i,j})
+\end{align*}
+where $\alpha = \Delta{t}/h^2$. The right hand side is only a function of known
+quantities (current state and boundary conditions), and therefore explcitly gives
+the solution in the next step.
 \section{Method} \label{sec:method}
 \subsection{One-dimensional implementation}
 How are the matrix equations solved? Tridiag and so on.
 \subsection{Two-dimensional implementation}
-Same. Jacobi used..
+Same. Explicit method used.
 \subsection{Error calculations}
 How are the errors calculated in the code? Relative error?
 \section{Results} \label{sec:results}
@@ -402,6 +422,57 @@ How are the errors calculated in the code? Relative error?
 \blankpage
 \appendix
 \section{Derivation of trunctation errors and stability conditions} \label{sec:errors}
+\subsection{Explicit scheme}
+The explicit scheme uses standard approximations for the derivatives which are
+inserted in the diffusion equation. The first order time approximation has
+an error term $\sim \Delta{t}$, and the second derivative position approximation
+has an error $\Delta{x^2}$. The method is therefore second order in position and
+first order in time.
+
+For the stability condition recall equation~\ref{eq:spectralradius}, which states
+that the spectral radius $\rho$ of the matrix does not exceed $1$. If the scheme is
+unstable, the algorithm will amplify trunctation and round-off errors, which is
+now shown to be a possibility for the explicit scheme. The matrix
+is rewritten to $A = I - \alpha B$, where
+\begin{align*}
+  B = \begin{bmatrix}
+        2  & -1 & \hdots  & 0      \\
+        -1 & 2  & -1 & 0       & \vdots \\
+        0  & -1 & 2  & -1  & \vdots \\
+        \vdots       & \ddots      & \ddots       & \ddots  & \vdots \\
+        0  & \hdots  & \hdots       & -1  & 2 \\
+      \end{bmatrix}
+\end{align*}
+$A$ therefore has eigenvalues $\lambda_i = 1 - \alpha \mu_i$ where $\mu_i$ is
+the eigenvalues of $B$. The matrix elements of $B$ are $b_{i,j} = 2\delta_{i,j} - \delta_{i+1,j} - \delta{i-1,j}$.
+For component $i$ the eigenequations are
+\begin{align*}
+  (B\vb{x})_i = \sum_{j=1}^{n} (2\delta_{i,j} - \delta_{i+1,j} - \delta{i-1,j})x_j = 2x_i - x_{i+1} - x_{i-1} = \mu_i x_i
+\end{align*}
+Expanding $x$ in a basis of sines with arguments $\theta = l \pi / n + 1$, the previous equation can be rewritten as
+\begin{align*}
+  2(1 - \cos{(\theta)}) = \mu_i
+\end{align*}
+from which it is clear that the eigenvalues are $\mu_i = 2 - 2 \cos{(\theta)}$. The
+spectral radius requirement is therefore
+\begin{align*}
+  -1 < 1 - 2 \alpha (1 - \cos{(\theta)}) < 1
+\end{align*}
+which is satisfied if $\alpha \leq 1/2$. Thus the stability requirement is
+\begin{align}
+  \frac{\Delta{t}}{\Delta{x^2}} \leq \frac{1}{2}
+\end{align}
+The explicit scheme for solving the one-dimensional diffusion equation is therefore
+conditionally stable.
+
+\subsection{Implicit scheme}
+The implicit scheme uses the same time and position approximations as the explicit
+scheme, and therefore has identical trunctation error orders. However, the matrix
+is here positive definite, and the eigenvalues automatically satisfy~\ref{eq:spectralradius}.
+The implicit scheme is therefore unconditionally stable.
+
+\subsection{Crank-Nicolson scheme}
+Same as implicit but second order in time.
 \blankpage
 \end{document}
 
