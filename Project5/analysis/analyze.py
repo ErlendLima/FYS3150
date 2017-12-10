@@ -7,6 +7,7 @@ import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 import matplotlib as mpl
+import sys
 import argparse
 import os
 from numpy import pi, sin, exp
@@ -264,7 +265,7 @@ class Analyzer:
                                 min_time=None, max_time=None):
         t = self.get_trange()
         y = self.get_xrange()
-        Y = np.repeat(y, len(t))
+        Y = np.hstack((y,)*len(t))
         y = np.reshape(Y, self.solution.shape)
 
         # Do not use the endpoints to avoid division by zero
@@ -277,42 +278,17 @@ class Analyzer:
 
         analytical = self.analytical_fn(y.T, t).T
         analytical = analytical[tstart:tend, xstart:xend]
-        print(analytical)
         solution = self.solution[tstart:tend, xstart:xend]
         abs_err = abs(analytical - solution)
-        ind = np.argmax(abs_err, axis=1)
-        print(ind)
-        print(ind.shape)
-        print(np.mean(ind))
-        print(np.std(ind))
-        Y = self.get_xrange()[xstart:xend]
-        for ti, x in enumerate(ind):
-            print(abs_err[ti, x])
-            print(analytical[ti, x])
-            print(solution[ti, x])
-            plt.plot(Y, analytical[ti, :], label='analytic')
-            plt.plot(Y, solution[ti, :], label='numeric')
-            plt.plot((Y[x], Y[x]), (-1, 1))
-            print("======")
-            plt.legend()
-            plt.show()
-            input()
         return t[tstart:tend], method(abs_err, axis=1)
 
     def calculate_total_rel_err(self, method=np.max,
-                                tlimits=[1, -1000], xlimits=[1, -1],
+                                tlimits=[1, -1000], xlimits=[20, -20],
                                 min_time=None, max_time=None):
-        # Get the ranges for y and t used
         t = self.get_trange()
         y = self.get_xrange()
-
-        # Repeat y so that it has the same shape as u(y, t)
-        Y = np.repeat(y, len(t))
-        y = np.reshape(Y, self.solution.shape[::-1])
-
-        # Get the analytical values for u(y, t)
-        # It must be transposed since the solution has the shape u(t, y)
-        analytical = self.analytical_fn(y, t).T
+        Y = np.hstack((y,)*len(t))
+        y = np.reshape(Y, self.solution.shape)
 
         # Do not use the endpoints to avoid division by zero
         xstart, xend = xlimits
@@ -322,13 +298,13 @@ class Analyzer:
         if min_time is not None:
             tstart = np.where(t <= min_time)[0][0]
 
-        # Calculate the relative error
-        rel_err = abs((analytical[tstart:tend, xstart:xend] -
-                      self.solution[tstart:tend, xstart:xend]) /
-                      analytical[tstart:tend, xstart:xend])
+        analytical = self.analytical_fn(y.T, t).T
+        analytical = analytical[tstart:tend, xstart:xend]
+        solution = self.solution[tstart:tend, xstart:xend]
+        abs_err = abs(analytical - solution)
 
         # Find either the sum or the max error in each time step
-        diff = method(rel_err, axis=1)
+        diff = method(abs_err/analytical, axis=1)
 
         # Return the time steps used and total error
         return t[tstart:tend], diff
