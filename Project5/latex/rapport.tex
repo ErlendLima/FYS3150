@@ -99,16 +99,16 @@
 \title{Finite element solutions to the diffusion equation in one and two dimensions}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
-\affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project3}}
+\affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project4}}
 \date{\today}
 
 \begin{abstract}
 Three finite element methods, namely the explicit forward Euler, implicit backward Euler
-and Crank-Nicolson schemes are used to solve the diffusion equation in one and
-two dimensions. The equation is derived and motivated for a Couette flow from the
+and Crank-Nicolson schemes, are used to solve the diffusion equation in one and
+two dimensions. The equation is derived and motivated from a Couette flow from the
 incompressible Navier-Stokes equations, and a wide array of other applications
 are discussed. The solutions are compared to known analytic solutions, which shows
-that the second order in time and space Crank-Nicolson scheme outperforms
+that the second order in time and space. Crank-Nicolson scheme outperforms
 the Euler methods in terms of solution accuracy when the steps in space and time are sufficiently small. For $\Delta x = 10^{-2}$ and $\Delta{t} = 10^{-5}$ for instance,
 the Crank-Nicolson method was the most stable. The stability limitations of the
 explicit position-centered, time-forward Euler scheme are investigated and found to
@@ -126,9 +126,9 @@ and $1/4$ in two dimensions.
 
 \section{Introduction} \label{sec:introduction}
 The diffusion equation is a partial differential equation that appears frequently in
-multiple fields of science. Among others, heat transfer processes, Markov processes
+multiple fields of science. Heat transfer processes, Markov processes
 and applications in life science are examples of situations where the equation describes
-some phenomena. Furthermore, the numerical methods that are used to solve the diffusion
+some phenomena. The numerical methods that are used to solve the diffusion
 equation are easily modified to solve similar equations, which demonstrates the relevance
 of investigating the methods and attributed stability conditions and errors.
 
@@ -142,7 +142,7 @@ shows a close agreement. The solver is then extended to solve the two dimensiona
 diffusion equation, which for instance can be used to describe heat flow in a
 plate with edges held at given temperatures.
 \section{Theory} \label{sec:theory}
-\subsection{Deriving the diffusion equation for a Couette flow}
+\subsection{Deriving the Diffusion Equation for a Couette Flow}
 A Couette flow is a drag-induced flow between either parallel plates or concentric
 rotating cylinders and therefore differs from pressure driven flows such as the
 Hagen-Poiseuille flow. It is assumed that the flow is laminar and of an incompressible
@@ -214,7 +214,7 @@ where $\hat{x} = x / L$ and $\hat{u} = u / U$ and thus $\hat{t} = t / (L^2 / \nu
 The initial conditions are converted to $\hat{u}(\hat{x},0) = 0$ for $0 < \hat{x} < 1$,
 and $\hat{u}(0,\hat{t}) = 0$ and $\hat{u}(1,\hat{t}) = 1$ at the boundaries for $\hat{t} > 0$.
 Only the dimensionless equation is considered hereafter, with the hats omitted.
-\subsection{Developing the numerical algorithms}
+\subsection{Developing the Numerical Algorithms}
 In this project three numerical methods for solving partial differential equations (PDEs)
 are used. The methods are the explicit forward and implicit backward Euler
 algorithms, along with the implicit Crank-Nicolson scheme. For all three schemes
@@ -227,7 +227,7 @@ position, time and thus velocity is discretized:
 where $0 < i < n + 1$ and $j \geq 0$. The position step size is given by $\Delta{x} = 1 /(n+1)$.
 The notation $u(x_i,t_i) = u_{i,j}$ is used. The following derivations are based on
 section 10.2 in \cite{mortenjensen}, which has more detailed explanations.
-\subsubsection{Explicit forward Euler scheme}
+\subsubsection{Explicit Forward Euler Scheme}
 Perhaps the simplest method for forwarding the positions as a function of time
 is the forward Euler method. The derivatives are approximated using
 \begin{align*}
@@ -262,7 +262,7 @@ The discretized PDE can therefore be written as a chain of matrix multiplication
   \vb{u}_{j} = A^{j} \vb{u}_0
 \end{align*}
 where $\vb{u}_0 = g(x)$ is the initial state.
-\subsubsection{Implicit backward Euler}
+\subsubsection{Implicit Backward Euler}
 For the implicit backward Euler method the derivation is almost identical,
 the difference originates at the backward Euler time derivative expansion
 \begin{align*}
@@ -292,7 +292,7 @@ needs to be inverted once. The solution at time $t_j$ is therefore given by
 \begin{align*}
   \vb{u}_j = A^{-j} \vb{u}_0
 \end{align*}
-\subsubsection{Crank-Nicolson scheme}
+\subsubsection{Crank-Nicolson Scheme}
 The Crank-Nicolson scheme combines the ideas from the above Euler methods and is
 a second-order implicit method in time. Using the Taylor expansions seen in
 \cite{mortenjensen}, the diffusion equation can be rewritten to
@@ -320,7 +320,7 @@ Rewriting the above equation, the Crank-Nicolson scheme is
 \begin{align*}
   \vb{u}_j = (2 I + \alpha B)^{-1} (2 I - \alpha B) \vb{u}_{j-1}
 \end{align*}
-\subsection{Algorithm stability and trunctation errors}
+\subsection{Algorithm Stability and Trunctation Errors}
 The algorithms have different accuracies and are limited by different stability
 conditions. The solution approaches definite values if the spectral radius $\rho(A)$ of
 the matrix $A$ satisfies
@@ -345,7 +345,7 @@ Forward Euler  & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t}}$   & $\Delta{t} \leq \f
 Backward Euler & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t}}$   & None                                      \\ \hline
 \end{tabular}
 \end{table}
-\subsection{Analytic solution for the 1-D diffusion equation} \label{sec:analytic1d}
+\subsection{Analytic Solution for the 1-D Diffusion Equation} \label{sec:analytic1d}
 Analytic solutions are available for the one-dimensional diffusion equation. Assume
 the differential equation is scaled and on the form
 \begin{align*}
@@ -365,7 +365,8 @@ $u(x,t) = X(x)T(t)$. Inserting this in the diffusion equation yields
   \frac{1}{X} \pdv[2]{X}{x} = \frac{1}{T} \pdv{T}{t}
 \end{align*}
 The left hand side of the equation is only a function of $x$, and the right hand
-side similarly depends only on $t$. Thus both sides must be constant (set to $-\lambda^2$).
+side similarly depends only on $t$. Thus both sides must be constant. This
+constant is set to $-\lambda^2$.
 The PDE is therefore transformed to two ODE's:
 \begin{align*}
   \pdv[2]{X}{x} + \lambda^2 X &= 0 \\
@@ -381,8 +382,9 @@ This yields solutions
 \begin{align*}
   u(x,t) = A_n \sin{(n\pi x/L)}e^{-n^2 \pi^2 t/ L^2}
 \end{align*}
-Linear combinations of these solutions are also solutions because the diffusion
-equation is linear. Thus
+Since the diffusion equation is linear, linear combinations of these solutions
+are also solutions.
+Thus
 \begin{align}
   u(x,t) = \sum_{n = 1}^{\infty} A_n \sin{(n\pi x/L)}e^{-n^2 \pi^2 t/ L^2}
 \end{align}
@@ -392,7 +394,7 @@ configuration to the Fourier series base, through the inner product
 \begin{align*}
   A_n = \frac{2}{L}\int_0^L g(x) \sin{(n \pi x / L)} \dd{x}
 \end{align*}
-\subsection{Two dimensions}
+\subsection{Two Dimensions}
 In two spatial dimensions, the diffusion equation is extended to
 \begin{align} \label{eq:diffusion2d}
   \nabla^2 u = \pdv[2]{u}{x} + \pdv[2]{u}{y} = \pdv{u}{t}
@@ -401,7 +403,7 @@ where the solution $u(x,y,t)$ is a function of time $t$ and two spatial coordina
 the problem is therefore $2 + 1$ dimensional. $\nabla^2$ is the Laplacian. The solution at
 each time step is now a two-dimensional grid, which needs to be enclosed by boundary
 conditions in two dimensions.
-\subsubsection{Explicit scheme}
+\subsubsection{Explicit Scheme}
 The simplest method for approximating a solution to the two-dimensional diffusion
 equation is an explicit forward scheme. The derivatives are approximated as above:
 \begin{align*}
@@ -418,14 +420,14 @@ these expressions in~\ref{eq:diffusion2d} yields
 where $\alpha = \Delta{t}/h^2$. The right hand side is only a function of known
 quantities (current state and boundary conditions), and therefore explcitly gives
 the solution in the next step.
-\subsection{Analytic solution to the two-dimensional diffusion equation}
+\subsection{Analytic Solution to the Two-Dimensional Diffusion Equation}
 There is also a closed form solution available for the two-dimensional diffusion equation.
-Assume there are some boundary conditions (set to Dirichlet conditions here):
+Assume some boundary conditions, here the Dirichlet boundary conditions: 
 \begin{align*}
   u(0, y, t) = u(L, y, t) = u(x, 0, t) = u(x, L, t) = 0
 \end{align*}
 where the lattice length is $L$. These expressions simply state that the solution
-value is held to $0$ at the edges, for instance fixed at some temperature or fluid
+value is held fixed to $0$ at the edges, for instance fixed at some temperature or fluid
 boundary flow velocity. The initial condition is some initial configuration given by a function $u(x,y,0) = g(x,y)$.
 The same method is used here as in the one-dimensional case: separation of variables. The solution
 is written as $u(x,y,t) = X(x) Y(y) T(t)$, and inserted in the heat equation. Each resulting
@@ -435,7 +437,9 @@ term must equal a constant $-\lambda^2$:
   Y'' + \lambda^2 Y &= 0 \\
   T'  + \lambda^2 T &= 0
 \end{align*}
-where $X(0) = Y(0) = X(L) = Y(L) = 0$. From~\ref{sec:analytic1d} the solutions are
+where
+\[X(0) = Y(0) = X(L) = Y(L) = 0\]
+From~\ref{sec:analytic1d} the solutions are
 \begin{align*}
   X = A \sin{(\lambda x)} \quad Y = B \sin{(\lambda y)} \quad T = e^{-\lambda^2 t}
 \end{align*}
@@ -451,9 +455,9 @@ on the initial state.
 The full implementation of the algorithms is available in the Git-repository.
 The one dimensional solver was implemented in C++, and to test the speed of
 a vectorized NumPy implementation the two-dimensional solver was implemented in Python.
-\subsection{Initial and boundary values. Implementations.}
-\subsubsection{Testing the numerical solver}
-To test the numerical solvers a specific case with a trivial analytic solution
+\subsection{Initial and Boundary Values Implementations.}
+\subsubsection{Testing the Numerical Solver}
+In order to test the numerical solvers, a specific case with a trivial analytic solution
 was investigated. With an initial state of a half sine wave spanning the domain
 \begin{align*}
   g(x) = \sin{(x \pi)}
@@ -461,41 +465,41 @@ was investigated. With an initial state of a half sine wave spanning the domain
 and Dirichlet boundaries $u(0,t) = u(1,t) = 0$ an analytic solution can be found.
 Observe that the general solution terms are very similar to the initial condition,
 because setting $t = 0$ removes the exponential factor. Furthermore, using only
-the $n = 1$ term yields $u(x,0) = g(x)$, and the solution in the test case is
+the $n = 1$ term yields $u(x,0) = g(x)$. This gives the analytic solution to the test case as
 \begin{align*}
   u(x,t) = \sin{(\pi x)} e^{- \pi^2 t}
 \end{align*}
-This solution is then tested against the numerical solutions for different step
+This solution was then tested against the numerical solutions for different step
 sizes, both in space and time.
-\subsubsection{Couette flow initial and boundary conditions}
-For the Couette flow investigated in this paper, the zero flow initial condition
-is $u(x,0) = 0$ for $0 < x < 1$. With a scaled plate velocity difference, the
-lower plate at $x = 0$ is held stationary and the upper plate is given a constant
-velocity $1$. This equates to boundary conditions $u(0,t) = 0$ and $u(1,t) = 1$.
-\subsubsection{Two-dimensional boundaries}
-In two dimensions, boundary conditions along all sides of the square lattice need
-to be specified in addition to an initial state. The boundaries will be different
-in differend cases, for instance one edge of a metal plate may be held at a much
+\subsubsection{Couette Flow Initial and Boundary Conditions}
+The Couette flow investigated in this paper had an initial condition
+corresponding to zero flow, $u(x,0) = 0$ for $0 < x < 1$. With a scaled plate velocity difference, the
+lower plate at $x = 0$ is held stationary while the upper plate is given a constant
+velocity of $1$. This equates to boundary conditions $u(0,t) = 0$ and $u(1,t) = 1$.
+\subsubsection{Two-dimensional Boundaries}
+The boundary conditions are more complex in the two dimensional case, as all
+four boundaries of the square lattice must be specified.
+For instance one edge of a metal plate may be held at a much
 higher temperature than the other sides. In the analysis in this paper, the boundaries
 are set to Dirichlet boundaries, i.e.
 \begin{align*}
   u(0,y,t) = u(1,y,t) = u(x,0,t) = u(x,1,t) = 0
 \end{align*}
-so all the edges have the same temperature. The grid could in this case also represent an
-intersection of a square tube with flowing fluid and the tube stationary. With no
+This describes a lattice where all edges have the same temperature. The grid could also represent an
+intersection of a square tube with fluid flowing while the tube is stationary. With no
 pressure driving the flow, the velocity field will diffuse away as energy is dissipated
 to other forms through viscous effects.
 
 For this paper only the explicit method is used to solve the two-dimensional equation.
 The stability condition is tested by attempting to run the solver for combinations
-of $\Delta t$ og $\Delta x$
-\subsection{Matrix equation solver}
+of $\Delta t$ and $\Delta x$
+\subsection{Matrix Equation Solver}
 To solve the matrix equations some numerical method needs to be used. By inspection,
 the matrices in all of the methods are tridiagonal, which allows usage of the
 Thomas algorithm, specifically made to solve tridiagonal matrix systems. A
 thorough derivation and analysis of the algorithm is seen in~\cite{project1}. The
 implementation of the full solver can be seen in the source code.
-\subsection{Error analysis}
+\subsection{Error Analysis}
 Assume the solution at time step $j$ and node $i$ is $u_{i,j}$, and that the analytical
 solution at the same position and time is $v_{i,j}$. The maximum relative error for some
 time step is here defined as
@@ -506,10 +510,10 @@ where $i$ runs through discretized domain. This quantity is calculated for each
 time step to show how the errors develop with time for each method, which is
 then compared with the expected error orders in time for each scheme.
 \section{Results} \label{sec:results}
-\subsection{One dimensional solution}
+\subsection{One Dimensional Solution}
 There are two sets of results for the one dimensional case, first the sinusoidal
 test case solution is presented, then the Couette flow results are shown.
-\subsubsection{Half wave solution and errors}
+\subsubsection{Half Wave Solution and Errors}
 See figures~\ref{fig:sinnumanalytic} through~\ref{fig:sinrelerr} for the solution
 time development and the error as a function of time.
 \begin{figure}[ht]
@@ -517,12 +521,20 @@ time development and the error as a function of time.
   \includegraphics[width=\columnwidth]{figures/sin_numeric_vs_analytical.eps}
   \caption{\label{fig:sinnumanalytic} Both the numerical (solid) and analytical
     (dashed) solutions of the test case with
-    sinusoidal initial conditions. Brighter colors represent later time points.}
+    sinusoidal initial conditions. Brighter colors represent later time points.
+    Here the Forward Euler scheme is used.
+  The uppermost curve is the initial position, where the numerical and
+  analytical solutions agree exactly. As time progresses, truncation errors
+  accumulate, which manifests itself as the dashed line and the solid line goes
+  out of sync.}
 \end{figure}
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/sin_absolute_error.eps}
-  \caption{\label{fig:sinabserr} The total absolute error in the test case.}
+  \caption{\label{fig:sinabserr} The max absolute error in the test case. Each
+    point is the maximal absolute error which occurred at a certain time step.
+    As the truncation errors accumulate, the distance between the top of the
+    curves increases, before decreasing once they approach stability. }
 \end{figure}
 \begin{figure}[ht]
   \centering
@@ -531,20 +543,20 @@ time development and the error as a function of time.
 \end{figure}
 Figures~\ref{fig:posrelerr} and~\ref{fig:timerelerr} show the relative errors as functions
 of position and time for each numerical scheme. Note that the boundaries are not considered
-here for two reasons, first of all the boundaries are held constant and will hever have errors,
-and secondly, the error calculation would include division by zero.
+here for two reasons: the boundaries are held constant and will hever have errors,
+and the error calculation would include division by zero.
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\columnwidth]{figures/relative_error_in_position.eps}
+  \includegraphics[width=\columnwidth]{figures/relative_error_in_position.png}
   \caption{\label{fig:posrelerr} Error for the different node positions across the domain.}
 \end{figure}
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=\columnwidth]{figures/relative_error_in_time.eps}
+  \includegraphics[width=\columnwidth]{figures/relative_error_in_time.png}
   \caption{\label{fig:timerelerr} Error developement with time.}
 \end{figure}
 
-\subsubsection{Couette flow solution}
+\subsubsection{Couette Flow Solution}
 The time development with the explicit scheme for the Couette flow is shown in
 figure~\ref{fig:couettenumanalytic}, with the analytic solution.
 \begin{figure}[ht]
@@ -552,9 +564,9 @@ figure~\ref{fig:couettenumanalytic}, with the analytic solution.
   \includegraphics[width=\columnwidth]{figures/couette_numeric_vs_analytical.eps}
   \caption{\label{fig:couettenumanalytic} Both the numerical (solid) and analytical
     (dashed) solutions of the Couette flows. Brighter colors represent later time
-    points.}
+    points. }
 \end{figure}
-\subsection{Two dimensional solution}
+\subsection{Two Dimensional Solution}
 The two-dimensional solution time development is shown in figure~\ref{fig:twodimsolution}.
 The initial configuration is $u(x,y,0) = \sin{(\pi x)} \sin{(\pi y)}$, where
 $0 < x,y < 1$.
@@ -575,7 +587,7 @@ center nodes) amplitude as a function of time.
   time period}
   \label{fig:twodimamplitude}
 \end{figure}
-\subsection{Stability requirements}
+\subsection{Stability Requirements}
 By trial and error, using different combinations of time step and grid resolution
 showed that the stability conditions found in the text are correct. Any solution
 with $\alpha < 1/2$ in the one-dimensional case and $\alpha < 1/4$ in the two-dimensional case
@@ -583,8 +595,8 @@ diverged to overflow and were completely unstable. A proper way of demonstrating
 this in the report was not found, however the behaviour is easily reproduced by
 running the codes with an unstable combination of step parameters.
 \section{Discussion} \label{sec:discussion}
-\subsection{One dimensional equation}
-\subsubsection{Test case - Verifying the implementation}
+\subsection{One Dimensional Equation}
+\subsubsection{Test Case - Verifying the Implementation}
 By inspecting the solution when the initial configuration is half a sine wave
 shown in figure~\ref{fig:sinnumanalytic}, it is clear that the numerical solution
 behaves as expected and very similar to the analytic expression. The amplitude
@@ -593,13 +605,13 @@ gradually be put to a halt in a tube in which the pressure difference was to be
 switched off. Furthermore, the solution corresponds well with the analytic solution
 despite the increasing deviation with time. The increasing error is also clear from
 figure~\ref{fig:sinrelerr}. These results are for the explicit method.
-\subsubsection{Couette flow solution}
+\subsubsection{Couette Flow Solution}
 The Couette flow solution shown in figure~\ref{fig:couettenumanalytic} also behaves
 as expected. The upper boundary movement gradually accelerates more and more of the fluid through
 viscosity, and the solution approaches the expected linear equilibrium flow state
 with time. The Newtonian viscous forces transfer momentum across the fluid, which
 is one of the key types of possible diffusion processes.
-\subsubsection{Comparison of the scheme errors}
+\subsubsection{Comparison of the Scheme Errors}
 From figures~\ref{fig:posrelerr} and~\ref{fig:timerelerr} it is clear that there is
 an error in the implicit methods in towards the lower boundaries. Unfortunately
 this error was not discovered at the time of writing this paper. The error is
@@ -616,7 +628,7 @@ has a slightly lower error. It is not clear if this is correct, because the erro
 seems to be very unstable from the beginning.
 
 In position, a similar behaviour is found as with time.
-\subsection{Two dimensional equation}
+\subsection{Two Dimensional Equation}
 The explicit method two dimensional solution inhibits very similar characteristics
 as the one dimensional solution. The system quite rapidly goes to equilibrium,
 which in this case is completely given by the boundaries. The system therefore
@@ -630,8 +642,8 @@ Noe.
 \bibliography{references}
 \blankpage
 \appendix
-\section{Derivation of trunctation errors and stability conditions} \label{sec:errors}
-\subsection{Explicit scheme}
+\section{Derivation of Trunctation Errors and Stability Conditions} \label{sec:errors}
+\subsection{Explicit Scheme}
 The explicit scheme uses standard approximations for the derivatives which are
 inserted in the diffusion equation. The first order time approximation has
 an error term $\sim \Delta{t}$, and the second derivative position approximation
@@ -676,13 +688,13 @@ which is satisfied if $\alpha \leq 1/2$. Thus the stability requirement is
 The explicit scheme for solving the one-dimensional diffusion equation is therefore
 conditionally stable.
 
-\subsection{Implicit scheme}
+\subsection{Implicit Scheme}
 The implicit scheme uses the same time and position approximations as the explicit
 scheme, and therefore has identical trunctation error orders. However, the matrix
 is here positive definite, and the eigenvalues automatically satisfy~\ref{eq:spectralradius}.
 The implicit scheme is therefore unconditionally stable.
 
-\subsection{Crank-Nicolson scheme}
+\subsection{Crank-Nicolson Scheme}
 The derivation of the Crank-Nicolson scheme is similar to the above derivations,
 but notice that the time derivative approximations are now of second order. The
 matrix used in the algorithm is, as for the implicit Euler method, positive definite

@@ -60,15 +60,13 @@ class Analyzer:
         return self.trange
 
     def plot(self):
-        self.plot_analytic_solution()
-        plt.show()
+        # self.plot_analytic_solution()
+        # plt.show()
         # plt.savefig('../latex/figures/couette_numeric_vs_analytical.eps')
         self.plot_total_abs_error()
-        plt.show()
-        # plt.savefig('../latex/figures/couette_absolute_error.eps')
+        plt.savefig('../latex/figures/sin_absolute_error.eps')
         self.plot_total_rel_error()
-        plt.show()
-        # plt.savefig('../latex/figures/couette_relative_error.eps')
+        plt.savefig('../latex/figures/sin_relative_error.eps')
 
     def plot_numerical_solution(self):
         trange = range(0, self.meta['t steps'], self.meta['t steps']//10)
@@ -81,23 +79,23 @@ class Analyzer:
         fig, ax = plt.subplots(1, figsize=(7, 7))
         ax.plot(*self.calculate_total_abs_err())
         ax.set_xlabel("Time [s]")
-        ax.set_ylabel("Total Absolute Error")
+        ax.set_ylabel("Max Absolute Error")
 
     def plot_total_rel_error(self):
         fig, ax = plt.subplots(1, figsize=(7, 7))
-        ax.plot(*self.calculate_total_rel_err())
+        ax.plot(*self.calculate_total_rel_err(max_time=1.2))
         ax.set_xlabel("Time [s]")
-        ax.set_ylabel("Total Relative Error")
+        ax.set_ylabel("Max Relative Error")
 
     def plot_analytic_solution(self):
         fig, ax = plt.subplots(1, figsize=(7, 7))
         y = self.get_xrange()
         N = 500
-        ts = self.get_trange()[::N]
+        ts = self.get_trange()[:10]
         palette = sns.color_palette("GnBu_d", len(ts))
         for i, t in enumerate(ts):
             ax.plot(y, self.analytical_fn(y, t), '--', label=rf'$u(y, {t})$', c=palette[i])
-            ax.plot(y, self.solution[i*N, :], c=palette[i])
+            ax.plot(y, self.solution[i, :], c=palette[i])
         ax.set_xlabel('x')
         ax.set_ylabel('y')
         # ax.legend()
@@ -129,7 +127,7 @@ class Analyzer:
         if init_cond == "zero":
             return self.analytical_zero(y, t)
         elif init_cond == "sin":
-            return self.analytical_sin_2(y, t)
+            return self.analytical_sin(y, t)
 
     def analytical_zero(self, y, t):
         U = 1
@@ -141,15 +139,7 @@ class Analyzer:
         return U*y/h - 2*U/pi * S
 
     def analytical_sin(self, y, t):
-        L = 1
-        S = 0
-        for n in range(2, 1000):
-            S += sin(pi*n)/(1-n**2)*sin(pi*n*y/L)*exp(-n**2*pi**2*t/L**2)
-        return 2/pi * S
-
-    def analytical_sin_2(self, y, t):
         return exp(-pi**2*t)*sin(pi*y)
-
 
     def update_lines(self, num, lines, text):
         lines[0][0].set_data(self.get_xrange(), self.solution[num, :])
@@ -226,7 +216,6 @@ class Analyzer:
 
         X, Y = np.meshgrid(xrange, yrange[indices])
         self.X = X
-        # U = np.repeat(self.solution[0, indices], N).reshape(M+1, N)
         U = np.ones_like(X)*0.3
         V = Y*0
         Q = ax.quiver(X, Y, U, V, units='inches', scale=2, width=0.015)
@@ -270,15 +259,45 @@ class Analyzer:
         # Return the time steps used and total error
         return y, errors
 
-    def calculate_total_abs_err(self, method=np.sum,
-                                tlimits=[1, -1000], xlimits=[1, -1]):
+    def calculate_total_abs_err(self, method=np.max,
+                                tlimits=[0, -1], xlimits=[1, -1],
+                                min_time=None, max_time=None):
         t = self.get_trange()
         y = self.get_xrange()
         Y = np.repeat(y, len(t))
         y = np.reshape(Y, self.solution.shape)
+
+        # Do not use the endpoints to avoid division by zero
+        xstart, xend = xlimits
+        tstart, tend = tlimits
+        if max_time is not None:
+            tend = np.where(t >= max_time)[0][0]
+        if min_time is not None:
+            tstart = np.where(t <= min_time)[0][0]
+
         analytical = self.analytical_fn(y.T, t).T
-        diff = method(abs(analytical-self.solution), axis=1)
-        return t, diff
+        analytical = analytical[tstart:tend, xstart:xend]
+        print(analytical)
+        solution = self.solution[tstart:tend, xstart:xend]
+        abs_err = abs(analytical - solution)
+        ind = np.argmax(abs_err, axis=1)
+        print(ind)
+        print(ind.shape)
+        print(np.mean(ind))
+        print(np.std(ind))
+        Y = self.get_xrange()[xstart:xend]
+        for ti, x in enumerate(ind):
+            print(abs_err[ti, x])
+            print(analytical[ti, x])
+            print(solution[ti, x])
+            plt.plot(Y, analytical[ti, :], label='analytic')
+            plt.plot(Y, solution[ti, :], label='numeric')
+            plt.plot((Y[x], Y[x]), (-1, 1))
+            print("======")
+            plt.legend()
+            plt.show()
+            input()
+        return t[tstart:tend], method(abs_err, axis=1)
 
     def calculate_total_rel_err(self, method=np.max,
                                 tlimits=[1, -1000], xlimits=[1, -1],

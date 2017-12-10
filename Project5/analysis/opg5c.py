@@ -33,7 +33,7 @@ class ErrorAnalysis(Runner):
             self.run_simulation()
             print("Running error analysis")
             analyzer = Analyzer(self.base_path, 'meta.json')
-            # analyzer.plot()
+            analyzer.plot()
             y, (initial, final) = analyzer.calculate_rel_err([0.1, 0.8])
             total_abs = analyzer.calculate_total_abs_err(method=np.max, tlimits=[1, 1000])
             total_rel = analyzer.calculate_total_rel_err(method=np.max, max_time=1.2)
