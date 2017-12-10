@@ -422,7 +422,7 @@ quantities (current state and boundary conditions), and therefore explcitly give
 the solution in the next step.
 \subsection{Analytic Solution to the Two-Dimensional Diffusion Equation}
 There is also a closed form solution available for the two-dimensional diffusion equation.
-Assume some boundary conditions, here the Dirichlet boundary conditions: 
+Assume some boundary conditions, here the Dirichlet boundary conditions:
 \begin{align*}
   u(0, y, t) = u(L, y, t) = u(x, 0, t) = u(x, L, t) = 0
 \end{align*}
@@ -469,8 +469,8 @@ the $n = 1$ term yields $u(x,0) = g(x)$. This gives the analytic solution to the
 \begin{align*}
   u(x,t) = \sin{(\pi x)} e^{- \pi^2 t}
 \end{align*}
-This solution was then tested against the numerical solutions for different step
-sizes, both in space and time.
+This solution was then tested against the numerical solutions for different grid
+resolutions. The time step size is then set to match the stability condition limit.
 \subsubsection{Couette Flow Initial and Boundary Conditions}
 The Couette flow investigated in this paper had an initial condition
 corresponding to zero flow, $u(x,0) = 0$ for $0 < x < 1$. With a scaled plate velocity difference, the
@@ -617,26 +617,31 @@ an error in the implicit methods in towards the lower boundaries. Unfortunately
 this error was not discovered at the time of writing this paper. The error is
 perhaps an index error in the Thomas algorithm solver or a similar index error
 near the lower boundary, which might result in the strange solution spikes in this
-area.
+area. The error is appears so large for the implicit method that the results
+are likely unreliable, as seen in the relative error figures. The Crank-Nicolson
+method also seems to have a small initial error, but it is much smaller than for
+the implicit method.
 
 Despite the obvious error, it is still possible to compare the general impression
 of the solutions with each method, especially towards the upper boundary where
 the strange behaviour is not seen. In the error vs. time plot, surprisingly
 the explicit scheme has the smallest error for $\Delta x = 0.1$, which corresponds to
-11 grid points. However, when the grid resolution is increased, the implicit backward Euler method
-has a slightly lower error. It is not clear if this is correct, because the error development
-seems to be very unstable from the beginning.
+11 grid points. However, when the grid resolution is increased, the Crank-Nicolson method
+is slightly more accurate than the forward Euler scheme.
 
-In position, a similar behaviour is found as with time.
+In position, a similar behaviour is found as with time. Here the implicit method
+has even lower errors, which is quite surprising. When the spatial resolution is increased
+the Crank-Nicolson algorithm again has lower errors than the Euler scheme, but only barely.
 \subsection{Two Dimensional Equation}
 The explicit method two dimensional solution inhibits very similar characteristics
 as the one dimensional solution. The system quite rapidly goes to equilibrium,
 which in this case is completely given by the boundaries. The system therefore
 goes to zero across the grid, the initial heat (or momentum) diffuses away.
 
-Notice the shape of the center node $u(N/2, N/2, t) \sim e^{-t}$, which corresponds
+Notice the shape of the center node $u(1/2, 1/2, t) \sim e^{-t}$, which corresponds
 well with the analytic expression which reduces to the inverse exponential function when
-a position is chosen.
+a position is chosen. From the graph it is possible to deduce that equilibrium is
+reached at around $t = 0.25$, at this point the distribution is approximately uniformly $0$.
 \section{Conclusion} \label{sec:conclusion}
 Noe.
 \bibliography{references}
