@@ -9,5 +9,5 @@
     "x start": 0.0,
     "x end": 1.0,
     "step size dx": 0.01,
-    "method": "crank-nicolson"
+    "method": "forward"
 }

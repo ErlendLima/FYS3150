@@ -61,8 +61,11 @@ class Analyzer:
 
     def plot(self):
         self.plot_analytic_solution()
-        # self.plot_numerical_solution()
-        # self.animate_simple()
+        plt.savefig('../latex/figures/couette_numeric_vs_analytical.eps')
+        # self.plot_total_abs_error()
+        # plt.savefig('../latex/figures/couette_absolute_error.eps')
+        # self.plot_total_rel_error()
+        # plt.savefig('../latex/figures/couette_relative_error.eps')
 
     def plot_numerical_solution(self):
         trange = range(0, self.meta['t steps'], self.meta['t steps']//10)
@@ -70,12 +73,36 @@ class Analyzer:
         for i, t in enumerate(trange):
             plt.plot(self.get_xrange(), self.solution[t, :], label=rf'{t*self.meta["dt"]}', c=palette[i])
         plt.legend()
-        plt.show()
+
+    def plot_total_abs_error(self):
+        fig, ax = plt.subplots(1, figsize=(7, 7))
+        ax.plot(*self.calculate_total_abs_err())
+        ax.set_xlabel("Time [s]")
+        ax.set_ylabel("Total Absolute Error")
+
+    def plot_total_rel_error(self):
+        fig, ax = plt.subplots(1, figsize=(7, 7))
+        ax.plot(*self.calculate_total_rel_err())
+        ax.set_xlabel("Time [s]")
+        ax.set_ylabel("Total Relative Error")
+
+    def plot_analytic_solution(self):
+        fig, ax = plt.subplots(1, figsize=(7, 7))
+        y = self.get_xrange()
+        N = 500
+        ts = self.get_trange()[::N]
+        palette = sns.color_palette("GnBu_d", len(ts))
+        for i, t in enumerate(ts):
+            ax.plot(y, self.analytical_fn(y, t), '--', label=rf'$u(y, {t})$', c=palette[i])
+            ax.plot(y, self.solution[i*N, :], c=palette[i])
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        # ax.legend()
 
     def animate_simple(self):
-        y = np.linspace(0,1,self.meta['x steps'] + 2)
-        fig, ax = plt.subplots(1,1)
-        U = self.solution[0,:]
+        y = np.linspace(0, 1, self.meta['x steps'] + 2)
+        fig, ax = plt.subplots(1, 1)
+        U = self.solution[0, :]
         zeros = np.zeros_like(U)
         ax.plot([0, 1], [1, 1], 'k-', alpha=0.5)
         ax.plot([0, 1], [0, 0], 'k-', alpha=0.5)
@@ -84,35 +111,42 @@ class Analyzer:
         ax.set_ylim(0, 1.1)
 
         anim = animation.FuncAnimation(fig, self.update_quiver_simple,
-                                       fargs=(U,Q), interval=10,
-                                       frames=range(0,len(self.solution)),
+                                       fargs=(U, Q), interval=10,
+                                       frames=range(0, len(self.solution)),
                                        blit=False)
         plt.show()
 
     def update_quiver_simple(self, num, U, Q):
-        U = self.solution[num,:]
+        U = self.solution[num, :]
         Q.set_UVC(U, np.zeros_like(U))
         return Q,
 
     def analytical_fn(self, y, t):
+        init_cond = self.meta['initial condition']
+        if init_cond == "zero":
+            return self.analytical_zero(y, t)
+        elif init_cond == "sin":
+            return self.analytical_sin_2(y, t)
+
+    def analytical_zero(self, y, t):
         U = 1
         h = 1
         nu = 1
         S = 0
-        for n in range(1, 1000):
+        for n in range(1, 2000):
             S += 1/n*exp(-n**2*pi**2*nu*t/h**2)*sin(n*pi*(1-y/h))
         return U*y/h - 2*U/pi * S
 
-    def plot_analytic_solution(self):
-        fig, ax = plt.subplots(1)
-        y = self.get_xrange()
-        ts = self.get_trange()[::100]
-        palette = sns.color_palette("GnBu_d", len(ts))
-        for i, t in enumerate(ts):
-            ax.plot(y, self.analytical_fn(y, t), '--', label=rf'$u(y, {t})$', c=palette[i])
-            ax.plot(y, self.solution[i*100, :], c=palette[i])
-        # ax.legend()
-        plt.show()
+    def analytical_sin(self, y, t):
+        L = 1
+        S = 0
+        for n in range(2, 1000):
+            S += sin(pi*n)/(1-n**2)*sin(pi*n*y/L)*exp(-n**2*pi**2*t/L**2)
+        return 2/pi * S
+
+    def analytical_sin_2(self, y, t):
+        return exp(-pi**2*t)*sin(pi*y)
+
 
     def update_lines(self, num, lines, text):
         lines[0][0].set_data(self.get_xrange(), self.solution[num, :])
@@ -216,6 +250,43 @@ class Analyzer:
             analytical = self.analytical_fn(y, t)
             errors.append(abs(analytical - self.solution[index, :]))
         return t, y, errors
+
+    def calculate_total_abs_err(self, method=np.sum):
+        t = self.get_trange()
+        y = self.get_xrange()
+        Y = np.repeat(y, len(t))
+        y = np.reshape(Y, self.solution.shape)
+        analytical = self.analytical_fn(y.T, t).T
+        diff = method(abs(analytical-self.solution), axis=1)
+        return t, diff
+
+    def calculate_total_rel_err(self, method=np.max):
+        # Get the ranges for y and t used
+        t = self.get_trange()
+        y = self.get_xrange()
+
+        # Repeat y so that it has the same shape as u(y, t)
+        Y = np.repeat(y, len(t))
+        y = np.reshape(Y, self.solution.shape[::-1])
+
+        # Get the analytical values for u(y, t)
+        # It must be transposed since the solution has the shape u(t, y)
+        analytical = self.analytical_fn(y, t).T
+
+        # Do not use the endpoints to avoid division by zero
+        xstart, xend = 1, -1
+        tstart, tend = 1, -1000
+
+        # Calculate the relative error
+        rel_err = abs((analytical[tstart:tend, xstart:xend] -
+                      self.solution[tstart:tend, xstart:xend]) /
+                      analytical[tstart:tend, xstart:xend])
+
+        # Find either the sum or the max error in each time step
+        diff = method(rel_err, axis=1)
+
+        # Return the time steps used and total error
+        return t[tstart:tend], diff
 
 
 if __name__ == '__main__':

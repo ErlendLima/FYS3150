@@ -77,6 +77,7 @@ private:
     std::string  m_basepath     = "../data/";
     std::string  m_metapath     = "meta.json";
     std::string  m_solutionpath = "solution.bin";
+    std::string  m_initialCondition;
     bool         m_parallel     = false;
 };
 
