@@ -110,7 +110,8 @@ incompressible Navier-Stokes equations, and a wide array of other applications
 are discussed. The solutions are compared to known analytic solutions, which shows
 that the second order in time and space. Unexpectedly, the backward Euler scheme outperforms
 the other methods in terms of solution accuracy when the steps in space and time are sufficiently small. For $\Delta x = 10^{-2}$ and $\Delta{t}$ chosen based on the stability condition for instance,
-the backward Euler method had the least relative error. The stability limitations of the
+the backward Euler method had the least relative error. It is worth to mention that the backward Euler and Crank-Nicolson methods
+had a visible implementation error, and the results are therefore deemed unreliable. The stability limitations of the
 explicit position-centered, time-forward Euler scheme are investigated and found to
 correspond to the expected requirement $\Delta{t}/\Delta{x}^2 \leq 1/2$ in one dimension
 and $1/4$ in two dimensions. The flow profile of a Couette flow with boundaries in one and
