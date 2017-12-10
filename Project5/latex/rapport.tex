@@ -446,7 +446,10 @@ are solutions, so
 is a general solution, where again the coefficients need to be determined based
 on the initial state.
 \section{Method} \label{sec:method}
-\subsection{Initial and boundary values}
+The full implementation of the algorithms is available in the Git-repository.
+The one dimensional solver was implemented in C++, and to test the speed of
+a vectorized NumPy implementation the two-dimensional solver was implemented in Python.
+\subsection{Initial and boundary values. Implementations.}
 \subsubsection{Testing the numerical solver}
 To test the numerical solvers a specific case with a trivial analytic solution
 was investigated. With an initial state of a half sine wave spanning the domain
@@ -467,6 +470,23 @@ For the Couette flow investigated in this paper, the zero flow initial condition
 is $u(x,0) = 0$ for $0 < x < 1$. With a scaled plate velocity difference, the
 lower plate at $x = 0$ is held stationary and the upper plate is given a constant
 velocity $1$. This equates to boundary conditions $u(0,t) = 0$ and $u(1,t) = 1$.
+\subsubsection{Two-dimensional boundaries}
+In two dimensions, boundary conditions along all sides of the square lattice need
+to be specified in addition to an initial state. The boundaries will be different
+in differend cases, for instance one edge of a metal plate may be held at a much
+higher temperature than the other sides. In the analysis in this paper, the boundaries
+are set to Dirichlet boundaries, i.e.
+\begin{align*}
+  u(0,y,t) = u(1,y,t) = u(x,0,t) = u(x,1,t) = 0
+\end{align*}
+so all the edges have the same temperature. The grid could in this case also represent an
+intersection of a square tube with flowing fluid and the tube stationary. With no
+pressure driving the flow, the velocity field will diffuse away as energy is dissipated
+to other forms through viscous effects.
+
+For this paper only the explicit method is used to solve the two-dimensional equation.
+The stability condition is tested by attempting to run the solver for combinations
+of $\Delta t$ og $\Delta x$ 
 \subsection{Matrix equation solver}
 To solve the matrix equations some numerical method needs to be used. By inspection,
 the matrices in all of the methods are tridiagonal, which allows usage of the
@@ -485,11 +505,15 @@ time step to show how the errors develop with time for each method, which is
 then compared with the expected error orders in time for each scheme.
 \section{Results} \label{sec:results}
 \subsection{One dimensional solution}
+\subsubsection{Half wave solution and errors}
+\subsubsection{Couette flow solution}
 Time development with explicit scheme.
 
 Then compare with analytic result.
 \subsection{Two dimensional solution}
 The two-dimensional solution time development is shown in figure~\ref{fig:twodimsolution}.
+The initial configuration is $u(x,y,0) = \sin{(\pi x)} \sin{(\pi y)}$, where
+$0 < x,y < 1$.
 \begin{figure}[H]
   \includegraphics[width=\columnwidth]{figures/twodim.eps}
   \caption{Two dimensional solution for four different time steps with a
