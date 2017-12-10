@@ -532,14 +532,15 @@ time development and the error as a function of time.
   \centering
   \includegraphics[width=\columnwidth]{figures/sin_absolute_error.eps}
   \caption{\label{fig:sinabserr} The max absolute error in the test case. Each
-    point is the maximal absolute error which occurred at a certain time step.
+    point is the maximal absolute error which occurred at a given time step.
     As the truncation errors accumulate, the distance between the top of the
     curves increases, before decreasing once they approach stability. }
 \end{figure}
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/sin_relative_error.eps}
-  \caption{\label{fig:sinrelerr} The total relative error in the test case.}
+  \caption{\label{fig:sinrelerr} The maximal relative error in the test case.
+    The relative error grow linearly with time as the truncation error accumulates.}
 \end{figure}
 Figures~\ref{fig:posrelerr} and~\ref{fig:timerelerr} show the relative errors as functions
 of position and time for each numerical scheme. Note that the boundaries are not considered
@@ -548,12 +549,24 @@ and the error calculation would include division by zero.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/relative_error_in_position.png}
-  \caption{\label{fig:posrelerr} Error for the different node positions across the domain.}
+  \caption{\label{fig:posrelerr} Error for the different node positions across
+    the domain. The solid lines are close to the beginning of the time
+    evolution, being significantly curved.  The dashed lines are near the steady
+    state. With a large step \(dx = 0.1\), the curves have so low resolution
+  that the relative error is large. It is not until the system reach a steady
+  state that the relative error falls to zero, as it is simply a straight line.
+  This improves with a smaller step size \(dx = 0.01\). Here it becomes apparent
+that there is an error in the Backward Euler and Crank-Nicolson schemes, as the
+left hand side of the curves show significant and systematic peaks.}
 \end{figure}
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/relative_error_in_time.png}
-  \caption{\label{fig:timerelerr} Error developement with time.}
+  \caption{\label{fig:timerelerr} Error developement with time. As earlier
+    noted, all of the schemes exhibit accumulation of numerical errors. The top
+    plot shows how the error grows as time progresses. In addition, the curves
+    for the Backward Euler and Crank-Nicolson schemes show jumps in the relative
+  error at the start, revealing errors in their implementations.}
 \end{figure}
 
 \subsubsection{Couette Flow Solution}
@@ -564,7 +577,11 @@ figure~\ref{fig:couettenumanalytic}, with the analytic solution.
   \includegraphics[width=\columnwidth]{figures/couette_numeric_vs_analytical.eps}
   \caption{\label{fig:couettenumanalytic} Both the numerical (solid) and analytical
     (dashed) solutions of the Couette flows. Brighter colors represent later time
-    points. }
+    points. The analytical and numerical solutions agree well for each time
+    step, though the numerical solution exhibit accumulation of error. In
+    addition, note the meandering nature of the initial curve for the analytical
+  solution on the right hand side near \(x=1\). This is caused by the finite
+  approximation of the discontinuity at \(x=1\) by sinusoidal functions. }
 \end{figure}
 \subsection{Two Dimensional Solution}
 The two-dimensional solution time development is shown in figure~\ref{fig:twodimsolution}.
