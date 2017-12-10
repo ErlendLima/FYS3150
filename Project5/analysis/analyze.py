@@ -61,10 +61,13 @@ class Analyzer:
 
     def plot(self):
         self.plot_analytic_solution()
-        plt.savefig('../latex/figures/couette_numeric_vs_analytical.eps')
-        # self.plot_total_abs_error()
+        plt.show()
+        # plt.savefig('../latex/figures/couette_numeric_vs_analytical.eps')
+        self.plot_total_abs_error()
+        plt.show()
         # plt.savefig('../latex/figures/couette_absolute_error.eps')
-        # self.plot_total_rel_error()
+        self.plot_total_rel_error()
+        plt.show()
         # plt.savefig('../latex/figures/couette_relative_error.eps')
 
     def plot_numerical_solution(self):
@@ -242,16 +245,33 @@ class Analyzer:
         else:
             plt.show()
 
-    def calculate_error(self, indices: [int]) -> (int, np.array):
-        y = self.get_xrange()
-        errors = []
-        for index in indices:
-            t = self.get_trange()[index]
-            analytical = self.analytical_fn(y, t)
-            errors.append(abs(analytical - self.solution[index, :]))
-        return t, y, errors
+    def calculate_rel_err(self, tlimits, method=np.max,
+                          xlimits=[1, -1]):
+        # Do not use the endpoints to avoid division by zero
+        xstart, xend = xlimits
 
-    def calculate_total_abs_err(self, method=np.sum):
+        # Get the ranges for y and t used
+        t = self.get_trange()
+        y = self.get_xrange()[xstart:xend]
+
+        tmin, tmax = tlimits
+        tstart = np.where(t >= tmax)[0][0]
+        tend = np.where(t <= tmin)[0][0]
+        # Get the analytical values for u(y, t)
+        # It must be transposed since the solution has the shape u(t, y)
+
+        # Calculate the relative error
+        errors = []
+        for index in [tstart, tend]:
+            analytical = self.analytical_fn(y, t[index])
+            rel_err = abs((analytical - self.solution[index, xstart:xend]) / analytical)
+            errors.append(rel_err)
+
+        # Return the time steps used and total error
+        return y, errors
+
+    def calculate_total_abs_err(self, method=np.sum,
+                                tlimits=[1, -1000], xlimits=[1, -1]):
         t = self.get_trange()
         y = self.get_xrange()
         Y = np.repeat(y, len(t))
@@ -260,7 +280,9 @@ class Analyzer:
         diff = method(abs(analytical-self.solution), axis=1)
         return t, diff
 
-    def calculate_total_rel_err(self, method=np.max):
+    def calculate_total_rel_err(self, method=np.max,
+                                tlimits=[1, -1000], xlimits=[1, -1],
+                                min_time=None, max_time=None):
         # Get the ranges for y and t used
         t = self.get_trange()
         y = self.get_xrange()
@@ -274,8 +296,12 @@ class Analyzer:
         analytical = self.analytical_fn(y, t).T
 
         # Do not use the endpoints to avoid division by zero
-        xstart, xend = 1, -1
-        tstart, tend = 1, -1000
+        xstart, xend = xlimits
+        tstart, tend = tlimits
+        if max_time is not None:
+            tend = np.where(t >= max_time)[0][0]
+        if min_time is not None:
+            tstart = np.where(t <= min_time)[0][0]
 
         # Calculate the relative error
         rel_err = abs((analytical[tstart:tend, xstart:xend] -

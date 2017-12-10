@@ -16,12 +16,12 @@ class ErrorAnalysis(Runner):
         self['dimensions'] = 1
         self['initial condition'] = 'sin'
         self['lower bound'] = 0.0
-        self['upper bound'] = 1.0
+        self['upper bound'] = 0.0
 
     def run(self):
         steps = [(1/10, 3e3), (1/100, 3e4)]
         methods = ['forward', 'backward', 'crank-nicolson']
-        df = pd.DataFrame(columns=['method', 'dx', 'time',
+        df = pd.DataFrame(columns=['method', 'dx',
                                    'initial', 'final', 'y',
                                    'total abs', 'total rel'])
         i = 0
@@ -33,51 +33,66 @@ class ErrorAnalysis(Runner):
             self.run_simulation()
             print("Running error analysis")
             analyzer = Analyzer(self.base_path, 'meta.json')
-            time, y, (initial, final) = analyzer.calculate_error([10, -10])
-            total_abs = analyzer.calculate_total_abs_err(method=np.max)
-            total_rel = analyzer.calculate_total_rel_err(method=np.max)
-            df.loc[i] = [method, dx, time, initial, final, y, total_abs, total_rel]
+            # analyzer.plot()
+            y, (initial, final) = analyzer.calculate_rel_err([0.1, 0.8])
+            total_abs = analyzer.calculate_total_abs_err(method=np.max, tlimits=[1, 1000])
+            total_rel = analyzer.calculate_total_rel_err(method=np.max, max_time=1.2)
+            df.loc[i] = [method, dx, initial, final,
+                         y, total_abs, total_rel]
             i += 1
 
         self.plot_total_error(df)
+        self.plot_pos_error(df)
 
-    def plot(self, df):
-        fig, ax = plt.subplots(nrows=3, sharex=True)
-        palette = sns.color_palette("GnBu_d", len(df['method']))
-        lines = {}
-        for j, method in enumerate(set(df['method'])):
-            dfm = df[df['method'] == method]
+    def plot_pos_error(self, df):
+        fig, ax = plt.subplots(nrows=2, sharex=True, figsize=(9.5, 8))
+        pal = sns.color_palette()
+        for j, dx in enumerate(set(df['dx'])):
+            dfm = df[df['dx'] == dx]
             i = 0
-            ax[j].set_title(method)
-            if j == 1:
-                ax[j].set_ylabel("Absolute error")
-            lines = []
+            ax[j].set_title(rf'dx = {dx}')
             for index, row in dfm.iterrows():
                 initial = row['initial']
                 final = row['final']
-                dx = row['dx']
+                method = row['method']
                 y = row['y']
-                l1, = ax[j].plot(y, initial, '-', c=palette[i])
-                l2, = ax[j].plot(y, final, '--', c=palette[i])
+                l1, = ax[j].plot(y, initial, '-', label=rf'{method}', c=pal[i])
+                l2, = ax[j].plot(y, final, '--', c=pal[i])
                 i += 1
-                lines.append([l1, l2])
-        ax[-1].set_xlabel("Position")
 
-        # print([rf"$dx = {dx}$" for dx in set(df['dx'])])
-        legend1 = fig.legend([l[0] for l in lines], [rf"$dx = {dx}$" for dx in set(df['dx'])],
-                             loc='upper center', ncol=1)
-        fig.legend([lines[0][0], lines[0][1]], ['initial', 'final'], loc='upper left', ncol=1)
-        # ax = plt.gca().add_artist(legend1)
-        fig.savefig('../latex/figures/opg5c.eps')
-        plt.show()
+        # Shrink current axis by 20%
+        for a in ax:
+            box = a.get_position()
+            a.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+        # Put a legend to the right of the current axis
+        fig.legend(loc='center right')
+        ax[-1].set_xlabel("Position")
+        ax[0].set_ylabel("Relative error")
+        ax[1].set_ylabel("Relative error")
+
+        fig.savefig('../latex/figures/relative_error_in_position.png')
 
     def plot_total_error(self, df):
-        fig, ax = plt.subplots(nrows=3, sharex=True)
-        for i, method in enumerate(df['method']):
-            dfm = df[df['method'] == method]
+        fig, ax = plt.subplots(nrows=2, sharex=True, figsize=(9.5, 8))
+        for i, dx in enumerate(set(df['dx'])):
+            dfm = df[df['dx'] == dx]
+            ax[i].set_title(rf"dx = {dx}")
             for index, row in dfm.iterrows():
-                ax[i].plot(dfm['total_rel'])
-        plt.show()
+                time, err = row['total rel']
+                method = row['method']
+                ax[i].plot(time, err, label=rf"{method}")
+        # Shrink current axis by 20%
+        for a in ax:
+            box = a.get_position()
+            a.set_position([box.x0, box.y0, box.width * 0.8, box.height])
+
+        # Put a legend to the right of the current axis
+        fig.legend(loc='center right')
+        ax[-1].set_xlabel('Time [s]')
+        ax[1].set_ylabel('Max Relative Error')
+        ax[0].set_ylabel('Max Relative Error')
+        fig.savefig('../latex/figures/relative_error_in_time.png')
 
 
 if __name__ == '__main__':
