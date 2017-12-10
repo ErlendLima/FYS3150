@@ -16,8 +16,6 @@
 |
 <b><a href="#testing-c">Testing (C++)</a></b>
 |
-<b><a href="#usage-julia">Usage (Julia)</a></b>
-|
 <b><a href="#credits">Credits</a></b>
 |
 <b><a href="#license">License</a></b>
@@ -42,11 +40,12 @@ table explaining the function to each script. Python 3.6 is required.
 | Script                  | Function                                                                                                          |
 | ------                  | --------                                                                                                          |
 | `analyze.py`            | Analyzes the output from the simulation automagically |
+| `opg5c.py`             | Runs the solver for different step sizes and using different methods, using the results to create plots showing the absolute and relative errors as function of time and position |
 ## Usage (C++)
 
-Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1, MPI and JSONcpp. On Ubuntu these can be installed with
+Compilation of the C++ program requires C++14, Armadillo version 6.7, CMake version 3.1 and JSONcpp. On Ubuntu these can be installed with
 ```console
-sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev libjsoncpp-1 libjsoncpp-dev libopenmpi-dev openmpi-bin
+sudo apt-get install cmake liblapack-dev libblas-dev libbost-dev libarmadillo-dev libjsoncpp-1 libjsoncpp-dev 
 ```
 
 Note that the path to jsoncpp is not standardized. This program assumes it lies in `<include path>/jsoncpp/json/json.h`. 
@@ -60,9 +59,8 @@ cmake . && make
 ```
 
 After initial compilation, typing `make` will make the program. To run the
-compiled program, type `./solve`. Optional flags exist, see `./solve -h`.
-The resulting data can then be analyzed
-by the python script in the analysis directory using `python analyze.py ../cpp/data`.
+compiled program, type `./solve`.
+by the python script in the analysis directory using `python analyze.py`.
 
 
 The rapport and all supporting material is located in the `latex` directory.
