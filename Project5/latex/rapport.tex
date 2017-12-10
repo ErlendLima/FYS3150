@@ -99,7 +99,7 @@
 \title{Finite element solutions to the diffusion equation in one and two dimensions}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
-\affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project4}}
+\affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project5}}
 \date{\today}
 
 \begin{abstract}
@@ -108,9 +108,9 @@ and Crank-Nicolson schemes, are used to solve the diffusion equation in one and
 two dimensions. The equation is derived and motivated from a Couette flow from the
 incompressible Navier-Stokes equations, and a wide array of other applications
 are discussed. The solutions are compared to known analytic solutions, which shows
-that the second order in time and space. Crank-Nicolson scheme outperforms
-the Euler methods in terms of solution accuracy when the steps in space and time are sufficiently small. For $\Delta x = 10^{-2}$ and $\Delta{t}$ chosen based on the stability condition for instance,
-the Crank-Nicolson method was the most stable. The stability limitations of the
+that the second order in time and space. Unexpectedly, the backward Euler scheme outperforms
+the other methods in terms of solution accuracy when the steps in space and time are sufficiently small. For $\Delta x = 10^{-2}$ and $\Delta{t}$ chosen based on the stability condition for instance,
+the backward Euler method had the least relative error. The stability limitations of the
 explicit position-centered, time-forward Euler scheme are investigated and found to
 correspond to the expected requirement $\Delta{t}/\Delta{x}^2 \leq 1/2$ in one dimension
 and $1/4$ in two dimensions.
