@@ -109,7 +109,7 @@ two dimensions. The equation is derived and motivated from a Couette flow from t
 incompressible Navier-Stokes equations, and a wide array of other applications
 are discussed. The solutions are compared to known analytic solutions, which shows
 that the second order in time and space. Crank-Nicolson scheme outperforms
-the Euler methods in terms of solution accuracy when the steps in space and time are sufficiently small. For $\Delta x = 10^{-2}$ and $\Delta{t} = 10^{-5}$ for instance,
+the Euler methods in terms of solution accuracy when the steps in space and time are sufficiently small. For $\Delta x = 10^{-2}$ and $\Delta{t}$ chosen based on the stability condition for instance,
 the Crank-Nicolson method was the most stable. The stability limitations of the
 explicit position-centered, time-forward Euler scheme are investigated and found to
 correspond to the expected requirement $\Delta{t}/\Delta{x}^2 \leq 1/2$ in one dimension
@@ -419,7 +419,9 @@ these expressions in~\ref{eq:diffusion2d} yields
 \end{align*}
 where $\alpha = \Delta{t}/h^2$. The right hand side is only a function of known
 quantities (current state and boundary conditions), and therefore explcitly gives
-the solution in the next step.
+the solution in the next step. It can be shown that in two dimensions, the stability condition
+for the forward scheme changes to $\alpha \leq 1/4$ when $\Delta{x} = \Delta{y}$. The extra spatial dimension
+therefore halves the stability condition.
 \subsection{Analytic Solution to the Two-Dimensional Diffusion Equation}
 There is also a closed form solution available for the two-dimensional diffusion equation.
 Assume some boundary conditions, here the Dirichlet boundary conditions:
