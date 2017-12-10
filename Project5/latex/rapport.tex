@@ -108,10 +108,12 @@ and Crank-Nicolson schemes are used to solve the diffusion equation in one and
 two dimensions. The equation is derived and motivated for a Couette flow from the
 incompressible Navier-Stokes equations, and a wide array of other applications
 are discussed. The solutions are compared to known analytic solutions, which shows
-that the second order in time and space Crank-Nicolson scheme consistently outperforms
-the Euler methods in terms of solution accuracy. \textbf{TALL HER!} The stability limitations of the
+that the second order in time and space Crank-Nicolson scheme outperforms
+the Euler methods in terms of solution accuracy when the steps in space and time are sufficiently small. For $\Delta x = 10^{-2}$ and $\Delta{t} = 10^{-5}$ for instance,
+the Crank-Nicolson method was the most stable. The stability limitations of the
 explicit position-centered, time-forward Euler scheme are investigated and found to
-correspond to the expected requirement $\Delta{t}/\Delta{x}^2 \leq 1/2$ in one dimension.
+correspond to the expected requirement $\Delta{t}/\Delta{x}^2 \leq 1/2$ in one dimension
+and $1/4$ in two dimensions.
 \end{abstract}
 \maketitle
 \tableofcontents
@@ -527,6 +529,21 @@ time development and the error as a function of time.
   \includegraphics[width=\columnwidth]{figures/sin_relative_error.eps}
   \caption{\label{fig:sinrelerr} The total relative error in the test case.}
 \end{figure}
+Figures~\ref{fig:posrelerr} and~\ref{fig:timerelerr} show the relative errors as functions
+of position and time for each numerical scheme. Note that the boundaries are not considered
+here for two reasons, first of all the boundaries are held constant and will hever have errors,
+and secondly, the error calculation would include division by zero.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/relative_error_in_position.eps}
+  \caption{\label{fig:posrelerr} Error for the different node positions across the domain.}
+\end{figure}
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/relative_error_in_time.eps}
+  \caption{\label{fig:timerelerr} Error developement with time.}
+\end{figure}
+
 \subsubsection{Couette flow solution}
 The time development with the explicit scheme for the Couette flow is shown in
 figure~\ref{fig:couettenumanalytic}, with the analytic solution.
@@ -537,7 +554,6 @@ figure~\ref{fig:couettenumanalytic}, with the analytic solution.
     (dashed) solutions of the Couette flows. Brighter colors represent later time
     points.}
 \end{figure}
-Then compare with analytic result.
 \subsection{Two dimensional solution}
 The two-dimensional solution time development is shown in figure~\ref{fig:twodimsolution}.
 The initial configuration is $u(x,y,0) = \sin{(\pi x)} \sin{(\pi y)}$, where
@@ -559,6 +575,13 @@ center nodes) amplitude as a function of time.
   time period}
   \label{fig:twodimamplitude}
 \end{figure}
+\subsection{Stability requirements}
+By trial and error, using different combinations of time step and grid resolution
+showed that the stability conditions found in the text are correct. Any solution
+with $\alpha < 1/2$ in the one-dimensional case and $\alpha < 1/4$ in the two-dimensional case
+diverged to overflow and were completely unstable. A proper way of demonstrating
+this in the report was not found, however the behaviour is easily reproduced by
+running the codes with an unstable combination of step parameters.
 \section{Discussion} \label{sec:discussion}
 \subsection{One dimensional equation}
 \subsubsection{Test case - Verifying the implementation}
@@ -576,10 +599,34 @@ as expected. The upper boundary movement gradually accelerates more and more of 
 viscosity, and the solution approaches the expected linear equilibrium flow state
 with time. The Newtonian viscous forces transfer momentum across the fluid, which
 is one of the key types of possible diffusion processes.
+\subsubsection{Comparison of the scheme errors}
+From figures~\ref{fig:posrelerr} and~\ref{fig:timerelerr} it is clear that there is
+an error in the implicit methods in towards the lower boundaries. Unfortunately
+this error was not discovered at the time of writing this paper. The error is
+perhaps an index error in the Thomas algorithm solver or a similar index error
+near the lower boundary, which might result in the strange solution spikes in this
+area.
+
+Despite the obvious error, it is still possible to compare the general impression
+of the solutions with each method, especially towards the upper boundary where
+the strange behaviour is not seen. In the error vs. time plot, surprisingly
+the explicit scheme has the smallest error for $\Delta x = 0.1$, which corresponds to
+11 grid points. However, when the grid resolution is increased, the implicit backward Euler method
+has a slightly lower error. It is not clear if this is correct, because the error development
+seems to be very unstable from the beginning.
+
+In position, a similar behaviour is found as with time.
 \subsection{Two dimensional equation}
 The explicit method two dimensional solution inhibits very similar characteristics
-as 
+as the one dimensional solution. The system quite rapidly goes to equilibrium,
+which in this case is completely given by the boundaries. The system therefore
+goes to zero across the grid, the initial heat (or momentum) diffuses away.
+
+Notice the shape of the center node $u(N/2, N/2, t) \sim e^{-t}$, which corresponds
+well with the analytic expression which reduces to the inverse exponential function when
+a position is chosen.
 \section{Conclusion} \label{sec:conclusion}
+Noe.
 \bibliography{references}
 \blankpage
 \appendix
