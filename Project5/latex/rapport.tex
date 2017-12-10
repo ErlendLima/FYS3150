@@ -508,7 +508,33 @@ then compared with the expected error orders in time for each scheme.
 \subsubsection{Half wave solution and errors}
 \subsubsection{Couette flow solution}
 Time development with explicit scheme.
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/sin_numeric_vs_analytical.eps}
+  \caption{\label{fig:sinnumanalytic} Both the numerical (solid) and analytical
+    (dashed) solutions of the test case with
+    sinusoidal initial conditions. }
+\end{figure}
 
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/sin_absolute_error.eps}
+  \caption{\label{fig:sinabserr} The total absolute error in the test case.}
+\end{figure}
+
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/sin_relative_error.eps}
+  \caption{\label{fig:sinrelerr} The total relative error in the test case.}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/couette_numeric_vs_analytical.eps}
+  \caption{\label{fig:couettenumanalytic} Both the numerical (solid) and analytical
+    (dashed) solutions of the Couette flows. }
 Then compare with analytic result.
 \subsection{Two dimensional solution}
 The two-dimensional solution time development is shown in figure~\ref{fig:twodimsolution}.

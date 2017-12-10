@@ -29,6 +29,7 @@ void Metamodel::write() const{
   root["alpha"]              = getAlpha();
   root["dx"]                 = getDx();
   root["dt"]                 = getDt();
+  root["initial condition"]  = m_initialCondition;
   metafile << root << std::endl;
   metafile.close();
 }
@@ -112,9 +113,11 @@ void Metamodel::read(const std::string& filename) {
     // Set the initial condition
     std::string initial = root["initial condition"].asString();
     if (initial == "zero"){
+        m_initialCondition = "zero";
         initialCondition = [](double x){return 0;};
         std::cout << "The initial condition are all 0\n";
     } else if (initial == "sin") {
+        m_initialCondition = "sin";
         initialCondition = [](double x){return sin(pi*x);};
     } else
         throw std::runtime_error("Initial condition not supported.");
@@ -154,7 +157,7 @@ arma::mat& Metamodel::getU(){
     m_hasCreatedU = true;
 
     // Set the initial condition
-    arma::vec X = arma::linspace(m_xstart, m_xend, getTsteps()+2);
+    arma::vec X = arma::linspace(m_xstart, m_xend, getXsteps()+2);
     for(unsigned int x = 0; x < getXsteps()+2; x++)
         m_u(0, x) = initialCondition(X[x]);
 
@@ -163,6 +166,7 @@ arma::mat& Metamodel::getU(){
         m_u(t, 0) = m_xstart_bound;
         m_u(t, getXsteps()+1) = m_xend_bound;
     }
+    std::cout << m_u(0, getXsteps()) << std::endl;
     return m_u;
 }
 
