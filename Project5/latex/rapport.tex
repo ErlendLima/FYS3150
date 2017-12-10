@@ -96,14 +96,22 @@
 
 \begin{document}
 \sisetup{detect-all}
-\title{Numerical solutions to the diffusion equation in one and two dimensions}
+\title{Finite element solutions to the diffusion equation in one and two dimensions}
 \author{Erlend Lima}
 \author{Frederik J. Mellbye}
 \affiliation{University of Oslo, Oslo, Norway \\ Source code available at: \url{https://github.com/Caronthir/FYS3150/tree/master/Project3}}
 \date{\today}
 
 \begin{abstract}
-Abstract.
+Three finite element methods, namely the explicit forward Euler, implicit backward Euler
+and Crank-Nicolson schemes are used to solve the diffusion equation in one and
+two dimensions. The equation is derived and motivated for a Couette flow from the
+incompressible Navier-Stokes equations, and a wide array of other applications
+are discussed. The solutions are compared to known analytic solutions, which shows
+that the second order in time and space Crank-Nicolson scheme consistently outperforms
+the Euler methods in terms of solution accuracy. \textbf{TALL HER!} The stability limitations of the
+explicit position-centered, time-forward Euler scheme are investigated and found to
+correspond to the expected requirement $\Delta{t}/\Delta{x}^2 \leq 1/2$ in one dimension.
 \end{abstract}
 \maketitle
 \tableofcontents
@@ -313,7 +321,7 @@ Rewriting the above equation, the Crank-Nicolson scheme is
 \subsection{Algorithm stability and trunctation errors}
 The algorithms have different accuracies and are limited by different stability
 conditions. The solution approaches definite values if the spectral radius $\rho(A)$ of
-the matrices satisfies
+the matrix $A$ satisfies
 \begin{align} \label{eq:spectralradius}
   \rho(A) = \text{max}\{ |\lambda| : \text{det}(A - \lambda I) = 0 \} < 1
 \end{align}
@@ -335,7 +343,7 @@ Forward Euler  & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t}}$   & $\Delta{t} \leq \f
 Backward Euler & $\bigO{\Delta{x^2}}$, $\bigO{\Delta{t}}$   & None                                      \\ \hline
 \end{tabular}
 \end{table}
-\subsection{Analytic solution for the 1-D diffusion equation}
+\subsection{Analytic solution for the 1-D diffusion equation} \label{sec:analytic1d}
 Analytic solutions are available for the one-dimensional diffusion equation. Assume
 the differential equation is scaled and on the form
 \begin{align*}
@@ -408,14 +416,90 @@ these expressions in~\ref{eq:diffusion2d} yields
 where $\alpha = \Delta{t}/h^2$. The right hand side is only a function of known
 quantities (current state and boundary conditions), and therefore explcitly gives
 the solution in the next step.
+\subsection{Analytic solution to the two-dimensional diffusion equation}
+There is also a closed form solution available for the two-dimensional diffusion equation.
+Assume there are some boundary conditions (set to Dirichlet conditions here):
+\begin{align*}
+  u(0, y, t) = u(L, y, t) = u(x, 0, t) = u(x, L, t) = 0
+\end{align*}
+where the lattice length is $L$. These expressions simply state that the solution
+value is held to $0$ at the edges, for instance fixed at some temperature or fluid
+boundary flow velocity. The initial condition is some initial configuration given by a function $u(x,y,0) = g(x,y)$.
+The same method is used here as in the one-dimensional case: separation of variables. The solution
+is written as $u(x,y,t) = X(x) Y(y) T(t)$, and inserted in the heat equation. Each resulting
+term must equal a constant $-\lambda^2$:
+\begin{align*}
+  X'' + \lambda^2 X &= 0 \\
+  Y'' + \lambda^2 Y &= 0 \\
+  T'  + \lambda^2 T &= 0
+\end{align*}
+where $X(0) = Y(0) = X(L) = Y(L) = 0$. From~\ref{sec:analytic1d} the solutions are
+\begin{align*}
+  X = A \sin{(\lambda x)} \quad Y = B \sin{(\lambda y)} \quad T = e^{-\lambda^2 t}
+\end{align*}
+Where the cosine terms vanish because of the boundary conditions. The upper
+boundary conditions again yield $\lambda = n \pi / L$. Linear combinations
+are solutions, so
+\begin{align*}
+  &u(x,y,t) = \\&\sum_{n = 1}^{\infty} A_{n} \sin{(n \pi x / L)} \sin{(n \pi y / L)} e^{- t n^2 \pi^2 / L^2}
+\end{align*}
+is a general solution, where again the coefficients need to be determined based
+on the initial state.
 \section{Method} \label{sec:method}
-\subsection{One-dimensional implementation}
-How are the matrix equations solved? Tridiag and so on.
-\subsection{Two-dimensional implementation}
-Same. Explicit method used.
-\subsection{Error calculations}
-How are the errors calculated in the code? Relative error?
+\subsection{Initial and boundary values}
+\subsubsection{Testing the numerical solver}
+To test the numerical solvers a specific case with a trivial analytic solution
+was investigated. With an initial state of a half sine wave spanning the domain
+\begin{align*}
+  g(x) = \sin{(x \pi)}
+\end{align*}
+and Dirichlet boundaries $u(0,t) = u(1,t) = 0$ an analytic solution can be found.
+Observe that the general solution terms are very similar to the initial condition,
+because setting $t = 0$ removes the exponential factor. Furthermore, using only
+the $n = 1$ term yields $u(x,0) = g(x)$, and the solution in the test case is
+\begin{align*}
+  u(x,t) = \sin{(\pi x)} e^{- \pi^2 t}
+\end{align*}
+This solution is then tested against the numerical solutions for different step
+sizes, both in space and time.
+\subsubsection{Couette flow initial and boundary conditions}
+For the Couette flow investigated in this paper, the zero flow initial condition
+is $u(x,0) = 0$ for $0 < x < 1$. With a scaled plate velocity difference, the
+lower plate at $x = 0$ is held stationary and the upper plate is given a constant
+velocity $1$. This equates to boundary conditions $u(0,t) = 0$ and $u(1,t) = 1$.
+\subsection{Matrix equation solver}
+To solve the matrix equations some numerical method needs to be used. By inspection,
+the matrices in all of the methods are tridiagonal, which allows usage of the
+Thomas algorithm, specifically made to solve tridiagonal matrix systems. A
+thorough derivation and analysis of the algorithm is seen in~\cite{project1}. The
+implementation of the full solver can be seen in the source code.
+\subsection{Error analysis}
+Assume the solution at time step $j$ and node $i$ is $u_{i,j}$, and that the analytical
+solution at the same position and time is $v_{i,j}$. The maximum relative error for some
+time step is here defined as
+\begin{align*}
+  \epsilon_j \equiv \text{max }\left| \frac{u_{i,j} - v_{i,j}}{v_{i,j}}\right|
+\end{align*}
+where $i$ runs through discretized domain. This quantity is calculated for each
+time step to show how the errors develop with time for each method, which is
+then compared with the expected error orders in time for each scheme.
 \section{Results} \label{sec:results}
+\subsection{One dimensional solution}
+Time development with explicit scheme.
+
+Then compare with analytic result.
+\subsection{Two dimensional solution}
+The two-dimensional solution time development is shown in figure~\ref{fig:twodimsolution}.
+\begin{figure}[H]
+  \includegraphics[width=\columnwidth]{figures/twodim.eps}
+  \caption{Two dimensional solution for four different time steps with a
+  $101 \times 101$ grid, $\Delta x = 10^{-2}$, $\Delta t = 2.5 \times 10^{-5}$
+  and Dirichlet boundaries. This combination sets $\alpha = 0.25$, right on the
+  stability limit.
+  Also note that bicubic interpolation is used to produce smoother figures.
+  }
+  \label{fig:twodimsolution}
+\end{figure}
 \section{Discussion} \label{sec:discussion}
 \section{Conclusion} \label{sec:conclusion}
 \bibliography{references}
@@ -447,7 +531,9 @@ $A$ therefore has eigenvalues $\lambda_i = 1 - \alpha \mu_i$ where $\mu_i$ is
 the eigenvalues of $B$. The matrix elements of $B$ are $b_{i,j} = 2\delta_{i,j} - \delta_{i+1,j} - \delta{i-1,j}$.
 For component $i$ the eigenequations are
 \begin{align*}
-  (B\vb{x})_i = \sum_{j=1}^{n} (2\delta_{i,j} - \delta_{i+1,j} - \delta{i-1,j})x_j = 2x_i - x_{i+1} - x_{i-1} = \mu_i x_i
+  (B\vb{x})_i &= \sum_{j=1}^{n} (2\delta_{i,j} - \delta_{i+1,j} - \delta{i-1,j})x_j \\
+              &= 2x_i - x_{i+1} - x_{i-1} \\
+              &= \mu_i x_i
 \end{align*}
 Expanding $x$ in a basis of sines with arguments $\theta = l \pi / n + 1$, the previous equation can be rewritten as
 \begin{align*}
@@ -472,7 +558,10 @@ is here positive definite, and the eigenvalues automatically satisfy~\ref{eq:spe
 The implicit scheme is therefore unconditionally stable.
 
 \subsection{Crank-Nicolson scheme}
-Same as implicit but second order in time.
+The derivation of the Crank-Nicolson scheme is similar to the above derivations,
+but notice that the time derivative approximations are now of second order. The
+matrix used in the algorithm is, as for the implicit Euler method, positive definite
+and the Crank-Nicolson scheme is therefore also unconditionally stable.
 \blankpage
 \end{document}
 
