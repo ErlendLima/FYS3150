@@ -77,19 +77,19 @@ class Analyzer:
         plt.legend()
 
     def plot_total_abs_error(self):
-        fig, ax = plt.subplots(1, figsize=(7, 7))
+        fig, ax = plt.subplots(1, figsize=(8, 7))
         ax.plot(*self.calculate_total_abs_err())
         ax.set_xlabel("Time [s]")
         ax.set_ylabel("Max Absolute Error")
 
     def plot_total_rel_error(self):
-        fig, ax = plt.subplots(1, figsize=(7, 7))
+        fig, ax = plt.subplots(1, figsize=(8, 7))
         ax.plot(*self.calculate_total_rel_err(max_time=1.2))
         ax.set_xlabel("Time [s]")
         ax.set_ylabel("Max Relative Error")
 
     def plot_analytic_solution(self):
-        fig, ax = plt.subplots(1, figsize=(7, 7))
+        fig, ax = plt.subplots(1, figsize=(8, 7))
         y = self.get_xrange()
         N = 500
         ts = self.get_trange()[:10]
