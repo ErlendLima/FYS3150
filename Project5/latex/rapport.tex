@@ -534,7 +534,9 @@ time development and the error as a function of time.
   \caption{\label{fig:sinabserr} The max absolute error in the test case. Each
     point is the maximal absolute error which occurred at a given time step.
     As the truncation errors accumulate, the distance between the top of the
-    curves increases, before decreasing once they approach stability. }
+    curves increases, before decreasing once they approach stability. This is
+    clearly reflected in the absolute error, showing a peak after \(t=0.2\)
+    before trailing off to zero.}
 \end{figure}
 \begin{figure}[ht]
   \centering
@@ -552,12 +554,13 @@ and the error calculation would include division by zero.
   \caption{\label{fig:posrelerr} Error for the different node positions across
     the domain. The solid lines are close to the beginning of the time
     evolution, being significantly curved.  The dashed lines are near the steady
-    state. With a large step \(dx = 0.1\), the curves have so low resolution
+    state. With a large step \(\Delta x = 0.1\), the curves have so low resolution
   that the relative error is large. It is not until the system reach a steady
   state that the relative error falls to zero, as it is simply a straight line.
-  This improves with a smaller step size \(dx = 0.01\). Here it becomes apparent
+  This improves with a smaller step size \(\Delta x = 0.01\). Here it becomes apparent
 that there is an error in the Backward Euler and Crank-Nicolson schemes, as the
-left hand side of the curves show significant and systematic peaks.}
+left hand side of the curves show significant and systematic peaks. These become
+negligible as time progresses.}
 \end{figure}
 \begin{figure}[ht]
   \centering
@@ -581,7 +584,7 @@ figure~\ref{fig:couettenumanalytic}, with the analytic solution.
     step, though the numerical solution exhibit accumulation of error. In
     addition, note the meandering nature of the initial curve for the analytical
   solution on the right hand side near \(x=1\). This is caused by the finite
-  approximation of the discontinuity at \(x=1\) by sinusoidal functions. }
+  approximation of the discontinuity at \(x=1\) by sinusoidal functions.}
 \end{figure}
 \subsection{Two Dimensional Solution}
 The two-dimensional solution time development is shown in figure~\ref{fig:twodimsolution}.
@@ -609,7 +612,7 @@ By trial and error, using different combinations of time step and grid resolutio
 showed that the stability conditions found in the text are correct. Any solution
 with $\alpha < 1/2$ in the one-dimensional case and $\alpha < 1/4$ in the two-dimensional case
 diverged to overflow and were completely unstable. A proper way of demonstrating
-this in the report was not found, however the behaviour is easily reproduced by
+this in the report was not found, however the behavior is easily reproduced by
 running the codes with an unstable combination of step parameters.
 \section{Discussion} \label{sec:discussion}
 \subsection{One Dimensional Equation}
@@ -618,16 +621,25 @@ By inspecting the solution when the initial configuration is half a sine wave
 shown in figure~\ref{fig:sinnumanalytic}, it is clear that the numerical solution
 behaves as expected and very similar to the analytic expression. The amplitude
 declines in a similar manner to how heat would escape or how the fluid flow would
-gradually be put to a halt in a tube in which the pressure difference was to be
+gradually come to a halt in a tube in which the pressure difference was to be
 switched off. Furthermore, the solution corresponds well with the analytic solution
 despite the increasing deviation with time. The increasing error is also clear from
-figure~\ref{fig:sinrelerr}. These results are for the explicit method.
+figures~\ref{fig:sinabserr} and~\ref{fig:sinrelerr}. These results are for the explicit method.
 \subsubsection{Couette Flow Solution}
 The Couette flow solution shown in figure~\ref{fig:couettenumanalytic} also behaves
 as expected. The upper boundary movement gradually accelerates more and more of the fluid through
 viscosity, and the solution approaches the expected linear equilibrium flow state
 with time. The Newtonian viscous forces transfer momentum across the fluid, which
 is one of the key types of possible diffusion processes.
+
+
+The analytic solution exhibit a curiosity at the beginning of the time evolution. The figure does not
+show it very clearly, but the right end of the curve at \(t=0\) and \(x=1\) is
+getting increasingly windy as it approaches the discontinuity at \(x=1\). This
+comes from the fact that the sum over sinus functions is not taken to infinity,
+but ends at a finite number (here \(2000\)). As trigonometric functions are
+inherently bad at approximating discontinuities, the curves becomes wobbly the
+closer it gets to \(x=1\).
 \subsubsection{Comparison of the Scheme Errors}
 From figures~\ref{fig:posrelerr} and~\ref{fig:timerelerr} it is clear that there is
 an error in the implicit methods in towards the lower boundaries. Unfortunately
@@ -655,7 +667,19 @@ Notice the shape of the center node $u(N/2, N/2, t) \sim e^{-t}$, which correspo
 well with the analytic expression which reduces to the inverse exponential function when
 a position is chosen.
 \section{Conclusion} \label{sec:conclusion}
-Noe.
+The diffusion equation crops up seemingly everywhere, portraying its power to
+explain a wide variety of problems. Some of these were studies here, most
+importantly the Couette flow of fluid through a pipe. The problem's initial and
+boundary conditions allowed an analytical solution to the diffusion equation to
+be found. This, however, is often extremely difficult. Instead one resorts to
+numerical methods. Three such methods were examined, namely the Forward Euler,
+Backward Euler and Crank-Nicolson scheme.
+
+By comparing the analytical solution to the numerical solutions, it was found
+that they agree well, with the numerical methods having low relative error. Of
+the methods, the Backward Euler was found to be the one giving the smallest
+error. However, the analysis revealed errors in the implementation of the
+implicit methods, hence these results can not be trusted with complete confidence.
 \bibliography{references}
 \blankpage
 \appendix
