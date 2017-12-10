@@ -486,7 +486,7 @@ to other forms through viscous effects.
 
 For this paper only the explicit method is used to solve the two-dimensional equation.
 The stability condition is tested by attempting to run the solver for combinations
-of $\Delta t$ og $\Delta x$ 
+of $\Delta t$ og $\Delta x$
 \subsection{Matrix equation solver}
 To solve the matrix equations some numerical method needs to be used. By inspection,
 the matrices in all of the methods are tridiagonal, which allows usage of the
@@ -505,52 +505,80 @@ time step to show how the errors develop with time for each method, which is
 then compared with the expected error orders in time for each scheme.
 \section{Results} \label{sec:results}
 \subsection{One dimensional solution}
+There are two sets of results for the one dimensional case, first the sinusoidal
+test case solution is presented, then the Couette flow results are shown.
 \subsubsection{Half wave solution and errors}
-\subsubsection{Couette flow solution}
-Time development with explicit scheme.
+See figures~\ref{fig:sinnumanalytic} through~\ref{fig:sinrelerr} for the solution
+time development and the error as a function of time.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/sin_numeric_vs_analytical.eps}
   \caption{\label{fig:sinnumanalytic} Both the numerical (solid) and analytical
     (dashed) solutions of the test case with
-    sinusoidal initial conditions. }
+    sinusoidal initial conditions. Brighter colors represent later time points.}
 \end{figure}
-
-
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/sin_absolute_error.eps}
   \caption{\label{fig:sinabserr} The total absolute error in the test case.}
 \end{figure}
-
-
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/sin_relative_error.eps}
   \caption{\label{fig:sinrelerr} The total relative error in the test case.}
 \end{figure}
-
+\subsubsection{Couette flow solution}
+The time development with the explicit scheme for the Couette flow is shown in
+figure~\ref{fig:couettenumanalytic}, with the analytic solution.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\columnwidth]{figures/couette_numeric_vs_analytical.eps}
   \caption{\label{fig:couettenumanalytic} Both the numerical (solid) and analytical
-    (dashed) solutions of the Couette flows. }
+    (dashed) solutions of the Couette flows. Brighter colors represent later time
+    points.}
+\end{figure}
 Then compare with analytic result.
 \subsection{Two dimensional solution}
 The two-dimensional solution time development is shown in figure~\ref{fig:twodimsolution}.
 The initial configuration is $u(x,y,0) = \sin{(\pi x)} \sin{(\pi y)}$, where
 $0 < x,y < 1$.
-\begin{figure}[H]
+\begin{figure}[ht]
   \includegraphics[width=\columnwidth]{figures/twodim.eps}
   \caption{Two dimensional solution for four different time steps with a
   $101 \times 101$ grid, $\Delta x = 10^{-2}$, $\Delta t = 2.5 \times 10^{-5}$
-  and Dirichlet boundaries. This combination sets $\alpha = 0.25$, right on the
-  stability limit.
+  and Dirichlet boundaries. This combination sets $\alpha = 0.25$, right on the stability limit.
   Also note that bicubic interpolation is used to produce smoother figures.
   }
   \label{fig:twodimsolution}
 \end{figure}
+Also, see figure~\ref{fig:twodimamplitude} for the center node (technically all four
+center nodes) amplitude as a function of time.
+\begin{figure}[ht]
+  \includegraphics[width=\columnwidth]{figures/twodimamplitude.eps}
+  \caption{Center node amplitude for the two dimensional solution, with a longer
+  time period}
+  \label{fig:twodimamplitude}
+\end{figure}
 \section{Discussion} \label{sec:discussion}
+\subsection{One dimensional equation}
+\subsubsection{Test case - Verifying the implementation}
+By inspecting the solution when the initial configuration is half a sine wave
+shown in figure~\ref{fig:sinnumanalytic}, it is clear that the numerical solution
+behaves as expected and very similar to the analytic expression. The amplitude
+declines in a similar manner to how heat would escape or how the fluid flow would
+gradually be put to a halt in a tube in which the pressure difference was to be
+switched off. Furthermore, the solution corresponds well with the analytic solution
+despite the increasing deviation with time. The increasing error is also clear from
+figure~\ref{fig:sinrelerr}. These results are for the explicit method.
+\subsubsection{Couette flow solution}
+The Couette flow solution shown in figure~\ref{fig:couettenumanalytic} also behaves
+as expected. The upper boundary movement gradually accelerates more and more of the fluid through
+viscosity, and the solution approaches the expected linear equilibrium flow state
+with time. The Newtonian viscous forces transfer momentum across the fluid, which
+is one of the key types of possible diffusion processes.
+\subsection{Two dimensional equation}
+The explicit method two dimensional solution inhibits very similar characteristics
+as 
 \section{Conclusion} \label{sec:conclusion}
 \bibliography{references}
 \blankpage
